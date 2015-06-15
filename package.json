@@ -1,0 +1,24 @@
+{
+  "name": "dc-custom",
+  "version": "0.0.1",
+  "description": "a junkdrawer for custom dc-js components that dont yet have a proper home",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/BI/dc-custom"
+  },
+  "author": "Barquin International",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/BI/dc-custom/issues"
+  },
+  "homepage": "https://github.com/BI/dc-custom",
+  "dependencies": {
+     "jquery": "^2.1.3",
+     "inflection": "~1.3.8",
+     "dc": "git://github.com/BI/dc.js"
+  }
+}
