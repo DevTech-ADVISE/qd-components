@@ -1,24 +1,52 @@
 {
-  "name": "dc-custom",
+  "name": "qd-components",
   "version": "0.0.1",
   "description": "a junkdrawer for custom dc-js components that dont yet have a proper home",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "./node_modules/karma/bin/karma start karma.conf.js",
+    "watch-test": "./node_modules/karma/bin/karma start karma.conf.js --auto-watch --no-single-run",
+    "build": "./node_modules/.bin/webpack -p",
+    "dev": "./node_modules/.bin/webpack-dev-server --inline --hot --content-base demo/build"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/BI/dc-custom"
+    "url": "https://github.com/QuickDash/qd-components"
   },
   "author": "Barquin International",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
-    "url": "https://github.com/BI/dc-custom/issues"
+    "url": "https://github.com/QuickDash/qd-components/issues"
   },
-  "homepage": "https://github.com/BI/dc-custom",
+  "homepage": "https://github.com/QuickDash/qd-components",
   "dependencies": {
-     "jquery": "^2.1.3",
-     "inflection": "~1.3.8",
-     "dc": "git://github.com/BI/dc.js"
+    "dc": "git://github.com/BI/dc.js",
+    "dynatable": "git://github.com/BI/jquery-dynatable",
+    "inflection": "~1.3.8",
+    "jquery": "^2.1.3",
+    "normalize.css": "^3.0.3"
+  },
+  "devDependencies": {
+    "css-loader": "^0.16.0",
+    "es5-shim": "^4.1.10",
+    "file-loader": "^0.8.4",
+    "font-awesome": "^4.4.0",
+    "jasmine": "^2.3.2",
+    "jasmine-core": "^2.3.4",
+    "jshint": "^2.8.0",
+    "karma": "^0.13.9",
+    "karma-chrome-launcher": "^0.2.0",
+    "karma-jasmine": "^0.3.6",
+    "karma-phantomjs-launcher": "^0.2.1",
+    "karma-sourcemap-loader": "^0.3.5",
+    "karma-webpack": "^1.7.0",
+    "node-sass": "^3.2.0",
+    "phantomjs": "^1.9.18",
+    "sass-loader": "^2.0.0",
+    "script-loader": "^0.6.1",
+    "style-loader": "^0.12.3",
+    "url-loader": "^0.5.6",
+    "webpack": "^1.11.0",
+    "webpack-dev-server": "^1.10.1"
   }
 }

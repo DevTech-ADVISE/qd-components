@@ -1,6 +1,13 @@
 var dc = require('dc'),
     inflection = require('inflection');
 
+// styles
+require('../../src/stylesheets/filter-builder.scss');
+require('dc/dc.css');
+require('font-awesome/css/font-awesome.css');
+require('../../src/stylesheets/common.scss');
+require('normalize.css/normalize.css');
+
 module.exports = function (parent, chartGroup) {
   
     var _chart = dc.baseMixin({});    
@@ -17,8 +24,8 @@ module.exports = function (parent, chartGroup) {
 
     _chart._doRender = function () {
         var hasFilters = false;
-        var filtered = _filterSources.filter(function(d){ return d.chart.filters().length > 0});
-        var notFiltered = _filterSources.filter(function(d){ return d.chart.filters().length === 0});
+        var filtered = _filterSources.filter(function(d){ return d.chart.filters().length > 0;});
+        var notFiltered = _filterSources.filter(function(d){ return d.chart.filters().length === 0;});
         if (filtered.length > 0) hasFilters = true;
 
         _chart.root().classed('filter-builder', true);
@@ -26,7 +33,7 @@ module.exports = function (parent, chartGroup) {
         _chart.root().append('h2').html('<i class="fa fa-2x fa-filter"></i><span class="hide-visually">Filter</span>');
         var list = _chart.root().append('ul');
 
-        var addFilterButton = list.append('li').classed('add-filter', true)
+        var addFilterButton = list.append('li').classed('add-filter', true);
         addFilterButton.append('i')
           .classed({'fa': true, 'fa-plus': true});
         filterMenu(addFilterButton, notFiltered);
@@ -39,7 +46,7 @@ module.exports = function (parent, chartGroup) {
           var fieldLabels = filteredFieldsRoot.selectAll('span.field-label')
               .data(function(d){return [d];})
             .enter().append('span').classed('field-label', true)
-            .text(function(d){return d.label});
+            .text(function(d){return d.label;});
 
           var filteredFields = filteredFieldsRoot.selectAll('ul')
              .data(function(d){return [d];})
@@ -123,20 +130,23 @@ module.exports = function (parent, chartGroup) {
       } 
       
       var _dimensionListContainer = _parentElement.append('div')
-        .classed({'picker-choices': true, 'dimension-list-container': true});
+        .classed({'picker-choices': true, 'dimension-list-container': true}).style('display', 'none');
 
-      _dimensionListContainer.append('div')
-        .classed('header', true)
-        .text('Add a Filter on')
-        .append('i')
-        .classed({'fa': true, 'fa-times': true})
+      var _dimListHeader = _dimensionListContainer.append('div')
+        .classed('header', true);
+
+      _dimListHeader.append('div')
+        .classed({'fa': true, 'fa-times': true, 'close-button': true})
         .on('click', function(){
-
           _dimensionListContainer.style('display', 'none');
           _dimensionList.selectAll('div.picker-choices').style('display', 'none');
           _dimensionList.selectAll('li.selected').classed('selected', false);
           d3.event.stopPropagation();
         });
+
+      _dimListHeader.append('div')
+        .text('Add a Filter on')
+        .classed({'header-label': true});
 
       var _dimensionList = _dimensionListContainer.append('ul')
         .classed({'dimension-list': true});
@@ -152,15 +162,19 @@ module.exports = function (parent, chartGroup) {
         .on('click', function(d){
           showValueOptions(this, _parentElement);
           d3.event.stopPropagation();
-        })
+        });
 
       valuePicker(_dimensionOptions);
 
 
       _parentElement.on('click', function(){
         blurMenus();
-        d3.select(this).select('.dimension-list-container').style("display", "block");
-        d3.event.stopPropagation();
+        d3.select('.dimension-list-container').style("display", "block");
+        try{
+          d3.event.stopPropagation();
+        } catch(e) {
+          // swallow
+        }
       });
 
     }
@@ -170,7 +184,7 @@ module.exports = function (parent, chartGroup) {
       var _valueListContainer = selection.selectAll('div.value-list-container')
           .data(function(d){return [d];})
         .enter().append('div')
-        .classed({'picker-choices': true,'value-list-container': true});
+        .classed({'picker-choices': true,'value-list-container': true}).style("display", "none");
 
       _valueListContainer.selectAll('div.header')
           .data(function(d){return [d];})
@@ -215,7 +229,7 @@ module.exports = function (parent, chartGroup) {
       var _valueList = _valueListContainer.selectAll('ul.value-list')
           .data(function(d){return [d];})
         .enter().append('ul')
-        .attr('class', function(d){return dc.utils.nameToId(d.label)})
+        .attr('class', function(d){return dc.utils.nameToId(d.label);})
         .classed({'value-list': true});
     
       var _valueOptions = _valueList.selectAll('li.value-option')
@@ -268,7 +282,7 @@ module.exports = function (parent, chartGroup) {
 
     d3.select("html").on("click", function(){
       d3.selectAll('.picker-choices').style('display', 'none');
-    })
+    });
 
     return _chart.anchor(parent, chartGroup);
-  } 
+  }; 
