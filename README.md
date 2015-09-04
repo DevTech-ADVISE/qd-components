@@ -6,4 +6,4 @@
 | dynaTable     | partial     |      |            |            | tehandyb    | Hot      |
 | audioDash     | partial     |      |            |            | tehandyb    | Cold     |
 | sizeBox       |             |      |            |            | jackcompton | Hot      |
-| toolTips      |             |      |            |            | jackcompton | Cold     |
+| toolTips      |             |      |            |            | tehandyb    | Cold     |
