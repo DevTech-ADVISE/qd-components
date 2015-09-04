@@ -3,6 +3,10 @@ window.jQuery = $;
 var dc = require('dc'),
     dynatable = require('dynatable');
 
+// styles
+require('../../src/stylesheets/dynatable.scss');
+require('font-awesome/css/font-awesome.css');
+require('../../src/stylesheets/common.scss');
 
 module.exports = function(parent, chartGroup){
 
