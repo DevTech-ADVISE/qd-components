@@ -3,7 +3,7 @@ var dc = require('dc'),
 
 // styles
 require('../../src/stylesheets/filter-builder.scss');
-require('dc/dc.css');
+
 require('font-awesome/css/font-awesome.css');
 require('../../src/stylesheets/common.scss');
 require('normalize.css/normalize.css');
@@ -133,16 +133,16 @@ module.exports = function (parent, chartGroup) {
         .classed({'picker-choices': true, 'dimension-list-container': true}).style('display', 'none');
 
       var _dimListHeader = _dimensionListContainer.append('div')
-        .classed('header', true);
-
-      _dimListHeader.append('div')
-        .classed({'fa': true, 'fa-times': true, 'close-button': true})
+        .classed('header', true)
         .on('click', function(){
           _dimensionListContainer.style('display', 'none');
           _dimensionList.selectAll('div.picker-choices').style('display', 'none');
           _dimensionList.selectAll('li.selected').classed('selected', false);
           d3.event.stopPropagation();
         });
+
+      _dimListHeader.append('div')
+        .classed({'fa': true, 'fa-times': true, 'close-button': true});
 
       _dimListHeader.append('div')
         .text('Add a Filter on')
@@ -186,19 +186,25 @@ module.exports = function (parent, chartGroup) {
         .enter().append('div')
         .classed({'picker-choices': true,'value-list-container': true}).style("display", "none");
 
-      _valueListContainer.selectAll('div.header')
+      var _valueListHeader = _valueListContainer.selectAll('div.header')
           .data(function(d){return [d];})
         .enter().append('div')
         .classed('header', true)
-        .text(function(d){return 'Choose a value for "' + d.label +'"';})
-        .append('i')
-        .classed({'fa': true, 'fa-times': true})
         .on('click', function(){
           _valueListContainer.style('display', 'none');
           _valueList.selectAll('div.picker-choices').style('display', 'none');
           _valueList.selectAll('li.selected').classed('selected', false);
           d3.event.stopPropagation();
-        }); 
+        });
+
+      _valueListHeader.append('div')
+        .append('i')
+        .classed({'fa': true, 'fa-times': true, 'close-button': true});
+        
+
+      _valueListHeader.append('div')
+        .text(function(d){return 'Choose a value for "' + d.label +'"';})
+        .classed({'header-label': true});;
 
       var _listFilterContainer = _valueListContainer
         .append('div')

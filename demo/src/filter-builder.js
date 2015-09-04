@@ -1,6 +1,8 @@
 var dc = require('../../index.js');
 var fixtures = require('../../spec/helpers/fixtures.js');
 
+require('dc/dc.css');
+
 var id, filterBuilder, data;
 var stateId, stateDimension, stateGroup, stateChart;
 var regionId, regionDimension, regionGroup, regionChart;
