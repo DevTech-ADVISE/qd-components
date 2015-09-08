@@ -7,7 +7,8 @@ module.exports = {
   context: path.join(demoPath, 'src'),
   entry: {
     'filter-builder': './filter-builder.demo.js',
-    'dynatable': './dynatable.demo.js'
+    'dynatable': './dynatable.demo.js', 
+    //'audio-dash': './audio-dash.demo.js'
   },
   output: {
     path: path.join(demoPath, 'build'),
