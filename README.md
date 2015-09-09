@@ -4,7 +4,7 @@
 |---------------------|:-----------:|:----:|:----------:|:----------:|-------------|----------|
 | filterBuilder       | ✔           | ✔    | partial    | ✔          | jackcompton | Hot      |
 | dynaTableComponent  | ✔           | ✔    |            | ✔          | tehandyb    | Hot      |
-| audioDash           | partial     |      |            |            | tehandyb    | Cold     |
+| audioDash           | ✔           | ✔    |            | ✔          | tehandyb    | Cold     |
 | sizeBox             |             |      |            |            | jackcompton | Hot      |
 | toolTips            |             |      |            |            | tehandyb    | Cold     |
 
@@ -54,5 +54,17 @@ dynatable.shortLoad(true);
 dynatable.shortLoad(100); //can set custom initial record size
 ```
 
+## audioDash
+Simply pass the charts that you would like to be readable by an audio browser, to the audioDash component. Also pass in a formatter to specify how the data should be read. 
 
+```
+var qd = require('qd-components');
+
+var formatterFunction = function(key, value) { return key + ": " + value};
+var audioDash = qd.audioDash('#audio-dash-id')
+				  .charts({
+				  		"Foo title": {chart: fooChart, formatter: formatterFunction}
+				  });
+
+```
 
