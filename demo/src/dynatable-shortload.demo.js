@@ -45,6 +45,8 @@ dynatable.columns([{label: "Region", csvColumnName: "region_name"},
 				   {label: "Assitance Category", csvColumnName: "assistance_category_name"},
 				   {label: "Sector", csvColumnName: "dac_sector_name"},
 				   {label: "Country", csvColumnName: "country_name"}]);
-
+dynatable.shortLoad(true);
 
 dc.renderAll();
+
+dynatable.redraw(); //manually redraw since the initial load only included 10 records because of short load

@@ -8,6 +8,7 @@ module.exports = {
   entry: {
     'filter-builder': './filter-builder.demo.js',
     'dynatable': './dynatable.demo.js', 
+    'dynatable-shortload': './dynatable-shortload.demo.js'
     //'audio-dash': './audio-dash.demo.js'
   },
   output: {
