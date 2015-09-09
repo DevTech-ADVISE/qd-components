@@ -7,4 +7,3 @@
 | audioDash           | partial     |      |            |            | tehandyb    | Cold     |
 | sizeBox             |             |      |            |            | jackcompton | Hot      |
 | toolTips            |             |      |            |            | tehandyb    | Cold     |
-
