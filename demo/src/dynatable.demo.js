@@ -44,4 +44,5 @@ dynatable = dc.dynatableComponent('#' + id)
 dynatable.columns([{label: "Region", csvColumnName: "region_name"},
 				   {label: "Assitance Category", csvColumnName: "assistance_category_name"}]);
 
+
 dc.renderAll();

@@ -15,6 +15,7 @@ module.exports = function(parent, chartGroup){
   var _columns; 
   var _dataTable;
   var _settings;
+  var _initialRecordSize = "Infinity";
 
   /**
       #### .columns({label: String, csvColumnName: String})
@@ -35,6 +36,17 @@ module.exports = function(parent, chartGroup){
 
   _chart.dataTable = function() {
     return _dataTable;
+  };
+
+  _chart.shortLoad = function(_) {
+    if(_) {
+      if(typeof _ === 'number') {
+        _initialRecordSize = _;
+      }
+      else {
+        _initialRecordSize = 10;
+      }
+    }
   };
 
   _chart._doRender = function() {
@@ -66,7 +78,7 @@ module.exports = function(parent, chartGroup){
             perPageText: 'records per page'
           },
           dataset: {
-              records: _chart.dimension().top(10),
+              records: _chart.dimension().top(_initialRecordSize),//.top(10),
               perPageDefault: 10,
               perPageOptions: [10, 50, 100, 200, 500]
           }
@@ -78,7 +90,7 @@ module.exports = function(parent, chartGroup){
       _dataTable = $(parent + " table").dynatable(dynatableConfig).data('dynatable');
     }  
     //_chart._doRedraw(); 
-    RefreshTable(10);   
+    RefreshTable(_initialRecordSize);   
   }
 
   _chart._doRedraw = function(){
