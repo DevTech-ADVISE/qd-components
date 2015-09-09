@@ -13,7 +13,7 @@ id = 'filter-builder';
 
 stateId = 'state-chart';
 
-regionId = 'regionChart';
+regionId = 'region-chart';
 
 
 stateDimension = data.dimension(function(d) { return d.state; });

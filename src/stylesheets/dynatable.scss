@@ -1,0 +1,155 @@
+#table-container {
+	width: 50%;
+	height: 400px;
+	margin: 30px;
+}
+
+#dynatable {
+    position:relative;
+    width:100%;
+    margin-top: 30px;
+    table.dc-datatable {
+        margin: 15px 0;
+        width: 100%;
+
+        th, td {
+            font-size: 14px;
+            line-height: 16px;
+            vertical-align: top;
+            text-align: left;
+            padding: 5px 5px;
+        }
+        th a {
+            color:#222;
+
+            .dynatable-arrow {
+                color: #666;
+                display: inline-block;
+                font-size: 11px;
+                margin-left: 3px;
+            }
+        }
+    }
+
+    .dynatable-search {
+
+        position: absolute;
+        top: -28px;
+        right: 5px;
+        font-size: 11px;
+        width: 50%;
+        padding-left: 45px;
+        text-indent: -45px;
+        text-shadow: 0 -1px 0 rgba(255,255,255, 0.6);
+
+        input {
+            width: 95%;
+            float: right;
+            border-radius: 3px;
+            padding: 4px 4px 4px 2px;
+            border: 1px solid #aaa;
+            margin-top: 1px;
+            outline:0;
+
+            &:focus {border-color:#336799;outline:0;box-shadow:0 0 3px rgba(53, 104, 147, 0.6);}
+        }
+    }
+
+    .dynatable-per-page {
+        position: absolute;
+        top: -30px;
+        left: 5px;
+
+        span {
+            float: right;
+            margin-left: 3px;
+            margin-top:2px;
+            font-size: 11px;
+            text-shadow: 0 -1px 0 rgba(255,255,255, 0.6);
+        }
+
+
+        select {width:64px;}
+    }
+
+    .dynatable-record-count {
+        font-size: 11px;
+        text-transform: lowercase;
+        position: absolute;
+        bottom: -32px;
+        left: 6px;
+        color: #666;
+        text-shadow: 0 -1px 0 rgba(255,255,255, 0.6);
+    }
+
+    ul.dynatable-pagination-links {
+        margin: 0 5px 0 0;
+        list-style-type: none;
+        position: absolute;
+        bottom: -37px;
+        padding: 0;
+        right: 5px;
+
+        li {
+            float:left;
+
+            &:first-child span {
+                font-size: 11px;
+                text-shadow: 0 -1px 0 rgba(255,255,255, 0.6);
+                position: relative;
+                top: 2px;
+            }
+        }
+
+
+        a.dynatable-page-link {
+            padding: 3px 3px;
+            display: block;
+            margin: 0 2px;
+            color: #336799;
+            text-decoration: underline;
+            font-size:14px;
+            cursor: pointer;
+
+            &.dynatable-active-page {text-decoration:none;font-weight:bold;color:#222;}
+
+        }
+        a.dynatable-page-prev,
+        a.dynatable-page-next {
+            background-color:#f6f6f6;
+            border: 2px solid rgba(53, 104, 147, 0.6);
+            border-radius: 3px;
+            padding: 2px 6px;
+            display: block;
+            text-decoration:none;
+            margin-left:5px;
+
+            .fa {
+                color:#bbb;
+            }
+
+            &:hover {
+                background-color:#fff;
+
+                .fa {
+                    color: #336799;
+                }
+            }
+
+            &.dynatable-disabled-page {
+                color:#bbb;
+                background-color:#f7f7f7;
+                border-color:#e0e0e0;
+                box-shadow:none;
+                text-decoration: none;
+                cursor: default;
+
+                .fa,
+                &:hover .fa {color:#e0e0e0;}
+            }
+        }
+        a.dynatable-page-prev {margin-right:5px;}
+
+    }
+
+}
