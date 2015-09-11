@@ -14,9 +14,7 @@
 
 | Param           | Type  | Description |
 |-----------------|-------|-------------|
-| filterabeCharts | Array | An array of objects all conforming to the following pattern 
-
-__{chart: SomeDcJsChart, label:  StringLabelForChart }__ |
+| filterabeCharts | Array | An array of objects like  *{chart: SomeDcJsChart, label:  StringLabelForChart }* |
 
 
 Has only one method for configuration: __filterSources__.
