@@ -1,23 +1,26 @@
 # qd-components
 
-This library slaps a few handy missing features on to the excellent [DC.js](http://dc-js.github.io/dc.js/) dashboard framework.
+This library slaps a few handy extra features on to the excellent [DC.js](http://dc-js.github.io/dc.js/) dashboard framework.
+
+Use it wherever you would use DC.js.
+
+## Getting Started
+
+Install
 
 ```
-// Use it in place of dc, not along side, as it wraps it's own instance of the DC.js framework.
-var qd = require('qd-components');
+npm install qd-components
 ```
 
-|Component            | Implemented | Demo | Unit Tests | Documented | Assigned    | Priority |
-|---------------------|:-----------:|:----:|:----------:|:----------:|-------------|----------|
-| filterBuilder       | ✔           | ✔    | partial    | ✔          | jackcompton | Hot      |
-| dynaTableComponent  | ✔           | ✔    |            | ✔          | tehandyb    | Hot      |
-| audioDash           | ✔           | ✔    |            | ✔          | tehandyb    | Cold     |
-| sizeBox             |             |      |            |            | jackcompton | Hot      |
-| toolTips            |             |      |            |            | tehandyb    | Cold     |
+Require in your code
+
+```
+var dc = require('qd-components');
+```
 
 # API Reference
 
-## qd.filterBuilder(parent)
+## dc.filterBuilder(parent)
 
 filterBuilder provides two things that are lacking in a typical DC dashboard:
 
@@ -37,7 +40,7 @@ Wires up the filterBuilder to handle filter creation and display for a set of ch
 ```
 // Example Usage
 
-var filterBuilder = qd.filterBuilder('#filter-builder-id')
+var filterBuilder = dc.filterBuilder('#filter-builder-id')
   .filterSources([{chart: fooChart, label: "Foo"}, 
                   {chart: barChart, label: "Bar"}, 
                   {chart: bazChart, label: "Baz"}]);
@@ -47,13 +50,13 @@ var filterBuilder = qd.filterBuilder('#filter-builder-id')
 Simply pass the dynatable a crossfilter dimension and group. Also add the column names that you would like to show in the table.
 
 ```
-var qd = require('qd-components');
+var dc = require('qd-components');
 
 var data = crossfilter(someData);
 var tableListingDimension = data.dimension(function(d) { return d.data_column_name;});
 var tableListingGroup = tableListingDimension.group();
 
-var dynatable = qd.dynatableComponent('#dynatable-id')
+var dynatable = dc.dynatableComponent('#dynatable-id')
 				.dimension(tableListingDimension)
 				.group(tableListingGroup);
 dynatable.columns([{label: "Foo", csvColumnName: "foo_name"},
@@ -69,13 +72,22 @@ dynatable.shortLoad(100); //can set custom initial record size
 Simply pass the charts that you would like to be readable by an audio browser, to the audioDash component. Also pass in a formatter to specify how the data should be read. 
 
 ```
-var qd = require('qd-components');
+var dc = require('qd-components');
 
 var formatterFunction = function(key, value) { return key + ": " + value};
-var audioDash = qd.audioDash('#audio-dash-id')
+var audioDash = dc.audioDash('#audio-dash-id')
 				  .charts({
 				  		"Foo title": {chart: fooChart, formatter: formatterFunction}
 				  });
 
 ```
 
+## Todo
+
+|Component            | Implemented | Demo | Unit Tests | Documented | Assigned    | Priority |
+|---------------------|:-----------:|:----:|:----------:|:----------:|-------------|----------|
+| filterBuilder       | ✔           | ✔    | partial    | ✔          | jackcompton | Hot      |
+| dynaTableComponent  | ✔           | ✔    |            | ✔          | tehandyb    | Hot      |
+| audioDash           | ✔           | ✔    |            | ✔          | tehandyb    | Cold     |
+| sizeBox             |             |      |            |            | jackcompton | Hot      |
+| toolTips            |             |      |            |            | tehandyb    | Cold     |
