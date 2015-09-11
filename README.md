@@ -8,9 +8,14 @@
 | sizeBox             |             |      |            |            | jackcompton | Hot      |
 | toolTips            |             |      |            |            | tehandyb    | Cold     |
 
-# Usage
+# API Reference
 
-## filterBuilder
+## qd.filterBuilder
+
+| Param           | Type  | Description |
+|-----------------|-------|-------------|
+| filterabeCharts | Array | An array of objects all conforming to the following pattern __{chart: SomeDcJsChart, label:  StringLabelForChart }__ |
+
 
 Has only one method for configuration: __filterSources__.
 
