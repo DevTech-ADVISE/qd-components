@@ -25,8 +25,6 @@ Wires up the filterBuilder to handle filter creation and display for a set of ch
 |-----------------|-------|-------------|
 | filterabeCharts | Array | An array of objects like  __{chart: *SomeDcJsChart*, label:  *StringLabelForChart* }__ |
 
-### Example Usage
-
 ```
 // Example Usage
 
