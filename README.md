@@ -10,31 +10,30 @@
 
 # API Reference
 
-## qd.filterBuilder
+## qd.filterBuilder(parent)
+
+filterBuilder provides two things that are lacking in a typical DC dashboard:
+
+* A clear display of current filter state in one place
+* A searchable menu method for filtering on any value of any chart
+
+### .filterSources(filterableCharts)
+
+Wires up the filterBuilder to handle filter creation and display for a set of charts. 
 
 | Param           | Type  | Description |
 |-----------------|-------|-------------|
 | filterabeCharts | Array | An array of objects like  __{chart: *SomeDcJsChart*, label:  *StringLabelForChart* }__ |
 
-
-Has only one method for configuration: __filterSources__.
-
-Simply pass it an array of __objects__ each having a __chart__ and __label__ property. The __chart__ property values should all be dc/qd charts and the __label__ values should all be strings.
+### Example Usage
 
 ```
-var qd = require('qd-components');
-
-var fooChart, barChart, bazChart;
-
-/*
- Crossfilter Dimensions, Groups, & Charts Setup Here
-*/
+// Example Usage
 
 var filterBuilder = qd.filterBuilder('#filter-builder-id')
   .filterSources([{chart: fooChart, label: "Foo"}, 
                   {chart: barChart, label: "Bar"}, 
                   {chart: bazChart, label: "Baz"}]);
-
 ```
 
 ## dynatableComponent
