@@ -1,5 +1,12 @@
 # qd-components
 
+This library slaps a few handy missing features on to the excellent [DC.js](http://dc-js.github.io/dc.js/) dashboard framework.
+
+```
+// Use it in place of dc, not along side, as it wraps it's own instance of the DC.js framework.
+var qd = require('qd-components');
+```
+
 |Component            | Implemented | Demo | Unit Tests | Documented | Assigned    | Priority |
 |---------------------|:-----------:|:----:|:----------:|:----------:|-------------|----------|
 | filterBuilder       | ✔           | ✔    | partial    | ✔          | jackcompton | Hot      |
