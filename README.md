@@ -17,6 +17,8 @@ filterBuilder provides two things that are lacking in a typical DC dashboard:
 * A clear display of current filter state in one place
 * A searchable menu method for filtering on any value of any chart
 
+You can see it in action [here](https://explorer.usaid.gov/aid-trends.html) and [here](https://explorer.usaid.gov/aid-dashboard.html)
+
 ### .filterSources(filterableCharts)
 
 Wires up the filterBuilder to handle filter creation and display for a set of charts. 
