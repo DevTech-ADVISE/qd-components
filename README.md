@@ -85,7 +85,7 @@ Pass an initial record size to dynatableComponent. If initialRecordSize is set t
 | initialRecordSize| boolean or number | Initial record set. Use this if you have a huge amount of data you don't want to block the page load.    |
 
 ```
-//Example Useage
+//Example Usage
 
 var dc = require('qd-components');
 
@@ -119,11 +119,13 @@ var audioDash = dc.audioDash('#audio-dash-id')
 
 ```
 
-## sizeBoxify
+## sizeBoxify(chart)
 
 Provides easy addition of dynamic resize capability to any DC chart component instance.
 
 ```
+// Example Usage
+
 var dc = require('qd-components');
 
 var myFooChart;
@@ -137,11 +139,13 @@ dc.sizeBoxify(myFooChart, function(){
 });
 ```
 
-## toolTipsify
+## toolTipsify(chart)
 
 Provides easy addition of customizable tooltips to any DC chart component instance.
 
 ```
+// Example Usage
+
 var dc = require('qd-components');
 
 var myFooChart;
