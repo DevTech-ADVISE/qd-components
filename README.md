@@ -105,17 +105,25 @@ dynatable.shortLoad(true);
 
 ```
 
-## dc.audioDash(chartList)
+## dc.audioDash(parent)
+AudioDash will enable your DC charts to be read by a screen reader. 
 
-Simply pass the charts that you would like to be readable by an audio browser, to the audioDash component. Also pass in a formatter to specify how the data should be read. 
+### .charts(chartsConfig)
+Pass an object containing your chart config to audioDash. Multiple charts can be passed, just make a property for each one.
 
+| Param            | Type              | Description                 |
+|----------------- |-------------------|-----------------------------|
+| chartsConfig     | object            | The property names of this object should be the title of the chart that will be read to the screen reader. The values of each object should be another object containing the DC chart to format and the formatter function. The formatter function will access the key and value data from a chart, and you can customize how it should be read by the screen reader by the return string of the formatter function. |
+
+//Example Useage
 ```
 var dc = require('qd-components');
 
 var formatterFunction = function(key, value) { return key + ": " + value};
 var audioDash = dc.audioDash('#audio-dash-id')
 				  .charts({
-				  		"Foo title": {chart: fooChart, formatter: formatterFunction}
+				  		"Foo title": {chart: fooChart, formatter: formatterFunction},
+				  		"Bar title": {chart: barChart, formatter: formatterFunction}
 				  });
 
 ```
