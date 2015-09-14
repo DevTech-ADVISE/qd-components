@@ -35,7 +35,7 @@ Wires up the filterBuilder to handle filter creation and display for a set of ch
 
 | Param           | Type  | Description |
 |-----------------|-------|-------------|
-| filterabeCharts | Array | An array of objects like  __{chart: *SomeDcJsChart*, label:  *StringLabelForChart* }__ |
+| filterableCharts | Array | An array of objects like  __{chart: *SomeDcJsChart*, label:  *StringLabelForChart* }__ |
 
 ```
 // Example Usage
@@ -53,12 +53,15 @@ DynatableComponent turns a simple table into a dimensional table that responds t
 You can see it in action [here](https://explorer.usaid.gov/aid-dashboard.html)
 
 ### .dimension(dimension)
-Pass the crossfilter dimension to dynatableComponent. This dimension should be something different than any of your chart dimensions. A dimension that uses a column for data IDs would be suitable. 
+
+Pass the crossfilter dimension to dynatableComponent. This dimension should be something different than any of your chart dimensions. A dimension that uses a column for data IDs would be suitable.
+
 | Param           | Type   | Description                 |
 |-----------------|--------|-----------------------------|
 | dimension       | object | Crossfilter dimension object|
 
 ### .group(group)
+
 Pass the crossfilter group to dynatableComponent. 
 
 | Param           | Type   | Description                 |
@@ -66,6 +69,7 @@ Pass the crossfilter group to dynatableComponent.
 | group           | object | Crossfilter group object    |
 
 ### .columns(columns)
+
 Pass an array of column objects to dynatableComponent, describing what columns to use from the data, and the display label of those columns. 
 
 | Param           | Type   | Description                 |
@@ -73,12 +77,16 @@ Pass an array of column objects to dynatableComponent, describing what columns t
 | columns         | Array  | Array of objects with the properties label and csvColumnName. The label is what the column header will be in the table. The csvColumnName is the name of the column in the data.    |
 
 ### .shortLoad(initialRecordSize)
+
 Pass an initial record size to dynatableComponent. If initialRecordSize is set to true, the record set will be defaulted to 10, otherwise you can specify a specific initial record size. 
+
 | Param            | Type              | Description                 |
 |----------------- |-------------------|-----------------------------|
 | initialRecordSize| boolean or number | Initial record set. Use this if you have a huge amount of data you don't want to block the page load.    |
+
 ```
 //Example Useage
+
 var dc = require('qd-components');
 
 var data = crossfilter(someData);
@@ -111,6 +119,38 @@ var audioDash = dc.audioDash('#audio-dash-id')
 
 ```
 
+## sizeBoxify
+
+## toolTipsify
+
+Provides easy addition of customizable tooltips to any DC chart component instance.
+
+```
+var dc = require('qd-components');
+
+var myFooChart;
+
+//
+// crossfilter & chart setup here 
+//
+
+// Minimal setup example. 
+// Content for tooltips defaults sensibly: 
+//  - dimension value displayed as a label/title, 
+//  - group value displayed as value
+//  - tip position defaults to "mouse follow" style
+dc.toolTipsify(myFooChart);
+
+// Override defaults with custom settings
+dc.toolTipsify(myFooChart, {
+	content: function(d) {
+		// whatever you must here
+	},
+	position: YourChosenPositionSetting
+});
+
+```
+
 ## Todo
 
 |Component            | Implemented | Demo | Unit Tests | Documented | Assigned    | Priority |
@@ -118,5 +158,8 @@ var audioDash = dc.audioDash('#audio-dash-id')
 | filterBuilder       | ✔           | ✔    | partial    | ✔          | jackcompton | Hot      |
 | dynaTableComponent  | ✔           | ✔    |            | ✔          | tehandyb    | Hot      |
 | audioDash           | ✔           | ✔    |            | ✔          | tehandyb    | Cold     |
-| sizeBox             |             |      |            |            | jackcompton | Hot      |
-| toolTips            |             |      |            |            | tehandyb    | Cold     |
+| sizeBoxify          |             |      |            |            | jackcompton | Hot      |
+| toolTipsify         |             |      |            | ✔          | tehandyb    | Cold     |
+
+
+
