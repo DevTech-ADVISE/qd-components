@@ -121,6 +121,22 @@ var audioDash = dc.audioDash('#audio-dash-id')
 
 ## sizeBoxify
 
+Provides easy addition of dynamic resize capability to any DC chart component instance.
+
+```
+var dc = require('qd-components');
+
+var myFooChart;
+
+// Minimal setup example. Will resize myFooChart based on dimensions of myFooChart.parent()
+dc.sizeBoxify(myFooChart);
+
+// Custom example
+dc.sizeBoxify(myFooChart, function(){
+	// custom resize code here
+});
+```
+
 ## toolTipsify
 
 Provides easy addition of customizable tooltips to any DC chart component instance.
@@ -158,7 +174,7 @@ dc.toolTipsify(myFooChart, {
 | filterBuilder       | ✔           | ✔    | partial    | ✔          | jackcompton | Hot      |
 | dynaTableComponent  | ✔           | ✔    |            | ✔          | tehandyb    | Hot      |
 | audioDash           | ✔           | ✔    |            | ✔          | tehandyb    | Cold     |
-| sizeBoxify          |             |      |            |            | jackcompton | Hot      |
+| sizeBoxify          |             |      |            | ✔          | jackcompton | Hot      |
 | toolTipsify         |             |      |            | ✔          | tehandyb    | Cold     |
 
 
