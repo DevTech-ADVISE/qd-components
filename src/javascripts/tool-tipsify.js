@@ -17,7 +17,6 @@ var toolTipsify = function(chart, options){
     return "<label>" + chart.label()(d) + "</label><br/>" + formatter(d.value);
   };
   var position = 'mouse';
-  
 
   // override content and position via options
   if (options && options.content) {
@@ -38,8 +37,14 @@ var toolTipsify = function(chart, options){
     var tt = d3.tip()
       .attr('class', d3TipClass)
       .attr('id', ttId)
-      .positionAnchor(position)
       .html(content);
+
+    if (position === 'mouse') {
+      tt.positionAnchor(position)
+    }
+    else {
+      tt.direction(position);
+    }
 
     var tippables = tippableSelector(chart); 
 
@@ -49,8 +54,10 @@ var toolTipsify = function(chart, options){
     tippables.call(tt);
     tippables.on('mouseover', tt.show)
              .on('mouseout', tt.hide)
-             .on('mousemove', tt.updatePosition)
              .on('click', tt.hide);
+    if(position === 'mouse') {
+      tippables.on('mousemove', tt.updatePosition)
+    }
   });
 
 };
