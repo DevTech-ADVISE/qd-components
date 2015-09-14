@@ -168,10 +168,16 @@ var myFooChart;
 // Content for tooltips defaults sensibly: 
 //  - dimension value displayed as a label/title, 
 //  - group value displayed as value
+//  - bring your own formatter, or it defaults to d3.format(",")
 //  - tip position defaults to "mouse follow" style
-dc.toolTipsify(myFooChart);
 
+// default Formatter to d3.format(",")
+dc.toolTipsify(myFooChart);
+// or BYOF
+dc.toolTipsify(myFooChart, {formatter: d3.format(".2s")});
+ 
 // Override defaults with custom settings
+
 dc.toolTipsify(myFooChart, {
 	content: function(d) {
 		// whatever you must here
@@ -189,7 +195,7 @@ dc.toolTipsify(myFooChart, {
 | dynaTableComponent  | ✔           | ✔    |            | ✔          | tehandyb    | Hot      |
 | audioDash           | ✔           | ✔    |            | ✔          | tehandyb    | Cold     |
 | sizeBoxify          |             |      |            | ✔          | jackcompton | Hot      |
-| toolTipsify         |             |      |            | ✔          | tehandyb    | Cold     |
+| toolTipsify         | ✔           | ✔    |            | ✔          | tehandyb    | Cold     |
 
 
 
