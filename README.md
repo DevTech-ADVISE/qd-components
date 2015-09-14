@@ -115,8 +115,9 @@ Pass an object containing your chart config to audioDash. Multiple charts can be
 |----------------- |-------------------|-----------------------------|
 | chartsConfig     | object            | The property names of this object should be the title of the chart that will be read to the screen reader. The values of each object should be another object containing the DC chart to format and the formatter function. The formatter function will access the key and value data from a chart, and you can customize how it should be read by the screen reader by the return string of the formatter function. |
 
-//Example Useage
+
 ```
+//Example Usage
 var dc = require('qd-components');
 
 var formatterFunction = function(key, value) { return key + ": " + value};
