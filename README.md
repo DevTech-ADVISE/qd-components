@@ -105,7 +105,8 @@ dynatable.shortLoad(true);
 
 ```
 
-## audioDash
+## dc.audioDash(chartList)
+
 Simply pass the charts that you would like to be readable by an audio browser, to the audioDash component. Also pass in a formatter to specify how the data should be read. 
 
 ```
@@ -119,7 +120,7 @@ var audioDash = dc.audioDash('#audio-dash-id')
 
 ```
 
-## sizeBoxify(chart)
+## dc.sizeBoxify(chart)
 
 Provides easy addition of dynamic resize capability to any DC chart component instance.
 
@@ -139,7 +140,7 @@ dc.sizeBoxify(myFooChart, function(){
 });
 ```
 
-## toolTipsify(chart)
+## dc.toolTipsify(chart)
 
 Provides easy addition of customizable tooltips to any DC chart component instance.
 
