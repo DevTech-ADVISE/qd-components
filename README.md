@@ -162,16 +162,17 @@ To customize tool tip config call __yourchart.toolTipsify(toolTipConfig)__. The 
 |---------------|---------|-------------------------|
 | toolTipConfig | object  | This object can have optional properties for a content function, number formatting function, positioning, and offset.|
 
-### content: function(chartData)
+### toolTipConfig object properties
+* **content:** function(chartData)
 The content function will tell toolTipsify how to deal with data coming from the chart. This is useful when data should be manipulated or displayed in a certain way in the tooltip. 
 
-### position: "mouse" or any ordinal coordinates like 'n', 's', 'e', 'w', or combos like 'ne' etc. 
+* **position:** "mouse" or any ordinal coordinates like 'n', 's', 'e', 'w', or combos like 'ne' etc. 
 Set the position to 'mouse' if you want the tool tip to follow the mouse. The ordinal coordinates will fix the tooltip in a specific location.
 
-### offset: [y, x]
+* **offset:** [y, x]
 Add coordinate offsets for custom positioning of the tooltip.
 
-### formatter: function(chartData)
+* **formatter:** function(chartData)
 The formatter function is useful for formatting a chart data value. This function will only have an effect if the default content function is being used, and a custom one is not provided. The default formatter will default to d3.format(",") 
 
 ```
