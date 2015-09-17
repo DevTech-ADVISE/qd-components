@@ -149,42 +149,38 @@ dc.sizeBoxify(myFooChart, function(){
 });
 ```
 
-## dc.toolTipsify(chart)
+## dc.toolTipsify(chart, toolTipConfig)
+Makes it easy to add high quality tooltips to any of your DC charts. 
 
-Provides easy addition of customizable tooltips to any DC chart component instance.
+You can see it in action [here](https://explorer.usaid.gov/aid-dashboard.html)
+
+Pass your chart, and tool tip config to tool tipsify. The config allows you to customize the tooltip position, and how to display its content. 
+
+| Param         | Type    | Description             |
+|---------------|---------|-------------------------|
+| toolTipConfig | object  | This object can have optional properties for a content function, number formatting function, positioning, and offset.|
+
+### content: function(chartData)
+The content function will tell toolTipsify how to deal with data coming from the chart. This is useful when data should be manipulated or displayed in a certain way in the tooltip. 
+
+### position: "mouse" or any ordinal coordinates like 'n', 's', 'e', 'w', or combos like 'ne' etc. 
+Set the position to 'mouse' if you want the tool tip to follow the mouse. The ordinal coordinates will fix the tooltip in a specific location.
+
+### offset: [y, x]
+Add coordinate offsets for custom positioning of the tooltip.
+
+### formatter: function(chartData)
+The formatter function is useful for formatting a chart data value. This function will only have an effect if the default content function is being used, and a custom one is not provided. The default formatter will default to d3.format(",") 
 
 ```
 // Example Usage
 
 var dc = require('qd-components');
 
-var myFooChart;
+var myFooChart = dc.somechart;
 
-//
-// crossfilter & chart setup here 
-//
-
-// Minimal setup example. 
-// Content for tooltips defaults sensibly: 
-//  - dimension value displayed as a label/title, 
-//  - group value displayed as value
-//  - bring your own formatter, or it defaults to d3.format(",")
-//  - tip position defaults to "mouse follow" style
-
-// default Formatter to d3.format(",")
-dc.toolTipsify(myFooChart);
-// or BYOF
-dc.toolTipsify(myFooChart, {formatter: d3.format(".2s")});
+dc.toolTipsify(myFooChart, {position: 'n', offset: [5, 0], content: contentFunc})
  
-// Override defaults with custom settings
-
-dc.toolTipsify(myFooChart, {
-	content: function(d) {
-		// whatever you must here
-	},
-	position: YourChosenPositionSetting
-});
-
 ```
 
 ## Todo
