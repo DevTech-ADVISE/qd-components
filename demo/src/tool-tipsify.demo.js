@@ -48,9 +48,10 @@ yearChart = dc.barChart('#' + yearId)
   .xUnits(dc.units.ordinal);
 
 //*********tipsify your charts**************
-dc.toolTipsify(regionChart, {content: toolTipFunc});
-dc.toolTipsify(stateChart, {position: 'e', offset: [0, 5]});
-dc.toolTipsify(yearChart, {position: 'n', content: yearToolTipFunc, offset: [-5, 0]})
+
+// regionChart has the automatic toolTipsify behavior
+ stateChart.toolTipsify({position: 'e', offset: [0, 5]});
+ yearChart.toolTipsify({position: 'n', content: yearToolTipFunc, offset: [-5, 0]});
 
 
 dc.renderAll();

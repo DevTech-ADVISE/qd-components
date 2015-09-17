@@ -149,12 +149,14 @@ dc.sizeBoxify(myFooChart, function(){
 });
 ```
 
-## dc.toolTipsify(chart, toolTipConfig)
+## [dcChart].toolTipsify(toolTipConfig)
 Makes it easy to add high quality tooltips to any of your DC charts. 
 
 You can see it in action [here](https://explorer.usaid.gov/aid-dashboard.html)
 
-Pass your chart, and tool tip config to tool tipsify. The config allows you to customize the tooltip position, and how to display its content. 
+By default all supported charts come with an automatic toolTipsify setup using default __toolTipConfig__ values as described below.
+
+To customize tool tip config call __yourchart.toolTipsify(toolTipConfig)__. The config allows you to customize the tooltip value formatter, content, position, and offset.
 
 | Param         | Type    | Description             |
 |---------------|---------|-------------------------|
@@ -177,11 +179,44 @@ The formatter function is useful for formatting a chart data value. This functio
 
 var dc = require('qd-components');
 
-var myFooChart = dc.somechart;
+var myFooChart = dc.barChart('#myFooChart');
+var myBazChart = dc.pieChart('#myBazChart');
 
-dc.toolTipsify(myFooChart, {position: 'n', offset: [5, 0], content: contentFunc})
+/******* dimension & group setup here ********/
+
+// custom formatter
+myBazChart.toolTipsify({
+  formatter: d3.format('$,')
+});
+
+// fully custom example
+myFooChart.toolTipsify({
+  position: 'n', 
+  offset: [5, 0], 
+  content: function(d){ /** return content here **/} 
+});
  
 ```
+
+### toolTipsify Support
+
+| chart       			| toolTipsify Supported?   | Urgency |
+|-----------------------|--------------------------|---------|
+| rowChart    			| yes					   |         |
+| barChart   			| yes					   |         | 
+| pieChart    			| yes					   |         |
+| lineChart             | no					   | cold    |
+| bubbleChart           | no					   | cold    |
+| bubbleOverlay         | no					   | cold    |
+| geoChoroplethChart	| no					   | hot     |
+| geoBubbleOverlayChart | no					   | cold    |
+| heatmap				| no 					   | cold    |
+| scatterPlot			| no 					   | cold    |
+| seriesChart			| no 					   | cold    |
+| treeMap				| no 					   | cold    |
+| sankey				| no 					   | cold    |
+| boxPlot               | no					   | cold    |
+| compositeChart        | no					   | cold    |
 
 ## Todo
 
