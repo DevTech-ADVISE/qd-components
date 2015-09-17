@@ -33,6 +33,15 @@ var addToolTipsifyToDc = function(dc){
     return _chart;
   };
 
+  original.geoChoroplethChart = dc.geoChoroplethChart;
+  dc.geoChoroplethChart = function(parent, opts) {
+    var _chart = original.geoChoroplethChart(parent);
+    _chart = toolTipsifyMixin(_chart, 'g.country');
+    _chart.toolTipsify();
+
+    return _chart;
+  };
+
   return dc;
 };
 

@@ -208,7 +208,7 @@ myFooChart.toolTipsify({
 | lineChart             | no					   | cold    |
 | bubbleChart           | no					   | cold    |
 | bubbleOverlay         | no					   | cold    |
-| geoChoroplethChart	| no					   | hot     |
+| geoChoroplethChart	| yes					   |         |
 | geoBubbleOverlayChart | no					   | cold    |
 | heatmap				| no 					   | cold    |
 | scatterPlot			| no 					   | cold    |
