@@ -27,17 +27,17 @@ regionGroup = regionDimension.group();
 yearDimension = data.dimension(function(d) { return d.year; });
 yearGroup = yearDimension.group().reduceSum(function(d) { return d.value;});
 
-stateChart = dc.rowChart('#' + stateId);
-stateChart.dimension(stateDimension).group(stateGroup)
-  .width(600).height(200).gap(10)
-  .transitionDuration(0);
-
 regionChart = dc.pieChart('#' + regionId);
 regionChart.dimension(regionDimension).group(regionGroup)
   .width(600).height(200)
   .radius(100)
   .innerRadius(40)
   .title(function(d) {return d.region})
+  .transitionDuration(0);
+
+stateChart = dc.rowChart('#' + stateId);
+stateChart.dimension(stateDimension).group(stateGroup)
+  .width(600).height(200).gap(10)
   .transitionDuration(0);
 
 yearChart = dc.barChart('#' + yearId)

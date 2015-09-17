@@ -59,8 +59,8 @@ var toolTipsify = function(chart, options){
 
     tippables.call(tt);
     tippables.on('mouseover', tt.show)
-             .on('mouseout', tt.hide)
-             .on('click', tt.hide);
+             .on('mouseout', tt.hide);
+             //.on('click', tt.hide);
     if(position === 'mouse') {
       tippables.on('mousemove', tt.updatePosition)
     }
