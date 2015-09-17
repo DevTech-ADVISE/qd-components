@@ -11,7 +11,7 @@ module.exports = {
     'dynatable-shortload': './dynatable-shortload.demo.js',
     'audio-dash': './audio-dash.demo.js',
     'tool-tipsify': './tool-tipsify.demo.js',
-    'sizeboxify': './sizeboxify.demo.js'
+    'size-boxify': './size-boxify.demo.js'
   },
   output: {
     path: path.join(demoPath, 'build'),

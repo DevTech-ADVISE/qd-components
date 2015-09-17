@@ -8,7 +8,8 @@ var dcCustom = {
   filterBuilder: require(jsPath + 'filter-builder'),
   dynatableComponent: require(jsPath + 'dynatable-component'),
   audioDash: require(jsPath + 'audio-dash'),
-  toolTipsify: require(jsPath + 'tool-tipsify')
+  toolTipsify: require(jsPath + 'tool-tipsify'),
+  sizeBoxify: require(jsPath + 'size-boxify')
 };
 
 jQuery.extend(dc, dcCustom);

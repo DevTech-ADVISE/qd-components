@@ -2,14 +2,12 @@ dc = require('../../index.js');
 var fixtures = require('../../spec/helpers/fixtures.js');
 
 require('dc/dc.css');
-require('./stylesheets/sizeboxify.demo.scss');
+require('./stylesheets/size-boxify.demo.scss');
 
 var data;
 var stateId, stateDimension, stateGroup, stateChart;
 var regionId, regionDimension, regionGroup, regionChart;
 var yearId, yearDimension, yearGroup, yearChart;
-var toolTipFunc = function(d) {return d.data.key + ": " + d.data.value;};
-var yearToolTipFunc = function(d) {return "Year: " + d.data.key + "<br/>Value: " + d.data.value}
 
 //add more charts, and show the tool tip positions, add any more documentation
 data = crossfilter(fixtures.loadDateFixture());
@@ -42,12 +40,14 @@ regionChart.dimension(regionDimension).group(regionGroup)
 
 yearChart = dc.barChart('#' + yearId)
   .dimension(yearDimension).group(yearGroup)
-  .width(600).height(200).gap(10)
+  .gap(10)
   .elasticY(true)
   .x(d3.scale.ordinal().domain([2007, 2008, 2009, 2010, 2011]))
   .xUnits(dc.units.ordinal);
 
-//*********tipsify your charts**************
-
+//*********sizeboxify your charts here**************
+dc.sizeBoxify(regionChart);
+dc.sizeBoxify(stateChart);
+dc.sizeBoxify(yearChart);
 
 dc.renderAll();

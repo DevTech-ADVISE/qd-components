@@ -1,16 +1,16 @@
 var dc = require('dc');
 
 // styles
-require('../../src/stylesheets/sizeboxify.scss');
+require('../../src/stylesheets/size-boxify.scss');
 
 require('font-awesome/css/font-awesome.css');
 require('../../src/stylesheets/common.scss');
 require('normalize.css/normalize.css');
 
-var sizeboxify = function(chart) {
+var sizeBoxify = function(chart) {
 
 
 
 };
 
-module.exports = sizeboxify;
+module.exports = sizeBoxify;
