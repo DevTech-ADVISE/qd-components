@@ -37,7 +37,15 @@ var addToolTipsifyToDc = function(dc){
   dc.geoChoroplethChart = function(parent, opts) {
     var _chart = original.geoChoroplethChart(parent);
     _chart = toolTipsifyMixin(_chart, 'g.country');
-    _chart.toolTipsify();
+
+    var geoChoroContent = function(d) {
+      var dataItem = _chart.data().filter(function(i){return i.key === d.id})[0];
+      if (dataItem === undefined) return "<label>" + d.properties.name + "</label><br/>No Data";
+      return "<label>" + _chart.label()(dataItem) + "</label><br/>" + _chart.valueAccessor()(dataItem);
+    }
+
+    //need custom content function for geochoro
+    _chart.toolTipsify({content: geoChoroContent});
 
     return _chart;
   };
