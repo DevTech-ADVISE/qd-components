@@ -4,7 +4,7 @@ var inflection = require('inflection'),
 require('../stylesheets/tool-tipsify.scss');
 
 var addToolTipsifyToDc = function(dc){
-   var original = {};
+  var original = {};
   
   original.rowChart = dc.rowChart;
   dc.rowChart = function(parent, opts) {
@@ -36,6 +36,7 @@ var addToolTipsifyToDc = function(dc){
   original.geoChoroplethChart = dc.geoChoroplethChart;
   dc.geoChoroplethChart = function(parent, opts) {
     var _chart = original.geoChoroplethChart(parent);
+
     _chart = toolTipsifyMixin(_chart, 'g.country');
 
     var geoChoroContent = function(d) {
@@ -44,7 +45,6 @@ var addToolTipsifyToDc = function(dc){
       return "<label>" + _chart.label()(dataItem) + "</label><br/>" + _chart.valueAccessor()(dataItem);
     }
 
-    //need custom content function for geochoro
     _chart.toolTipsify({content: geoChoroContent});
 
     return _chart;

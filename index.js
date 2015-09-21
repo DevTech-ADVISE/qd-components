@@ -3,7 +3,9 @@ var dc = require('dc'),
 var $ = jQuery;
 
 var jsPath = './src/javascripts/';
+var quickDefaults = require(jsPath + 'quick-defaults');
 var toolTipsify = require(jsPath + 'tool-tipsify');
+// var sizeBoxify = require(jsPath + 'size-boxify');
 
 // custom charts & components
 var dcCustom = {
@@ -15,6 +17,9 @@ var dcCustom = {
 jQuery.extend(dc, dcCustom);
 
 // chart & component mods
-dc = toolTipsify(dc);
+// modify DC to have nice defaults, be tipsified and sizeboxified
+var dcWithDefaults = quickDefaults(dc);
+dc = toolTipsify(dcWithDefaults);
+// dc = sizeboxify(tipsified);
 
 module.exports = dc;

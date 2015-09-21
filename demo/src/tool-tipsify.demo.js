@@ -14,13 +14,6 @@ var countryId, countryDimension, countryGroup, countryChart;
 var toolTipFunc = function(d) {return d.data.key + ": " + d.data.value;};
 var yearToolTipFunc = function(d) {return "Year: " + d.data.key + "<br/>Value: " + d.data.value}
 
-//geochoropleth attributes
-var _colorRange = ["#a9c8f4", "#7fa1d2", "#5479b0", "#2a518e", "#002A6C"];
-var _zeroColor = '#ccc';
-var _layerName = 'country';
-var _colorDomain = [100, 60000];
-var geoJsonKeyField = 'id';
-
 d3.csv(dataFilePath, function(d) {
 
   //add more charts, and show the tool tip positions, add any more documentation
@@ -64,20 +57,14 @@ d3.csv(dataFilePath, function(d) {
     .xUnits(dc.units.ordinal);
 
     d3.json(countriesGeoJsonFilePath, function(geoJson) {
+      var geoJsonKeyField = 'id';
+      var _layerName = 'country';
 
       countryChart = dc.geoChoroplethChart('#' + countryId)
         .width(700)
         .height(300)
         .dimension(countryDimension)
         .group(countryGroup)
-        .colors(d3.scale.quantize().range(_colorRange))
-        .colorDomain(_colorDomain)
-        .colorCalculator(function (d) {
-          if(d === undefined) return _zeroColor;
-          if(d < 1 )return _zeroColor;
-          return countryChart.colors()(Math.sqrt(d)); 
-        })
-        .projection(d3.geo.mercator())
         .overlayGeoJson(geoJson.features, _layerName, function(d) {
           return d[geoJsonKeyField];
         });
