@@ -149,27 +149,30 @@ dc.sizeBoxify(myFooChart, function(){
 });
 ```
 
-## dc.toolTipsify(chart, toolTipConfig)
+## [dcChart].toolTipsify(toolTipConfig)
 Makes it easy to add high quality tooltips to any of your DC charts. 
 
 You can see it in action [here](https://explorer.usaid.gov/aid-dashboard.html)
 
-Pass your chart, and tool tip config to tool tipsify. The config allows you to customize the tooltip position, and how to display its content. 
+By default all supported charts come with an automatic toolTipsify setup using default __toolTipConfig__ values as described below.
+
+To customize tool tip config call __yourchart.toolTipsify(toolTipConfig)__. The config allows you to customize the tooltip value formatter, content, position, and offset.
 
 | Param         | Type    | Description             |
 |---------------|---------|-------------------------|
 | toolTipConfig | object  | This object can have optional properties for a content function, number formatting function, positioning, and offset.|
 
-### content: function(chartData)
+### toolTipConfig object properties
+* **content:** function(chartData)
 The content function will tell toolTipsify how to deal with data coming from the chart. This is useful when data should be manipulated or displayed in a certain way in the tooltip. 
 
-### position: "mouse" or any ordinal coordinates like 'n', 's', 'e', 'w', or combos like 'ne' etc. 
+* **position:** "mouse" or any ordinal coordinates like 'n', 's', 'e', 'w', or combos like 'ne' etc. 
 Set the position to 'mouse' if you want the tool tip to follow the mouse. The ordinal coordinates will fix the tooltip in a specific location.
 
-### offset: [y, x]
+* **offset:** [y, x]
 Add coordinate offsets for custom positioning of the tooltip.
 
-### formatter: function(chartData)
+* **formatter:** function(chartData)
 The formatter function is useful for formatting a chart data value. This function will only have an effect if the default content function is being used, and a custom one is not provided. The default formatter will default to d3.format(",") 
 
 ```
@@ -177,11 +180,44 @@ The formatter function is useful for formatting a chart data value. This functio
 
 var dc = require('qd-components');
 
-var myFooChart = dc.somechart;
+var myFooChart = dc.barChart('#myFooChart');
+var myBazChart = dc.pieChart('#myBazChart');
 
-dc.toolTipsify(myFooChart, {position: 'n', offset: [5, 0], content: contentFunc})
+/******* dimension & group setup here ********/
+
+// custom formatter
+myBazChart.toolTipsify({
+  formatter: d3.format('$,')
+});
+
+// fully custom example
+myFooChart.toolTipsify({
+  position: 'n', 
+  offset: [5, 0], 
+  content: function(d){ /** return content here **/} 
+});
  
 ```
+
+### toolTipsify Support
+
+| chart       			| toolTipsify Supported?   | Urgency |
+|-----------------------|--------------------------|---------|
+| rowChart    			| yes					   |         |
+| barChart   			| yes					   |         | 
+| pieChart    			| yes					   |         |
+| lineChart             | no					   | cold    |
+| bubbleChart           | no					   | cold    |
+| bubbleOverlay         | no					   | cold    |
+| geoChoroplethChart	| yes					   |         |
+| geoBubbleOverlayChart | no					   | cold    |
+| heatmap				| no 					   | cold    |
+| scatterPlot			| no 					   | cold    |
+| seriesChart			| no 					   | cold    |
+| treeMap				| no 					   | cold    |
+| sankey				| no 					   | cold    |
+| boxPlot               | no					   | cold    |
+| compositeChart        | no					   | cold    |
 
 ## Todo
 

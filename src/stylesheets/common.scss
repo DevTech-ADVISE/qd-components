@@ -1,3 +1,20 @@
 .hide-visually {
 	display: none;
 }
+
+//styles for geoChoropleth zoom buttons
+.zoomControlsContainer {
+
+	position: absolute;
+	margin-left: 10px;
+	margin-top: 10px;
+
+	.zoomButton {
+		float: left;
+	}
+
+	.resetZoomButton {
+		float: right;
+		margin-left: 10px;
+	}
+}
