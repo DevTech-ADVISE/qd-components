@@ -46,8 +46,6 @@ yearChart = dc.barChart('#' + yearId)
   .xUnits(dc.units.ordinal);
 
 //*********sizeboxify your charts here**************
-dc.sizeBoxify(regionChart);
-dc.sizeBoxify(stateChart);
-dc.sizeBoxify(yearChart);
+
 
 dc.renderAll();

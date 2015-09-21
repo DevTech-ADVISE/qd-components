@@ -13,14 +13,31 @@ var sizeBoxify = function(dc) {
   original.rowChart = dc.rowChart;
   dc.rowChart = function(parent, opts) {
     var _chart = original.rowChart(parent);
+    var container = d3.select(parent).node().parentNode;
+    var getDynamicHeight = function() {
+      console.log(container.offsetHeight)
+      return container.offsetHeight;
+    };
 
-    _chart.sizeBoxify();
+    var getDynamicWidth = function() {
+      return container.offsetWidth;
+    };
+
+    var resize = function() {
+      _chart.height(getDynamicHeight())
+        .width(getDynamicWidth())
+        .render();
+
+      console.log("test");
+    };
+
+    d3.select(window).on('resize', resize);
 
     return _chart;
   };
 
-
   return dc;
 };
+
 
 module.exports = sizeBoxify;
