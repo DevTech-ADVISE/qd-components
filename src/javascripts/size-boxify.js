@@ -108,6 +108,7 @@ var sizeBoxify = function(dc) {
     var _chart = original.geoChoroplethChart(parent);
     var container = d3.select(parent)[0][0];
     d3.select(parent).classed("size-boxified", true);
+    var projectionWidth = 960;
 
     _chart.getDynamicHeight = function() {
       return container.offsetHeight;
@@ -117,15 +118,25 @@ var sizeBoxify = function(dc) {
       return container.offsetWidth;
     };
 
+    _chart.getProjectionScale = function() {
+      return (_chart.getDynamicWidth()/projectionWidth) * 153;
+    };
+
+    _chart.getProjection = function() {
+      return d3.geo.mercator().scale(_chart.getProjectionScale()).translate([_chart.getDynamicWidth()/2, _chart.getDynamicHeight()/2]);
+    };
+
     _chart.resize = function() {
       _chart.width(_chart.getDynamicWidth())
         .height(_chart.getDynamicHeight())
+        .projection(_chart.getProjection())
         .render();
     };
 
     window.addEventListener('resize', _chart.resize, true);
 
-    _chart.width(_chart.getDynamicWidth()).height(_chart.getDynamicHeight());
+    _chart.width(_chart.getDynamicWidth()).height(_chart.getDynamicHeight())
+      .projection(_chart.getProjection());
     return _chart;
   };
 
