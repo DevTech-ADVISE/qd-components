@@ -5,6 +5,16 @@ var quickDefaults = function(dc) {
   
   var original = {};
 
+  original.rowChart = dc.rowChart;
+  dc.rowChart = function(parent, opts) {
+    var _chart = original.rowChart(parent);
+
+    _chart.elasticX(true);
+
+    return _chart;
+  };
+
+
   original.geoChoroplethChart = dc.geoChoroplethChart;
   dc.geoChoroplethChart = function(parent, opts) {
     var _chart = original.geoChoroplethChart(parent);

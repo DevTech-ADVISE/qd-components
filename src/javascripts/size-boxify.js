@@ -13,7 +13,7 @@ var sizeBoxify = function(dc) {
   original.rowChart = dc.rowChart;
   dc.rowChart = function(parent, opts) {
     var _chart = original.rowChart(parent);
-    var container = d3.select(parent)[0][0];//.node().parentNode;
+    var container = d3.select(parent)[0][0];
     d3.select(parent).classed("size-boxified", true);
 
     _chart.getDynamicHeight = function() {
@@ -41,7 +41,7 @@ var sizeBoxify = function(dc) {
   original.pieChart = dc.pieChart;
   dc.pieChart = function(parent, opts) {
     var _chart = original.pieChart(parent);
-    var container = d3.select(parent)[0][0];//.node().parentNode;
+    var container = d3.select(parent)[0][0];
     d3.select(parent).classed("size-boxified", true);
 
     _chart.getDynamicHeight = function() {
@@ -79,7 +79,34 @@ var sizeBoxify = function(dc) {
   original.barChart = dc.barChart;
   dc.barChart = function(parent, opts) {
     var _chart = original.barChart(parent);
-    var container = d3.select(parent)[0][0];//.node().parentNode;
+    var container = d3.select(parent)[0][0];
+    d3.select(parent).classed("size-boxified", true);
+
+    _chart.getDynamicHeight = function() {
+      return container.offsetHeight;
+    };
+
+    _chart.getDynamicWidth = function() {
+      return container.offsetWidth;
+    };
+
+    _chart.resize = function() {
+      _chart.width(_chart.getDynamicWidth())
+        .height(_chart.getDynamicHeight())
+        .rescale();
+      _chart.render();
+    };
+
+    window.addEventListener('resize', _chart.resize, true);
+
+    _chart.width(_chart.getDynamicWidth()).height(_chart.getDynamicHeight());
+    return _chart;
+  };
+
+  original.geoChoroplethChart = dc.geoChoroplethChart;
+  dc.geoChoroplethChart = function(parent, opts) {
+    var _chart = original.geoChoroplethChart(parent);
+    var container = d3.select(parent)[0][0];
     d3.select(parent).classed("size-boxified", true);
 
     _chart.getDynamicHeight = function() {

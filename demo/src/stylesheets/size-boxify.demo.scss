@@ -2,19 +2,34 @@ div.dc-chart {
 	float: none;
 }
 
+#simple-charts {
+	width: 49%;
+	float: left;
+	padding: 5px;
+}
+
+#country-geo-panel {
+	width: 49%;
+	height: 90%;
+	float: right;
+	background: #EAEAEA;
+	margin-top: 5px;
+	margin-right: 5px;
+}
+
 #region-panel {
 	position: relative;
 	float: left;
-	width: 49%;
+	width: 48%;
 	height: 50%;
-	background: #CCC;
+	background: #EAEAEA;
 
 	h3 {
 		margin-left: 20px;
 	}
 
 	#region-chart-column {
-		width: 50%;
+		width: 80%;
 		height: 80%;
 		position: absolute;
 		bottom: 0px;
@@ -24,9 +39,9 @@ div.dc-chart {
 #state-panel {
 	position: relative; 
 	float: right;
-	width: 49%;
+	width: 48%;
 	height: 50%;
-	background: #CCC;
+	background: #EAEAEA;
 
 	h3 {
 		margin-left: 15px;
@@ -34,8 +49,8 @@ div.dc-chart {
 	}
 
 	#state-chart-column {
-		width: 60%;
-		height: 90%;
+		width: 80%;
+		height: 85%;
 		position: absolute;
 		bottom: 0px;
 	}
@@ -46,21 +61,21 @@ div.dc-chart {
 	float: right;
 	width: 100%;
 	height: 45%;
-	background: #CCC;
-
+	background: #EAEAEA;
+	margin-top: 5px;
 	h3 {
 		margin-left: 20px;
 	}
 
 	#year-chart-column {
-		width: 100%;
+		width: 90%;
 		height: 80%;
 		position: absolute;
 		bottom: 0px;
 	}
 }
 
-#year-panel, #region-panel, #state-panel {
+#year-panel, #region-panel, #state-panel, #country-geo-panel {
 	border: 1px solid #B7B7B7;
 }
 
