@@ -2,25 +2,62 @@ div.dc-chart {
 	float: none;
 }
 
+#region-panel {
+	position: relative;
+	float: left;
+	width: 49%;
+	height: 50%;
+	background: #CCC;
+
+	h3 {
+		margin-left: 20px;
+	}
+
+	#region-chart-column {
+		width: 50%;
+		height: 80%;
+		position: absolute;
+		bottom: 0px;
+	}
+}
+
+#state-panel {
+	position: relative; 
+	float: right;
+	width: 49%;
+	height: 50%;
+	background: #CCC;
+
+	h3 {
+		margin-left: 15px;
+		margin-top: 10px;
+	}
+
+	#state-chart-column {
+		width: 60%;
+		height: 90%;
+		position: absolute;
+		bottom: 0px;
+	}
+}
+
 #year-panel {
+	position: relative;
 	float: right;
 	width: 100%;
 	height: 45%;
 	background: #CCC;
 
-}
+	h3 {
+		margin-left: 20px;
+	}
 
-#region-panel {
-	float: right;
-	width: 49%;
-	height: 50%;
-	background: #CCC;
-}
-
-#state-panel {
-	width: 49%;
-	height: 50%;
-	background: #CCC;
+	#year-chart-column {
+		width: 100%;
+		height: 80%;
+		position: absolute;
+		bottom: 0px;
+	}
 }
 
 #year-panel, #region-panel, #state-panel {
@@ -28,11 +65,5 @@ div.dc-chart {
 }
 
 h3 {
-	//position: absolute;
-	display: none;
-}
-
-.sizeboxified {
-	width: 100%;
-	height: 100%;
+	position: absolute;
 }

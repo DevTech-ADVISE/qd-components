@@ -5,9 +5,9 @@ require('dc/dc.css');
 require('./stylesheets/size-boxify.demo.scss');
 
 var data;
-var stateId, stateDimension, stateGroup;//, stateChart;
+var stateId, stateDimension, stateGroup, stateChart;
 var regionId, regionDimension, regionGroup, regionChart;
-var yearId, yearDimension, yearGroup;//yearChart;
+var yearId, yearDimension, yearGroup, yearChart;
 
 //add more charts, and show the tool tip positions, add any more documentation
 data = crossfilter(fixtures.loadDateFixture());
@@ -28,7 +28,7 @@ yearGroup = yearDimension.group().reduceSum(function(d) { return d.value;});
 stateChart = dc.rowChart('#' + stateId);
 stateChart.dimension(stateDimension).group(stateGroup)
   .gap(10)
-  .transitionDuration(0);
+  .elasticX(true);
 
 regionChart = dc.pieChart('#' + regionId);
 regionChart.dimension(regionDimension).group(regionGroup)

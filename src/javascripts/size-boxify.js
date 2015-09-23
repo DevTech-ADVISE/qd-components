@@ -14,6 +14,8 @@ var sizeBoxify = function(dc) {
   dc.rowChart = function(parent, opts) {
     var _chart = original.rowChart(parent);
     var container = d3.select(parent)[0][0];//.node().parentNode;
+    d3.select(parent).classed("size-boxified", true);
+
     _chart.getDynamicHeight = function() {
       return container.offsetHeight;
     };
@@ -22,15 +24,15 @@ var sizeBoxify = function(dc) {
       return container.offsetWidth;
     };
 
-    var resize = function() {
-      console.log(_chart.getDynamicHeight())
+    _chart.resize = function() {
+      console.log(_chart.getDynamicWidth())
       _chart.height(_chart.getDynamicHeight())
         .width(_chart.getDynamicWidth())
         .render();
 
     };
 
-    window.addEventListener('resize', resize, true);
+    window.addEventListener('resize', _chart.resize, true);
 
     _chart.width(_chart.getDynamicWidth()).height(_chart.getDynamicHeight());
     return _chart;
@@ -40,6 +42,7 @@ var sizeBoxify = function(dc) {
   dc.pieChart = function(parent, opts) {
     var _chart = original.pieChart(parent);
     var container = d3.select(parent)[0][0];//.node().parentNode;
+    d3.select(parent).classed("size-boxified", true);
 
     _chart.getDynamicHeight = function() {
       return container.offsetHeight;
@@ -49,25 +52,27 @@ var sizeBoxify = function(dc) {
       return container.offsetWidth;
     };
 
+    _chart.getDynamicRadius = function() {
+      if(_chart.getDynamicHeight() < _chart.getDynamicWidth())
+        return _chart.getDynamicHeight()/2;
+      else
+        return _chart.getDynamicWidth()/2;
+    };
+
     _chart.getInnerRadius = function() {
-      return (_chart.getDynamicHeight()/2) * (3/5);
+      return _chart.getDynamicRadius() * (3/5);
     };
 
-    _chart.getOuterRadius = function() {
-      return (_chart.getDynamicHeight()/2);
-    };
-
-    var resize = function() {
-      _chart.innerRadius(_chart.getInnerRadius())
-        .radius(_chart.getOuterRadius())
-        .height(_chart.getDynamicHeight())
+    _chart.resize = function() {
+      _chart.height(_chart.getDynamicHeight()).width(_chart.getDynamicWidth())
+        .innerRadius(_chart.getInnerRadius()).radius(_chart.getDynamicRadius())
         .render();
     };
 
-    window.addEventListener('resize', resize, true);
+    window.addEventListener('resize', _chart.resize, true);
 
     _chart.width(_chart.getDynamicWidth()).height(_chart.getDynamicHeight())
-      .innerRadius(_chart.getInnerRadius()).radius(_chart.getOuterRadius());
+      .innerRadius(_chart.getInnerRadius()).radius(_chart.getDynamicRadius());
     return _chart;
   };
 
@@ -75,6 +80,7 @@ var sizeBoxify = function(dc) {
   dc.barChart = function(parent, opts) {
     var _chart = original.barChart(parent);
     var container = d3.select(parent)[0][0];//.node().parentNode;
+    d3.select(parent).classed("size-boxified", true);
 
     _chart.getDynamicHeight = function() {
       return container.offsetHeight;
@@ -84,13 +90,13 @@ var sizeBoxify = function(dc) {
       return container.offsetWidth;
     };
 
-    var resize = function() {
+    _chart.resize = function() {
       _chart.width(_chart.getDynamicWidth())
         .height(_chart.getDynamicHeight())
         .render();
     };
 
-    window.addEventListener('resize', resize, true);
+    window.addEventListener('resize', _chart.resize, true);
 
     _chart.width(_chart.getDynamicWidth()).height(_chart.getDynamicHeight());
     return _chart;
