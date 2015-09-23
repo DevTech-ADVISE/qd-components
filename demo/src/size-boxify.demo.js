@@ -9,7 +9,7 @@ require('./stylesheets/size-boxify.demo.scss');
 var data;
 var assistanceCategoryId, assistanceCategoryDimension, assistanceCategoryGroup, assistanceCategoryChart;
 var regionId, regionDimension, regionGroup, regionChart;
-var yearId, yearDimension, yearGroup, yearChart;
+var yearId, yearDimension, yearGroup;//yearChart;
 var countryId, countryDimension, countryGroup, countryChart;
 
 d3.csv(dataFilePath, function(d) {
