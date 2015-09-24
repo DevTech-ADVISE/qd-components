@@ -14,6 +14,14 @@ var quickDefaults = function(dc) {
     return _chart;
   };
 
+  original.pieChart = dc.pieChart;
+  dc.pieChart = function(parent, opts) {
+    var _chart = original.pieChart(parent);
+
+    _chart.renderLabel(false);
+
+    return _chart;
+  };
 
   original.geoChoroplethChart = dc.geoChoroplethChart;
   dc.geoChoroplethChart = function(parent, opts) {

@@ -12,7 +12,7 @@ div.dc-chart {
 	position: relative;
 	overflow: auto;
 	width: 49%;
-	height: 90%;
+	height: 98%;
 	float: right;
 	background: #EAEAEA;
 	margin-top: 5px;
@@ -34,7 +34,7 @@ div.dc-chart {
 #region-panel {
 	position: relative;
 	float: left;
-	width: 48%;
+	width: 100%;
 	height: 50%;
 	background: #EAEAEA;
 
@@ -51,11 +51,11 @@ div.dc-chart {
 
 #assistance-category-panel {
 	position: relative; 
-	float: right;
+	float: left;
 	width: 48%;
-	height: 50%;
+	height: 47%;
 	background: #EAEAEA;
-
+	margin-top: 5px;
 	h3 {
 		margin-left: 15px;
 		margin-top: 10px;
@@ -72,8 +72,8 @@ div.dc-chart {
 #year-panel {
 	position: relative;
 	float: right;
-	width: 100%;
-	height: 45%;
+	width: 48%;
+	height: 47%;
 	background: #EAEAEA;
 	margin-top: 5px;
 	h3 {
