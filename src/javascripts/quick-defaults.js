@@ -18,6 +18,12 @@ var quickDefaults = function(dc) {
   original.geoChoroplethChart = dc.geoChoroplethChart;
   dc.geoChoroplethChart = function(parent, opts) {
     var _chart = original.geoChoroplethChart(parent);
+
+    //Add zoom markup
+    _chart.root().append("div").classed("zoomControlsContainer", true);
+    _chart.root().select(".zoomControlsContainer").append("div").classed("zoomButton", true);
+    _chart.root().select(".zoomControlsContainer").append("div").classed("resetZoomButton", true);
+
     //Defaults for colors and data
     var _colorRange = ["#a9c8f4", "#7fa1d2", "#5479b0", "#2a518e", "#002A6C"];
     var _zeroColor = '#ccc';

@@ -6,6 +6,9 @@ var countriesGeoJsonFilePath = './data/countries.geo.json';
 require('dc/dc.css');
 require('./stylesheets/size-boxify.demo.scss');
 
+
+//add pie chart with legend
+//add kpi chart
 var data;
 var assistanceCategoryId, assistanceCategoryDimension, assistanceCategoryGroup, assistanceCategoryChart;
 var regionId, regionDimension, regionGroup, regionChart;

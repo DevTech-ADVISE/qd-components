@@ -9,6 +9,8 @@ div.dc-chart {
 }
 
 #country-geo-panel {
+	position: relative;
+	overflow: auto;
 	width: 49%;
 	height: 90%;
 	float: right;
@@ -19,6 +21,13 @@ div.dc-chart {
 	h3 {
 		margin-top: 10px;
 		margin-left: 10px;
+		margin-bottom: 0px;
+		position: relative;
+	}
+
+	#country-chart {
+		position: absolute;
+
 	}
 }
 
@@ -33,15 +42,14 @@ div.dc-chart {
 		margin-left: 20px;
 	}
 
-	#region-chart-column {
-		width: 80%;
+	#region-chart{
 		height: 80%;
 		position: absolute;
 		bottom: 0px;
 	}
 }
 
-#state-panel {
+#assistance-category-panel {
 	position: relative; 
 	float: right;
 	width: 48%;
@@ -53,9 +61,9 @@ div.dc-chart {
 		margin-top: 10px;
 	}
 
-	#state-chart-column {
-		width: 80%;
-		height: 85%;
+	#assistance-category-chart {
+		
+		height: 80%;
 		position: absolute;
 		bottom: 0px;
 	}
@@ -72,8 +80,8 @@ div.dc-chart {
 		margin-left: 20px;
 	}
 
-	#year-chart-column {
-		width: 90%;
+	#year-chart {
+		
 		height: 80%;
 		position: absolute;
 		bottom: 0px;
@@ -84,7 +92,7 @@ div.dc-chart {
 	}
 }
 
-#year-panel, #region-panel, #state-panel, #country-geo-panel {
+#year-panel, #region-panel, #assistance-category-panel, #country-geo-panel {
 	border: 1px solid #B7B7B7;
 }
 
