@@ -77,6 +77,10 @@ div.dc-chart {
 		height: 80%;
 		position: absolute;
 		bottom: 0px;
+
+		svg {
+			padding-left: 10px;
+		}
 	}
 }
 
