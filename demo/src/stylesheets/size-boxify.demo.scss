@@ -1,0 +1,93 @@
+div.dc-chart {
+	float: none;
+}
+
+#simple-charts {
+	width: 49%;
+	float: left;
+	padding: 5px;
+}
+
+#country-geo-panel {
+	width: 49%;
+	height: 90%;
+	float: right;
+	background: #EAEAEA;
+	margin-top: 5px;
+	margin-right: 5px;
+
+	h3 {
+		margin-top: 10px;
+		margin-left: 10px;
+	}
+}
+
+#region-panel {
+	position: relative;
+	float: left;
+	width: 48%;
+	height: 50%;
+	background: #EAEAEA;
+
+	h3 {
+		margin-left: 20px;
+	}
+
+	#region-chart-column {
+		width: 80%;
+		height: 80%;
+		position: absolute;
+		bottom: 0px;
+	}
+}
+
+#state-panel {
+	position: relative; 
+	float: right;
+	width: 48%;
+	height: 50%;
+	background: #EAEAEA;
+
+	h3 {
+		margin-left: 15px;
+		margin-top: 10px;
+	}
+
+	#state-chart-column {
+		width: 80%;
+		height: 85%;
+		position: absolute;
+		bottom: 0px;
+	}
+}
+
+#year-panel {
+	position: relative;
+	float: right;
+	width: 100%;
+	height: 45%;
+	background: #EAEAEA;
+	margin-top: 5px;
+	h3 {
+		margin-left: 20px;
+	}
+
+	#year-chart-column {
+		width: 90%;
+		height: 80%;
+		position: absolute;
+		bottom: 0px;
+
+		svg {
+			padding-left: 10px;
+		}
+	}
+}
+
+#year-panel, #region-panel, #state-panel, #country-geo-panel {
+	border: 1px solid #B7B7B7;
+}
+
+h3 {
+	position: absolute;
+}

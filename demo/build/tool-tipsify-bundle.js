@@ -44,18 +44,16 @@
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var dc = __webpack_require__(1);
+	dc = __webpack_require__(1);
 	var fixtures = __webpack_require__(39);
 	
 	__webpack_require__(40);
 	
-	var id, filterBuilder, data;
-	var stateId, stateDimension, stateGroup, stateChart;
-	var regionId, regionDimension, regionGroup, regionChart;
+	// var id, filterBuilder, data;
+	// var stateId, stateDimension, stateGroup, stateChart;
+	// var regionId, regionDimension, regionGroup, regionChart;
 	
 	data = crossfilter(fixtures.loadDateFixture());
-	
-	id = 'filter-builder';
 	
 	stateId = 'state-chart';
 	
@@ -78,8 +76,8 @@
 	  .width(600).height(200).gap(10)
 	  .transitionDuration(0);
 	
-	filterBuilder = dc.filterBuilder('#' + id);
-	filterBuilder.filterSources([{chart: regionChart, label: "Region"},{chart: stateChart, label: "State"}]);
+	dc.toolTipsify(stateChart);
+	dc.toolTipsify(regionChart);
 	
 	dc.renderAll();
 
@@ -35054,4 +35052,4 @@
 
 /***/ }
 /******/ ]);
-//# sourceMappingURL=filter-builder-bundle.js.map
+//# sourceMappingURL=tool-tipsify-bundle.js.map

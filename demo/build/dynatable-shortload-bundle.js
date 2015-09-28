@@ -48,28 +48,34 @@
 	var fixtures = __webpack_require__(39);
 	
 	__webpack_require__(40);
+	//include styles
+	//better data set for paging
+	//don't require the group, its not using it
 	
-	var id, filterBuilder, data;
-	var stateId, stateDimension, stateGroup, stateChart;
+	var id, dynatable, data;
+	var assistanceCategoryId, assistanceCategoryDimension, assistanceCategoryGroup, assistanceCategoryChart;
 	var regionId, regionDimension, regionGroup, regionChart;
+	var listingDimension, listingGroup;
 	
-	data = crossfilter(fixtures.loadDateFixture());
+	data = crossfilter(fixtures.loadForeignAidFixture());
 	
-	id = 'filter-builder';
+	id = 'dynatable';
 	
-	stateId = 'state-chart';
+	assistanceCategoryId = 'assistance-category-chart';
 	
 	regionId = 'region-chart';
 	
+	listingDimension = data.dimension(function(d) {return d.activity_name;});
+	listingGroup = listingDimension.group(); 
 	
-	stateDimension = data.dimension(function(d) { return d.state; });
-	stateGroup = stateDimension.group();
+	assistanceCategoryDimension = data.dimension(function(d) { return d.assistance_category_name; });
+	assistanceCategoryGroup = assistanceCategoryDimension.group();
 	
-	regionDimension = data.dimension(function(d) { return d.region; });
+	regionDimension = data.dimension(function(d) { return d.region_name; });
 	regionGroup = regionDimension.group();
 	
-	stateChart = dc.rowChart('#' + stateId);
-	stateChart.dimension(stateDimension).group(stateGroup)
+	assistanceCategoryChart = dc.rowChart('#' + assistanceCategoryId);
+	assistanceCategoryChart.dimension(assistanceCategoryDimension).group(assistanceCategoryGroup)
 	  .width(600).height(200).gap(10)
 	  .transitionDuration(0);
 	
@@ -78,10 +84,18 @@
 	  .width(600).height(200).gap(10)
 	  .transitionDuration(0);
 	
-	filterBuilder = dc.filterBuilder('#' + id);
-	filterBuilder.filterSources([{chart: regionChart, label: "Region"},{chart: stateChart, label: "State"}]);
+	dynatable = dc.dynatableComponent('#' + id)
+				  .dimension(listingDimension)
+				  .group(listingGroup);
+	dynatable.columns([{label: "Region", csvColumnName: "region_name"},
+					   {label: "Assitance Category", csvColumnName: "assistance_category_name"},
+					   {label: "Sector", csvColumnName: "dac_sector_name"},
+					   {label: "Country", csvColumnName: "country_name"}]);
+	dynatable.shortLoad(true);
 	
 	dc.renderAll();
+	
+	dynatable.redraw(); //manually redraw since the initial load only included 10 records because of short load
 
 /***/ },
 /* 1 */
@@ -35054,4 +35068,4 @@
 
 /***/ }
 /******/ ]);
-//# sourceMappingURL=filter-builder-bundle.js.map
+//# sourceMappingURL=dynatable-shortload-bundle.js.map

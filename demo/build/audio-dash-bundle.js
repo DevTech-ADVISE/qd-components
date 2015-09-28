@@ -49,13 +49,13 @@
 	
 	__webpack_require__(40);
 	
-	var id, filterBuilder, data;
+	var id, audioDash, data;
 	var stateId, stateDimension, stateGroup, stateChart;
 	var regionId, regionDimension, regionGroup, regionChart;
 	
 	data = crossfilter(fixtures.loadDateFixture());
 	
-	id = 'filter-builder';
+	id = 'audio-dash';
 	
 	stateId = 'state-chart';
 	
@@ -78,8 +78,13 @@
 	  .width(600).height(200).gap(10)
 	  .transitionDuration(0);
 	
-	filterBuilder = dc.filterBuilder('#' + id);
-	filterBuilder.filterSources([{chart: regionChart, label: "Region"},{chart: stateChart, label: "State"}]);
+	var audioCurrency = function(key, value) {return key + " " + qd.numberFormat(value) + " dollars";};
+	var formatter = function(key, value) {return key + ": " + value};
+	
+	var audioDash = dc.audioDash("#audio-dash")
+	  .charts({"Region": {chart: regionChart, formatter: formatter},
+	           "State": {chart: stateChart, formatter: formatter}
+	          });
 	
 	dc.renderAll();
 
@@ -35054,4 +35059,4 @@
 
 /***/ }
 /******/ ]);
-//# sourceMappingURL=filter-builder-bundle.js.map
+//# sourceMappingURL=audio-dash-bundle.js.map

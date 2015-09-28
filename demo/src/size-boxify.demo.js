@@ -4,15 +4,13 @@ var dataFilePath = './data/bubble_map_table.csv';
 var countriesGeoJsonFilePath = './data/countries.geo.json';
 
 require('dc/dc.css');
-require('./stylesheets/tool-tipsify.demo.scss');
+require('./stylesheets/size-boxify.demo.scss');
 
 var data;
 var assistanceCategoryId, assistanceCategoryDimension, assistanceCategoryGroup, assistanceCategoryChart;
 var regionId, regionDimension, regionGroup, regionChart;
-var yearId, yearDimension, yearGroup, yearChart;
+var yearId, yearDimension, yearGroup;//yearChart;
 var countryId, countryDimension, countryGroup, countryChart;
-var toolTipFunc = function(d) {return d.data.key + ": " + d.data.value;};
-var yearToolTipFunc = function(d) {return "Year: " + d.data.key + "<br/>Value: " + d.data.value}
 
 d3.csv(dataFilePath, function(d) {
 
@@ -30,7 +28,7 @@ d3.csv(dataFilePath, function(d) {
   regionDimension = data.dimension(function(d) { return d.region_name; });
   regionGroup = regionDimension.group();
 
-  yearDimension = data.dimension(function(d) { return Number(d.fiscal_year); });
+  yearDimension = data.dimension(function(d) { return d.fiscal_year; });
   yearGroup = yearDimension.group();//.reduceSum(function(d) { return d.value;});
 
   countryDimension = data.dimension(function(d) { return d.country_code;});
@@ -38,56 +36,39 @@ d3.csv(dataFilePath, function(d) {
 
   regionChart = dc.pieChart('#' + regionId);
   regionChart.dimension(regionDimension).group(regionGroup)
-    .width(600).height(200)
-    .radius(100)
-    .innerRadius(40)
     .title(function(d) {return d.region})
     .transitionDuration(0);
 
   assistanceCategoryChart = dc.rowChart('#' + assistanceCategoryId);
   assistanceCategoryChart.dimension(assistanceCategoryDimension).group(assistanceCategoryGroup)
-    .width(600).height(200).gap(10)
+    .gap(10)
     .transitionDuration(0);
 
   yearChart = dc.barChart('#' + yearId)
     .dimension(yearDimension).group(yearGroup)
-    .width(600).height(200).gap(10)
+    .gap(10)
     .elasticY(true)
     .x(d3.scale.ordinal().domain([2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014]))
-    .xUnits(dc.units.ordinal);
+    .xUnits(dc.units.ordinal)
+    .transitionDuration(0);
 
-    d3.json(countriesGeoJsonFilePath, function(geoJson) {
-      var geoJsonKeyField = 'id';
-      var _layerName = 'country';
+  d3.json(countriesGeoJsonFilePath, function(geoJson) {
+        var geoJsonKeyField = 'id';
+        var _layerName = 'country';
 
-      countryChart = dc.geoChoroplethChart('#' + countryId)
-        .width(700)
-        .height(300)
-        .dimension(countryDimension)
-        .group(countryGroup)
-        .overlayGeoJson(geoJson.features, _layerName, function(d) {
-          return d[geoJsonKeyField];
-        });
+        countryChart = dc.geoChoroplethChart('#' + countryId)
+          .dimension(countryDimension)
+          .group(countryGroup)
+          .overlayGeoJson(geoJson.features, _layerName, function(d) {
+            return d[geoJsonKeyField];
+          });
 
+        dc.renderAll();
+  });
 
-
-      //*********tipsify your charts**************
-      // regionChart has the automatic toolTipsify behavior
-      assistanceCategoryChart.toolTipsify({position: 'e', offset: [0, 5]});
-      yearChart.toolTipsify({position: 'n', content: yearToolTipFunc, offset: [-5, 0]});
-
-      dc.renderAll();
-
-    });
-
-
-
-
-
+  //*********sizeboxify your charts here**************
 
 
   
 
-  }
-);
-  
+});

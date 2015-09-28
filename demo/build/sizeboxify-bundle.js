@@ -44,23 +44,25 @@
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var dc = __webpack_require__(1);
+	dc = __webpack_require__(1);
 	var fixtures = __webpack_require__(39);
 	
 	__webpack_require__(40);
+	__webpack_require__(42);
 	
-	var id, filterBuilder, data;
+	var data;
 	var stateId, stateDimension, stateGroup, stateChart;
 	var regionId, regionDimension, regionGroup, regionChart;
+	var yearId, yearDimension, yearGroup, yearChart;
+	var toolTipFunc = function(d) {return d.data.key + ": " + d.data.value;};
+	var yearToolTipFunc = function(d) {return "Year: " + d.data.key + "<br/>Value: " + d.data.value}
 	
+	//add more charts, and show the tool tip positions, add any more documentation
 	data = crossfilter(fixtures.loadDateFixture());
 	
-	id = 'filter-builder';
-	
 	stateId = 'state-chart';
-	
 	regionId = 'region-chart';
-	
+	yearId = 'year-chart';
 	
 	stateDimension = data.dimension(function(d) { return d.state; });
 	stateGroup = stateDimension.group();
@@ -68,18 +70,34 @@
 	regionDimension = data.dimension(function(d) { return d.region; });
 	regionGroup = regionDimension.group();
 	
+	yearDimension = data.dimension(function(d) { return d.year; });
+	yearGroup = yearDimension.group().reduceSum(function(d) { return d.value;});
+	
 	stateChart = dc.rowChart('#' + stateId);
 	stateChart.dimension(stateDimension).group(stateGroup)
 	  .width(600).height(200).gap(10)
 	  .transitionDuration(0);
 	
-	regionChart = dc.rowChart('#' + regionId);
+	regionChart = dc.pieChart('#' + regionId);
 	regionChart.dimension(regionDimension).group(regionGroup)
-	  .width(600).height(200).gap(10)
+	  .width(600).height(200)
+	  .radius(100)
+	  .innerRadius(40)
+	  .title(function(d) {return d.region})
 	  .transitionDuration(0);
 	
-	filterBuilder = dc.filterBuilder('#' + id);
-	filterBuilder.filterSources([{chart: regionChart, label: "Region"},{chart: stateChart, label: "State"}]);
+	yearChart = dc.barChart('#' + yearId)
+	  .dimension(yearDimension).group(yearGroup)
+	  .width(600).height(200).gap(10)
+	  .elasticY(true)
+	  .x(d3.scale.ordinal().domain([2007, 2008, 2009, 2010, 2011]))
+	  .xUnits(dc.units.ordinal);
+	
+	//*********tipsify your charts**************
+	dc.toolTipsify(regionChart, {content: toolTipFunc});
+	dc.toolTipsify(stateChart, {position: 'e', offset: [0, 5]});
+	dc.toolTipsify(yearChart, {position: 'n', content: yearToolTipFunc, offset: [-5, 0]})
+	
 	
 	dc.renderAll();
 
@@ -35052,6 +35070,46 @@
 	// exports
 
 
+/***/ },
+/* 42 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// style-loader: Adds some css to the DOM by adding a <style> tag
+	
+	// load the styles
+	var content = __webpack_require__(43);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// add the styles to the DOM
+	var update = __webpack_require__(14)(content, {});
+	if(content.locals) module.exports = content.locals;
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		if(!content.locals) {
+			module.hot.accept("!!./../../../node_modules/css-loader/index.js!./../../../node_modules/sass-loader/index.js!./sizeboxify.demo.scss", function() {
+				var newContent = require("!!./../../../node_modules/css-loader/index.js!./../../../node_modules/sass-loader/index.js!./sizeboxify.demo.scss");
+				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+				update(newContent);
+			});
+		}
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
+	}
+
+/***/ },
+/* 43 */
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(13)();
+	// imports
+	
+	
+	// module
+	exports.push([module.id, ".demo-chart {\n  float: left; }\n", ""]);
+	
+	// exports
+
+
 /***/ }
 /******/ ]);
-//# sourceMappingURL=filter-builder-bundle.js.map
+//# sourceMappingURL=sizeboxify-bundle.js.map
