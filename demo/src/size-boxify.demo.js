@@ -10,8 +10,9 @@ require('./stylesheets/size-boxify.demo.scss');
 var data;
 var assistanceCategoryId, assistanceCategoryDimension, assistanceCategoryGroup, assistanceCategoryChart;
 var regionId, regionDimension, regionGroup, regionChart;
-var yearId, yearDimension, yearGroup;//yearChart;
+var yearId, yearDimension, yearGroup, yearChart;
 var countryId, countryDimension, countryGroup, countryChart;
+var fundingId, fundingDimension, fundingGroupSum, fundingChart;
 
 d3.csv(dataFilePath, function(d) {
 
@@ -22,6 +23,7 @@ d3.csv(dataFilePath, function(d) {
   regionId = 'region-chart';
   yearId = 'year-chart';
   countryId = 'country-chart';
+  fundingId = 'funding-chart';
 
   assistanceCategoryDimension = data.dimension(function(d) { return d.assistance_category_name; });
   assistanceCategoryGroup = assistanceCategoryDimension.group();
@@ -34,6 +36,8 @@ d3.csv(dataFilePath, function(d) {
 
   countryDimension = data.dimension(function(d) { return d.country_code;});
   countryGroup = countryDimension.group();
+
+  fundingGroupSum = data.groupAll().reduceSum(function(d) { return d.constant_amount;});
 
   regionChart = dc.pieChart('#' + regionId);
   regionChart.dimension(regionDimension).group(regionGroup)
@@ -52,6 +56,8 @@ d3.csv(dataFilePath, function(d) {
     .x(d3.scale.ordinal().domain([2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014]))
     .xUnits(dc.units.ordinal)
     .transitionDuration(0);
+
+  fundingChart = dc.kpiGauge('#' + fundingId, countryDimension, fundingGroupSum, {title: "Total Activities"});
 
   d3.json(countriesGeoJsonFilePath, function(geoJson) {
         var geoJsonKeyField = 'id';

@@ -11,7 +11,8 @@ var sizeBoxify = require(jsPath + 'size-boxify');
 var dcCustom = {
   filterBuilder: require(jsPath + 'filter-builder'),
   dynatableComponent: require(jsPath + 'dynatable-component'),
-  audioDash: require(jsPath + 'audio-dash')
+  audioDash: require(jsPath + 'audio-dash'),
+  kpiGauge: require(jsPath + 'kpi-gauge')
 };
 
 jQuery.extend(dc, dcCustom);
