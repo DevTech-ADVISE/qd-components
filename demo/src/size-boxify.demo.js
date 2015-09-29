@@ -2,6 +2,7 @@ dc = require('../../index.js');
 var fixtures = require('../../spec/helpers/fixtures.js');
 var dataFilePath = './data/bubble_map_table.csv';
 var countriesGeoJsonFilePath = './data/countries.geo.json';
+var formatters = require('qd-formatters')(d3);
 
 require('dc/dc.css');
 require('./stylesheets/size-boxify.demo.scss');
@@ -57,7 +58,7 @@ d3.csv(dataFilePath, function(d) {
     .xUnits(dc.units.ordinal)
     .transitionDuration(0);
 
-  fundingChart = dc.kpiGauge('#' + fundingId, countryDimension, fundingGroupSum, {title: "Total Activities"});
+  fundingChart = dc.kpiGauge('#' + fundingId, countryDimension, fundingGroupSum, {title: "Total Activities", formatter: formatters.bigCurrencyFormat});
 
   d3.json(countriesGeoJsonFilePath, function(geoJson) {
         var geoJsonKeyField = 'id';
