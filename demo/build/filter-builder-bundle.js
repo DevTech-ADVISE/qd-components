@@ -45,9 +45,9 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	var dc = __webpack_require__(1);
-	var fixtures = __webpack_require__(39);
+	var fixtures = __webpack_require__(49);
 	
-	__webpack_require__(40);
+	__webpack_require__(50);
 	
 	var id, filterBuilder, data;
 	var stateId, stateDimension, stateGroup, stateChart;
@@ -92,15 +92,24 @@
 	var $ = jQuery;
 	
 	var jsPath = './src/javascripts/';
+	var quickDefaults = __webpack_require__(8)(jsPath + 'quick-defaults');
+	var toolTipsify = __webpack_require__(12)(jsPath + 'tool-tipsify');
+	var sizeBoxify = __webpack_require__(18)(jsPath + 'size-boxify');
 	
+	// custom charts & components
 	var dcCustom = {
-	  filterBuilder: __webpack_require__(8)(jsPath + 'filter-builder'),
-	  dynatableComponent: __webpack_require__(27)(jsPath + 'dynatable-component'),
-	  audioDash: __webpack_require__(32)(jsPath + 'audio-dash'),
-	  toolTipsify: __webpack_require__(34)(jsPath + 'tool-tipsify')
+	  filterBuilder: __webpack_require__(34)(jsPath + 'filter-builder'),
+	  dynatableComponent: __webpack_require__(38)(jsPath + 'dynatable-component'),
+	  audioDash: __webpack_require__(43)(jsPath + 'audio-dash'),
+	  kpiGauge: __webpack_require__(45)(jsPath + 'kpi-gauge')
 	};
 	
 	jQuery.extend(dc, dcCustom);
+	
+	// modify DC to have nice defaults, be tipsified and sizeboxified
+	var dcWithDefaults = quickDefaults(dc);
+	var dcWithTips = toolTipsify(dcWithDefaults);
+	dc = sizeBoxify(dcWithDefaults);
 	
 	module.exports = dc;
 
@@ -122,37 +131,47 @@
 
 	var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;!function() {
 	  var d3 = {
-	    version: "3.4.13"
-	  };
-	  if (!Date.now) Date.now = function() {
-	    return +new Date();
+	    version: "3.5.6"
 	  };
 	  var d3_arraySlice = [].slice, d3_array = function(list) {
 	    return d3_arraySlice.call(list);
 	  };
-	  var d3_document = document, d3_documentElement = d3_document.documentElement, d3_window = window;
-	  try {
-	    d3_array(d3_documentElement.childNodes)[0].nodeType;
-	  } catch (e) {
-	    d3_array = function(list) {
-	      var i = list.length, array = new Array(i);
-	      while (i--) array[i] = list[i];
-	      return array;
-	    };
+	  var d3_document = this.document;
+	  function d3_documentElement(node) {
+	    return node && (node.ownerDocument || node.document || node).documentElement;
 	  }
-	  try {
-	    d3_document.createElement("div").style.setProperty("opacity", 0, "");
-	  } catch (error) {
-	    var d3_element_prototype = d3_window.Element.prototype, d3_element_setAttribute = d3_element_prototype.setAttribute, d3_element_setAttributeNS = d3_element_prototype.setAttributeNS, d3_style_prototype = d3_window.CSSStyleDeclaration.prototype, d3_style_setProperty = d3_style_prototype.setProperty;
-	    d3_element_prototype.setAttribute = function(name, value) {
-	      d3_element_setAttribute.call(this, name, value + "");
-	    };
-	    d3_element_prototype.setAttributeNS = function(space, local, value) {
-	      d3_element_setAttributeNS.call(this, space, local, value + "");
-	    };
-	    d3_style_prototype.setProperty = function(name, value, priority) {
-	      d3_style_setProperty.call(this, name, value + "", priority);
-	    };
+	  function d3_window(node) {
+	    return node && (node.ownerDocument && node.ownerDocument.defaultView || node.document && node || node.defaultView);
+	  }
+	  if (d3_document) {
+	    try {
+	      d3_array(d3_document.documentElement.childNodes)[0].nodeType;
+	    } catch (e) {
+	      d3_array = function(list) {
+	        var i = list.length, array = new Array(i);
+	        while (i--) array[i] = list[i];
+	        return array;
+	      };
+	    }
+	  }
+	  if (!Date.now) Date.now = function() {
+	    return +new Date();
+	  };
+	  if (d3_document) {
+	    try {
+	      d3_document.createElement("DIV").style.setProperty("opacity", 0, "");
+	    } catch (error) {
+	      var d3_element_prototype = this.Element.prototype, d3_element_setAttribute = d3_element_prototype.setAttribute, d3_element_setAttributeNS = d3_element_prototype.setAttributeNS, d3_style_prototype = this.CSSStyleDeclaration.prototype, d3_style_setProperty = d3_style_prototype.setProperty;
+	      d3_element_prototype.setAttribute = function(name, value) {
+	        d3_element_setAttribute.call(this, name, value + "");
+	      };
+	      d3_element_prototype.setAttributeNS = function(space, local, value) {
+	        d3_element_setAttributeNS.call(this, space, local, value + "");
+	      };
+	      d3_style_prototype.setProperty = function(name, value, priority) {
+	        d3_style_setProperty.call(this, name, value + "", priority);
+	      };
+	    }
 	  }
 	  d3.ascending = d3_ascending;
 	  function d3_ascending(a, b) {
@@ -164,10 +183,16 @@
 	  d3.min = function(array, f) {
 	    var i = -1, n = array.length, a, b;
 	    if (arguments.length === 1) {
-	      while (++i < n && !((a = array[i]) != null && a <= a)) a = undefined;
+	      while (++i < n) if ((b = array[i]) != null && b >= b) {
+	        a = b;
+	        break;
+	      }
 	      while (++i < n) if ((b = array[i]) != null && a > b) a = b;
 	    } else {
-	      while (++i < n && !((a = f.call(array, array[i], i)) != null && a <= a)) a = undefined;
+	      while (++i < n) if ((b = f.call(array, array[i], i)) != null && b >= b) {
+	        a = b;
+	        break;
+	      }
 	      while (++i < n) if ((b = f.call(array, array[i], i)) != null && a > b) a = b;
 	    }
 	    return a;
@@ -175,10 +200,16 @@
 	  d3.max = function(array, f) {
 	    var i = -1, n = array.length, a, b;
 	    if (arguments.length === 1) {
-	      while (++i < n && !((a = array[i]) != null && a <= a)) a = undefined;
+	      while (++i < n) if ((b = array[i]) != null && b >= b) {
+	        a = b;
+	        break;
+	      }
 	      while (++i < n) if ((b = array[i]) != null && b > a) a = b;
 	    } else {
-	      while (++i < n && !((a = f.call(array, array[i], i)) != null && a <= a)) a = undefined;
+	      while (++i < n) if ((b = f.call(array, array[i], i)) != null && b >= b) {
+	        a = b;
+	        break;
+	      }
 	      while (++i < n) if ((b = f.call(array, array[i], i)) != null && b > a) a = b;
 	    }
 	    return a;
@@ -186,13 +217,19 @@
 	  d3.extent = function(array, f) {
 	    var i = -1, n = array.length, a, b, c;
 	    if (arguments.length === 1) {
-	      while (++i < n && !((a = c = array[i]) != null && a <= a)) a = c = undefined;
+	      while (++i < n) if ((b = array[i]) != null && b >= b) {
+	        a = c = b;
+	        break;
+	      }
 	      while (++i < n) if ((b = array[i]) != null) {
 	        if (a > b) a = b;
 	        if (c < b) c = b;
 	      }
 	    } else {
-	      while (++i < n && !((a = c = f.call(array, array[i], i)) != null && a <= a)) a = undefined;
+	      while (++i < n) if ((b = f.call(array, array[i], i)) != null && b >= b) {
+	        a = c = b;
+	        break;
+	      }
 	      while (++i < n) if ((b = f.call(array, array[i], i)) != null) {
 	        if (a > b) a = b;
 	        if (c < b) c = b;
@@ -222,7 +259,7 @@
 	    } else {
 	      while (++i < n) if (d3_numeric(a = d3_number(f.call(array, array[i], i)))) s += a; else --j;
 	    }
-	    return j ? s / j : undefined;
+	    if (j) return s / j;
 	  };
 	  d3.quantile = function(values, p) {
 	    var H = (values.length - 1) * p + 1, h = Math.floor(H), v = +values[h - 1], e = H - h;
@@ -235,7 +272,32 @@
 	    } else {
 	      while (++i < n) if (d3_numeric(a = d3_number(f.call(array, array[i], i)))) numbers.push(a);
 	    }
-	    return numbers.length ? d3.quantile(numbers.sort(d3_ascending), .5) : undefined;
+	    if (numbers.length) return d3.quantile(numbers.sort(d3_ascending), .5);
+	  };
+	  d3.variance = function(array, f) {
+	    var n = array.length, m = 0, a, d, s = 0, i = -1, j = 0;
+	    if (arguments.length === 1) {
+	      while (++i < n) {
+	        if (d3_numeric(a = d3_number(array[i]))) {
+	          d = a - m;
+	          m += d / ++j;
+	          s += d * (a - m);
+	        }
+	      }
+	    } else {
+	      while (++i < n) {
+	        if (d3_numeric(a = d3_number(f.call(array, array[i], i)))) {
+	          d = a - m;
+	          m += d / ++j;
+	          s += d * (a - m);
+	        }
+	      }
+	    }
+	    if (j > 1) return s / (j - 1);
+	  };
+	  d3.deviation = function() {
+	    var v = d3.variance.apply(this, arguments);
+	    return v ? Math.sqrt(v) : v;
 	  };
 	  function d3_bisector(compare) {
 	    return {
@@ -267,11 +329,15 @@
 	      return d3_ascending(f(d), x);
 	    } : f);
 	  };
-	  d3.shuffle = function(array) {
-	    var m = array.length, t, i;
+	  d3.shuffle = function(array, i0, i1) {
+	    if ((m = arguments.length) < 3) {
+	      i1 = array.length;
+	      if (m < 2) i0 = 0;
+	    }
+	    var m = i1 - i0, t, i;
 	    while (m) {
 	      i = Math.random() * m-- | 0;
-	      t = array[m], array[m] = array[i], array[i] = t;
+	      t = array[m + i0], array[m + i0] = array[i + i0], array[i + i0] = t;
 	    }
 	    return array;
 	  };
@@ -359,11 +425,18 @@
 	      });
 	    }
 	  }
-	  d3.map = function(object) {
+	  d3.map = function(object, f) {
 	    var map = new d3_Map();
-	    if (object instanceof d3_Map) object.forEach(function(key, value) {
-	      map.set(key, value);
-	    }); else for (var key in object) map.set(key, object[key]);
+	    if (object instanceof d3_Map) {
+	      object.forEach(function(key, value) {
+	        map.set(key, value);
+	      });
+	    } else if (Array.isArray(object)) {
+	      var i = -1, n = object.length, o;
+	      if (arguments.length === 1) while (++i < n) map.set(i, object[i]); else while (++i < n) map.set(f.call(object, o = object[i], i), o);
+	    } else {
+	      for (var key in object) map.set(key, object[key]);
+	    }
 	    return map;
 	  };
 	  function d3_Map() {
@@ -511,6 +584,9 @@
 	    }
 	  });
 	  d3.behavior = {};
+	  function d3_identity(d) {
+	    return d;
+	  }
 	  d3.rebind = function(target, source) {
 	    var i = 1, n = arguments.length, method;
 	    while (++i < n) target[method = arguments[i]] = d3_rebind(target, source, source[method]);
@@ -617,8 +693,12 @@
 	    return n.querySelector(s);
 	  }, d3_selectAll = function(s, n) {
 	    return n.querySelectorAll(s);
-	  }, d3_selectMatcher = d3_documentElement.matches || d3_documentElement[d3_vendorSymbol(d3_documentElement, "matchesSelector")], d3_selectMatches = function(n, s) {
-	    return d3_selectMatcher.call(n, s);
+	  }, d3_selectMatches = function(n, s) {
+	    var d3_selectMatcher = n.matches || n[d3_vendorSymbol(n, "matchesSelector")];
+	    d3_selectMatches = function(n, s) {
+	      return d3_selectMatcher.call(n, s);
+	    };
+	    return d3_selectMatches(n, s);
 	  };
 	  if (typeof Sizzle === "function") {
 	    d3_select = function(s, n) {
@@ -628,7 +708,7 @@
 	    d3_selectMatches = Sizzle.matchesSelector;
 	  }
 	  d3.selection = function() {
-	    return d3_selectionRoot;
+	    return d3.select(d3_document.documentElement);
 	  };
 	  var d3_selectionPrototype = d3.selection.prototype = [];
 	  d3_selectionPrototype.select = function(selector) {
@@ -788,7 +868,10 @@
 	        for (priority in name) this.each(d3_selection_style(priority, name[priority], value));
 	        return this;
 	      }
-	      if (n < 2) return d3_window.getComputedStyle(this.node(), null).getPropertyValue(name);
+	      if (n < 2) {
+	        var node = this.node();
+	        return d3_window(node).getComputedStyle(node, null).getPropertyValue(name);
+	      }
 	      priority = "";
 	    }
 	    return this.each(d3_selection_style(name, value, priority));
@@ -854,11 +937,14 @@
 	    });
 	  };
 	  function d3_selection_creator(name) {
-	    return typeof name === "function" ? name : (name = d3.ns.qualify(name)).local ? function() {
+	    function create() {
+	      var document = this.ownerDocument, namespace = this.namespaceURI;
+	      return namespace ? document.createElementNS(namespace, name) : document.createElement(name);
+	    }
+	    function createNS() {
 	      return this.ownerDocument.createElementNS(name.space, name.local);
-	    } : function() {
-	      return this.ownerDocument.createElementNS(this.namespaceURI, name);
-	    };
+	    }
+	    return typeof name === "function" ? name : (name = d3.ns.qualify(name)).local ? createNS : create;
 	  }
 	  d3_selectionPrototype.insert = function(name, before) {
 	    name = d3_selection_creator(name);
@@ -868,11 +954,12 @@
 	    });
 	  };
 	  d3_selectionPrototype.remove = function() {
-	    return this.each(function() {
-	      var parent = this.parentNode;
-	      if (parent) parent.removeChild(this);
-	    });
+	    return this.each(d3_selectionRemove);
 	  };
+	  function d3_selectionRemove() {
+	    var parent = this.parentNode;
+	    if (parent) parent.removeChild(this);
+	  }
 	  d3_selectionPrototype.data = function(value, key) {
 	    var i = -1, n = this.length, group, node;
 	    if (!arguments.length) {
@@ -1081,40 +1168,28 @@
 	      return node;
 	    };
 	  }
-	  d3_selectionPrototype.transition = function() {
-	    var id = d3_transitionInheritId || ++d3_transitionId, subgroups = [], subgroup, node, transition = d3_transitionInherit || {
-	      time: Date.now(),
-	      ease: d3_ease_cubicInOut,
-	      delay: 0,
-	      duration: 250
-	    };
-	    for (var j = -1, m = this.length; ++j < m; ) {
-	      subgroups.push(subgroup = []);
-	      for (var group = this[j], i = -1, n = group.length; ++i < n; ) {
-	        if (node = group[i]) d3_transitionNode(node, i, id, transition);
-	        subgroup.push(node);
-	      }
-	    }
-	    return d3_transition(subgroups, id);
-	  };
-	  d3_selectionPrototype.interrupt = function() {
-	    return this.each(d3_selection_interrupt);
-	  };
-	  function d3_selection_interrupt() {
-	    var lock = this.__transition__;
-	    if (lock) ++lock.active;
-	  }
 	  d3.select = function(node) {
-	    var group = [ typeof node === "string" ? d3_select(node, d3_document) : node ];
-	    group.parentNode = d3_documentElement;
+	    var group;
+	    if (typeof node === "string") {
+	      group = [ d3_select(node, d3_document) ];
+	      group.parentNode = d3_document.documentElement;
+	    } else {
+	      group = [ node ];
+	      group.parentNode = d3_documentElement(node);
+	    }
 	    return d3_selection([ group ]);
 	  };
 	  d3.selectAll = function(nodes) {
-	    var group = d3_array(typeof nodes === "string" ? d3_selectAll(nodes, d3_document) : nodes);
-	    group.parentNode = d3_documentElement;
+	    var group;
+	    if (typeof nodes === "string") {
+	      group = d3_array(d3_selectAll(nodes, d3_document));
+	      group.parentNode = d3_document.documentElement;
+	    } else {
+	      group = nodes;
+	      group.parentNode = null;
+	    }
 	    return d3_selection([ group ]);
 	  };
-	  var d3_selectionRoot = d3.select(d3_documentElement);
 	  d3_selectionPrototype.on = function(type, listener, capture) {
 	    var n = arguments.length;
 	    if (n < 3) {
@@ -1162,9 +1237,11 @@
 	    mouseenter: "mouseover",
 	    mouseleave: "mouseout"
 	  });
-	  d3_selection_onFilters.forEach(function(k) {
-	    if ("on" + k in d3_document) d3_selection_onFilters.remove(k);
-	  });
+	  if (d3_document) {
+	    d3_selection_onFilters.forEach(function(k) {
+	      if ("on" + k in d3_document) d3_selection_onFilters.remove(k);
+	    });
+	  }
 	  function d3_selection_onListener(listener, argumentz) {
 	    return function(e) {
 	      var o = d3.event;
@@ -1186,20 +1263,23 @@
 	      }
 	    };
 	  }
-	  var d3_event_dragSelect = "onselectstart" in d3_document ? null : d3_vendorSymbol(d3_documentElement.style, "userSelect"), d3_event_dragId = 0;
-	  function d3_event_dragSuppress() {
-	    var name = ".dragsuppress-" + ++d3_event_dragId, click = "click" + name, w = d3.select(d3_window).on("touchmove" + name, d3_eventPreventDefault).on("dragstart" + name, d3_eventPreventDefault).on("selectstart" + name, d3_eventPreventDefault);
+	  var d3_event_dragSelect, d3_event_dragId = 0;
+	  function d3_event_dragSuppress(node) {
+	    var name = ".dragsuppress-" + ++d3_event_dragId, click = "click" + name, w = d3.select(d3_window(node)).on("touchmove" + name, d3_eventPreventDefault).on("dragstart" + name, d3_eventPreventDefault).on("selectstart" + name, d3_eventPreventDefault);
+	    if (d3_event_dragSelect == null) {
+	      d3_event_dragSelect = "onselectstart" in node ? false : d3_vendorSymbol(node.style, "userSelect");
+	    }
 	    if (d3_event_dragSelect) {
-	      var style = d3_documentElement.style, select = style[d3_event_dragSelect];
+	      var style = d3_documentElement(node).style, select = style[d3_event_dragSelect];
 	      style[d3_event_dragSelect] = "none";
 	    }
 	    return function(suppressClick) {
 	      w.on(name, null);
 	      if (d3_event_dragSelect) style[d3_event_dragSelect] = select;
 	      if (suppressClick) {
-	        function off() {
+	        var off = function() {
 	          w.on(click, null);
-	        }
+	        };
 	        w.on(click, function() {
 	          d3_eventPreventDefault();
 	          off();
@@ -1211,24 +1291,27 @@
 	  d3.mouse = function(container) {
 	    return d3_mousePoint(container, d3_eventSource());
 	  };
-	  var d3_mouse_bug44083 = /WebKit/.test(d3_window.navigator.userAgent) ? -1 : 0;
+	  var d3_mouse_bug44083 = this.navigator && /WebKit/.test(this.navigator.userAgent) ? -1 : 0;
 	  function d3_mousePoint(container, e) {
 	    if (e.changedTouches) e = e.changedTouches[0];
 	    var svg = container.ownerSVGElement || container;
 	    if (svg.createSVGPoint) {
 	      var point = svg.createSVGPoint();
-	      if (d3_mouse_bug44083 < 0 && (d3_window.scrollX || d3_window.scrollY)) {
-	        svg = d3.select("body").append("svg").style({
-	          position: "absolute",
-	          top: 0,
-	          left: 0,
-	          margin: 0,
-	          padding: 0,
-	          border: "none"
-	        }, "important");
-	        var ctm = svg[0][0].getScreenCTM();
-	        d3_mouse_bug44083 = !(ctm.f || ctm.e);
-	        svg.remove();
+	      if (d3_mouse_bug44083 < 0) {
+	        var window = d3_window(container);
+	        if (window.scrollX || window.scrollY) {
+	          svg = d3.select("body").append("svg").style({
+	            position: "absolute",
+	            top: 0,
+	            left: 0,
+	            margin: 0,
+	            padding: 0,
+	            border: "none"
+	          }, "important");
+	          var ctm = svg[0][0].getScreenCTM();
+	          d3_mouse_bug44083 = !(ctm.f || ctm.e);
+	          svg.remove();
+	        }
 	      }
 	      if (d3_mouse_bug44083) point.x = e.pageX, point.y = e.pageY; else point.x = e.clientX, 
 	      point.y = e.clientY;
@@ -1247,13 +1330,13 @@
 	    }
 	  };
 	  d3.behavior.drag = function() {
-	    var event = d3_eventDispatch(drag, "drag", "dragstart", "dragend"), origin = null, mousedown = dragstart(d3_noop, d3.mouse, d3_behavior_dragMouseSubject, "mousemove", "mouseup"), touchstart = dragstart(d3_behavior_dragTouchId, d3.touch, d3_behavior_dragTouchSubject, "touchmove", "touchend");
+	    var event = d3_eventDispatch(drag, "drag", "dragstart", "dragend"), origin = null, mousedown = dragstart(d3_noop, d3.mouse, d3_window, "mousemove", "mouseup"), touchstart = dragstart(d3_behavior_dragTouchId, d3.touch, d3_identity, "touchmove", "touchend");
 	    function drag() {
 	      this.on("mousedown.drag", mousedown).on("touchstart.drag", touchstart);
 	    }
 	    function dragstart(id, position, subject, move, end) {
 	      return function() {
-	        var that = this, target = d3.event.target, parent = that.parentNode, dispatch = event.of(that, arguments), dragged = 0, dragId = id(), dragName = ".drag" + (dragId == null ? "" : "-" + dragId), dragOffset, dragSubject = d3.select(subject()).on(move + dragName, moved).on(end + dragName, ended), dragRestore = d3_event_dragSuppress(), position0 = position(parent, dragId);
+	        var that = this, target = d3.event.target, parent = that.parentNode, dispatch = event.of(that, arguments), dragged = 0, dragId = id(), dragName = ".drag" + (dragId == null ? "" : "-" + dragId), dragOffset, dragSubject = d3.select(subject(target)).on(move + dragName, moved).on(end + dragName, ended), dragRestore = d3_event_dragSuppress(target), position0 = position(parent, dragId);
 	        if (origin) {
 	          dragOffset = origin.apply(that, arguments);
 	          dragOffset = [ dragOffset.x - position0[0], dragOffset.y - position0[1] ];
@@ -1298,12 +1381,6 @@
 	  function d3_behavior_dragTouchId() {
 	    return d3.event.changedTouches[0].identifier;
 	  }
-	  function d3_behavior_dragTouchSubject() {
-	    return d3.event.target;
-	  }
-	  function d3_behavior_dragMouseSubject() {
-	    return d3_window;
-	  }
 	  d3.touches = function(container, touches) {
 	    if (arguments.length < 2) touches = d3_eventSource().touches;
 	    return touches ? d3_array(touches).map(function(touch) {
@@ -1312,7 +1389,7 @@
 	      return point;
 	    }) : [];
 	  };
-	  var π = Math.PI, τ = 2 * π, halfπ = π / 2, ε = 1e-6, ε2 = ε * ε, d3_radians = π / 180, d3_degrees = 180 / π;
+	  var ε = 1e-6, ε2 = ε * ε, π = Math.PI, τ = 2 * π, τε = τ - ε, halfπ = π / 2, d3_radians = π / 180, d3_degrees = 180 / π;
 	  function d3_sgn(x) {
 	    return x > 0 ? 1 : x < 0 ? -1 : 0;
 	  }
@@ -1357,7 +1434,16 @@
 	      x: 0,
 	      y: 0,
 	      k: 1
-	    }, translate0, center0, center, size = [ 960, 500 ], scaleExtent = d3_behavior_zoomInfinity, mousedown = "mousedown.zoom", mousemove = "mousemove.zoom", mouseup = "mouseup.zoom", mousewheelTimer, touchstart = "touchstart.zoom", touchtime, event = d3_eventDispatch(zoom, "zoomstart", "zoom", "zoomend"), x0, x1, y0, y1;
+	    }, translate0, center0, center, size = [ 960, 500 ], scaleExtent = d3_behavior_zoomInfinity, duration = 250, zooming = 0, mousedown = "mousedown.zoom", mousemove = "mousemove.zoom", mouseup = "mouseup.zoom", mousewheelTimer, touchstart = "touchstart.zoom", touchtime, event = d3_eventDispatch(zoom, "zoomstart", "zoom", "zoomend"), x0, x1, y0, y1;
+	    if (!d3_behavior_zoomWheel) {
+	      d3_behavior_zoomWheel = "onwheel" in d3_document ? (d3_behavior_zoomDelta = function() {
+	        return -d3.event.deltaY * (d3.event.deltaMode ? 120 : 1);
+	      }, "wheel") : "onmousewheel" in d3_document ? (d3_behavior_zoomDelta = function() {
+	        return d3.event.wheelDelta;
+	      }, "mousewheel") : (d3_behavior_zoomDelta = function() {
+	        return -d3.event.detail;
+	      }, "MozMousePixelScroll");
+	    }
 	    function zoom(g) {
 	      g.on(mousedown, mousedowned).on(d3_behavior_zoomWheel + ".zoom", mousewheeled).on("dblclick.zoom", dblclicked).on(touchstart, touchstarted);
 	    }
@@ -1373,7 +1459,7 @@
 	            };
 	            zoomstarted(dispatch);
 	          }).tween("zoom:zoom", function() {
-	            var dx = size[0], dy = size[1], cx = dx / 2, cy = dy / 2, i = d3.interpolateZoom([ (cx - view.x) / view.k, (cy - view.y) / view.k, dx / view.k ], [ (cx - view1.x) / view1.k, (cy - view1.y) / view1.k, dx / view1.k ]);
+	            var dx = size[0], dy = size[1], cx = center0 ? center0[0] : dx / 2, cy = center0 ? center0[1] : dy / 2, i = d3.interpolateZoom([ (cx - view.x) / view.k, (cy - view.y) / view.k, dx / view.k ], [ (cx - view1.x) / view1.k, (cy - view1.y) / view1.k, dx / view1.k ]);
 	            return function(t) {
 	              var l = i(t), k = dx / l[2];
 	              this.__chart__ = view = {
@@ -1383,6 +1469,8 @@
 	              };
 	              zoomed(dispatch);
 	            };
+	          }).each("interrupt.zoom", function() {
+	            zoomended(dispatch);
 	          }).each("end.zoom", function() {
 	            zoomended(dispatch);
 	          });
@@ -1429,6 +1517,11 @@
 	      size = _ && [ +_[0], +_[1] ];
 	      return zoom;
 	    };
+	    zoom.duration = function(_) {
+	      if (!arguments.length) return duration;
+	      duration = +_;
+	      return zoom;
+	    };
 	    zoom.x = function(z) {
 	      if (!arguments.length) return x1;
 	      x1 = z;
@@ -1465,6 +1558,18 @@
 	      view.x += p[0] - l[0];
 	      view.y += p[1] - l[1];
 	    }
+	    function zoomTo(that, p, l, k) {
+	      that.__chart__ = {
+	        x: view.x,
+	        y: view.y,
+	        k: view.k
+	      };
+	      scaleTo(Math.pow(2, k));
+	      translateTo(center0 = p, l);
+	      that = d3.select(that);
+	      if (duration > 0) that = that.transition().duration(duration);
+	      that.call(zoom.event);
+	    }
 	    function rescale() {
 	      if (x1) x1.domain(x0.range().map(function(x) {
 	        return (x - view.x) / view.k;
@@ -1474,7 +1579,7 @@
 	      }).map(y0.invert));
 	    }
 	    function zoomstarted(dispatch) {
-	      dispatch({
+	      if (!zooming++) dispatch({
 	        type: "zoomstart"
 	      });
 	    }
@@ -1487,12 +1592,12 @@
 	      });
 	    }
 	    function zoomended(dispatch) {
-	      dispatch({
+	      if (!--zooming) dispatch({
 	        type: "zoomend"
-	      });
+	      }), center0 = null;
 	    }
 	    function mousedowned() {
-	      var that = this, target = d3.event.target, dispatch = event.of(that, arguments), dragged = 0, subject = d3.select(d3_window).on(mousemove, moved).on(mouseup, ended), location0 = location(d3.mouse(that)), dragRestore = d3_event_dragSuppress();
+	      var that = this, target = d3.event.target, dispatch = event.of(that, arguments), dragged = 0, subject = d3.select(d3_window(that)).on(mousemove, moved).on(mouseup, ended), location0 = location(d3.mouse(that)), dragRestore = d3_event_dragSuppress(that);
 	      d3_selection_interrupt.call(that);
 	      zoomstarted(dispatch);
 	      function moved() {
@@ -1507,8 +1612,7 @@
 	      }
 	    }
 	    function touchstarted() {
-	      var that = this, dispatch = event.of(that, arguments), locations0 = {}, distance0 = 0, scale0, zoomName = ".zoom-" + d3.event.changedTouches[0].identifier, touchmove = "touchmove" + zoomName, touchend = "touchend" + zoomName, targets = [], subject = d3.select(that), dragRestore = d3_event_dragSuppress();
-	      d3_selection_interrupt.call(that);
+	      var that = this, dispatch = event.of(that, arguments), locations0 = {}, distance0 = 0, scale0, zoomName = ".zoom-" + d3.event.changedTouches[0].identifier, touchmove = "touchmove" + zoomName, touchend = "touchend" + zoomName, targets = [], subject = d3.select(that), dragRestore = d3_event_dragSuppress(that);
 	      started();
 	      zoomstarted(dispatch);
 	      subject.on(mousedown, null).on(touchstart, started);
@@ -1531,11 +1635,9 @@
 	        var touches = relocate(), now = Date.now();
 	        if (touches.length === 1) {
 	          if (now - touchtime < 500) {
-	            var p = touches[0], l = locations0[p.identifier];
-	            scaleTo(view.k * 2);
-	            translateTo(p, l);
+	            var p = touches[0];
+	            zoomTo(that, p, locations0[p.identifier], Math.floor(Math.log(view.k) / Math.LN2) + 1);
 	            d3_eventPreventDefault();
-	            zoomed(dispatch);
 	          }
 	          touchtime = now;
 	        } else if (touches.length > 1) {
@@ -1545,6 +1647,7 @@
 	      }
 	      function moved() {
 	        var touches = d3.touches(that), p0, l0, p1, l1;
+	        d3_selection_interrupt.call(that);
 	        for (var i = 0, n = touches.length; i < n; ++i, l1 = null) {
 	          p1 = touches[i];
 	          if (l1 = locations0[p1.identifier]) {
@@ -1580,8 +1683,8 @@
 	    }
 	    function mousewheeled() {
 	      var dispatch = event.of(this, arguments);
-	      if (mousewheelTimer) clearTimeout(mousewheelTimer); else translate0 = location(center0 = center || d3.mouse(this)), 
-	      d3_selection_interrupt.call(this), zoomstarted(dispatch);
+	      if (mousewheelTimer) clearTimeout(mousewheelTimer); else d3_selection_interrupt.call(this), 
+	      translate0 = location(center0 = center || d3.mouse(this)), zoomstarted(dispatch);
 	      mousewheelTimer = setTimeout(function() {
 	        mousewheelTimer = null;
 	        zoomended(dispatch);
@@ -1592,23 +1695,12 @@
 	      zoomed(dispatch);
 	    }
 	    function dblclicked() {
-	      var dispatch = event.of(this, arguments), p = d3.mouse(this), l = location(p), k = Math.log(view.k) / Math.LN2;
-	      zoomstarted(dispatch);
-	      scaleTo(Math.pow(2, d3.event.shiftKey ? Math.ceil(k) - 1 : Math.floor(k) + 1));
-	      translateTo(p, l);
-	      zoomed(dispatch);
-	      zoomended(dispatch);
+	      var p = d3.mouse(this), k = Math.log(view.k) / Math.LN2;
+	      zoomTo(this, p, location(p), d3.event.shiftKey ? Math.ceil(k) - 1 : Math.floor(k) + 1);
 	    }
 	    return d3.rebind(zoom, event, "on");
 	  };
-	  var d3_behavior_zoomInfinity = [ 0, Infinity ];
-	  var d3_behavior_zoomDelta, d3_behavior_zoomWheel = "onwheel" in d3_document ? (d3_behavior_zoomDelta = function() {
-	    return -d3.event.deltaY * (d3.event.deltaMode ? 120 : 1);
-	  }, "wheel") : "onmousewheel" in d3_document ? (d3_behavior_zoomDelta = function() {
-	    return d3.event.wheelDelta;
-	  }, "mousewheel") : (d3_behavior_zoomDelta = function() {
-	    return -d3.event.detail;
-	  }, "MozMousePixelScroll");
+	  var d3_behavior_zoomInfinity = [ 0, Infinity ], d3_behavior_zoomDelta, d3_behavior_zoomWheel;
 	  d3.color = d3_color;
 	  function d3_color() {}
 	  d3_color.prototype.toString = function() {
@@ -1737,8 +1829,9 @@
 	    return v < 16 ? "0" + Math.max(0, v).toString(16) : Math.min(255, v).toString(16);
 	  }
 	  function d3_rgb_parse(format, rgb, hsl) {
+	    format = format.toLowerCase();
 	    var r = 0, g = 0, b = 0, m1, m2, color;
-	    m1 = /([a-z]+)\((.*)\)/i.exec(format);
+	    m1 = /([a-z]+)\((.*)\)/.exec(format);
 	    if (m1) {
 	      m2 = m1[2].split(",");
 	      switch (m1[1]) {
@@ -1753,7 +1846,9 @@
 	        }
 	      }
 	    }
-	    if (color = d3_rgb_names.get(format)) return rgb(color.r, color.g, color.b);
+	    if (color = d3_rgb_names.get(format)) {
+	      return rgb(color.r, color.g, color.b);
+	    }
 	    if (format != null && format.charAt(0) === "#" && !isNaN(color = parseInt(format.slice(1), 16))) {
 	      if (format.length === 4) {
 	        r = (color & 3840) >> 4;
@@ -1916,6 +2011,7 @@
 	    plum: 14524637,
 	    powderblue: 11591910,
 	    purple: 8388736,
+	    rebeccapurple: 6697881,
 	    red: 16711680,
 	    rosybrown: 12357519,
 	    royalblue: 4286945,
@@ -1954,9 +2050,6 @@
 	    };
 	  }
 	  d3.functor = d3_functor;
-	  function d3_identity(d) {
-	    return d;
-	  }
 	  d3.xhr = d3_xhrType(d3_identity);
 	  function d3_xhrType(response) {
 	    return function(url, mimeType, callback) {
@@ -1967,7 +2060,7 @@
 	  }
 	  function d3_xhr(url, mimeType, response, callback) {
 	    var xhr = {}, dispatch = d3.dispatch("beforesend", "progress", "load", "error"), headers = {}, request = new XMLHttpRequest(), responseType = null;
-	    if (d3_window.XDomainRequest && !("withCredentials" in request) && /^(http(s)?:)?\/\//.test(url)) request = new XDomainRequest();
+	    if (this.XDomainRequest && !("withCredentials" in request) && /^(http(s)?:)?\/\//.test(url)) request = new XDomainRequest();
 	    "onload" in request ? request.onload = request.onerror = respond : request.onreadystatechange = function() {
 	      request.readyState > 3 && respond();
 	    };
@@ -2153,7 +2246,7 @@
 	  };
 	  d3.csv = d3.dsv(",", "text/csv");
 	  d3.tsv = d3.dsv("	", "text/tab-separated-values");
-	  var d3_timer_queueHead, d3_timer_queueTail, d3_timer_interval, d3_timer_timeout, d3_timer_active, d3_timer_frame = d3_window[d3_vendorSymbol(d3_window, "requestAnimationFrame")] || function(callback) {
+	  var d3_timer_queueHead, d3_timer_queueTail, d3_timer_interval, d3_timer_timeout, d3_timer_active, d3_timer_frame = this[d3_vendorSymbol(this, "requestAnimationFrame")] || function(callback) {
 	    setTimeout(callback, 17);
 	  };
 	  d3.timer = function(callback, delay, then) {
@@ -3253,6 +3346,15 @@
 	      d3_geo_centroidPointXYZ(x0, y0, z0);
 	    }
 	  }
+	  function d3_geo_compose(a, b) {
+	    function compose(x, y) {
+	      return x = a(x, y), b(x[0], x[1]);
+	    }
+	    if (a.invert && b.invert) compose.invert = function(x, y) {
+	      return x = b.invert(x, y), x && a.invert(x[0], x[1]);
+	    };
+	    return compose;
+	  }
 	  function d3_true() {
 	    return true;
 	  }
@@ -3851,15 +3953,6 @@
 	      return ca !== cb ? ca - cb : ca === 0 ? b[1] - a[1] : ca === 1 ? a[0] - b[0] : ca === 2 ? a[1] - b[1] : b[0] - a[0];
 	    }
 	  }
-	  function d3_geo_compose(a, b) {
-	    function compose(x, y) {
-	      return x = a(x, y), b(x[0], x[1]);
-	    }
-	    if (a.invert && b.invert) compose.invert = function(x, y) {
-	      return x = b.invert(x, y), x && a.invert(x[0], x[1]);
-	    };
-	    return compose;
-	  }
 	  function d3_geo_conic(projectAt) {
 	    var φ0 = 0, φ1 = π / 3, m = d3_geo_projectionMutator(projectAt), p = m(φ0, φ1);
 	    p.parallels = function(_) {
@@ -4131,7 +4224,7 @@
 	      result: d3_noop
 	    };
 	    function point(x, y) {
-	      context.moveTo(x, y);
+	      context.moveTo(x + pointRadius, y);
 	      context.arc(x, y, pointRadius, 0, τ);
 	    }
 	    function pointLineStart(x, y) {
@@ -5639,11 +5732,11 @@
 	        }
 	      }
 	      function insertChild(n, d, x, y, x1, y1, x2, y2) {
-	        var sx = (x1 + x2) * .5, sy = (y1 + y2) * .5, right = x >= sx, bottom = y >= sy, i = (bottom << 1) + right;
+	        var xm = (x1 + x2) * .5, ym = (y1 + y2) * .5, right = x >= xm, below = y >= ym, i = below << 1 | right;
 	        n.leaf = false;
 	        n = n.nodes[i] || (n.nodes[i] = d3_geom_quadtreeNode());
-	        if (right) x1 = sx; else x2 = sx;
-	        if (bottom) y1 = sy; else y2 = sy;
+	        if (right) x1 = xm; else x2 = xm;
+	        if (below) y1 = ym; else y2 = ym;
 	        insert(n, d, x, y, x1, y1, x2, y2);
 	      }
 	      var root = d3_geom_quadtreeNode();
@@ -5652,6 +5745,9 @@
 	      };
 	      root.visit = function(f) {
 	        d3_geom_quadtreeVisit(f, root, x1_, y1_, x2_, y2_);
+	      };
+	      root.find = function(point) {
+	        return d3_geom_quadtreeFind(root, point[0], point[1], x1_, y1_, x2_, y2_);
 	      };
 	      i = -1;
 	      if (x1 == null) {
@@ -5705,6 +5801,42 @@
 	      if (children[2]) d3_geom_quadtreeVisit(f, children[2], x1, sy, sx, y2);
 	      if (children[3]) d3_geom_quadtreeVisit(f, children[3], sx, sy, x2, y2);
 	    }
+	  }
+	  function d3_geom_quadtreeFind(root, x, y, x0, y0, x3, y3) {
+	    var minDistance2 = Infinity, closestPoint;
+	    (function find(node, x1, y1, x2, y2) {
+	      if (x1 > x3 || y1 > y3 || x2 < x0 || y2 < y0) return;
+	      if (point = node.point) {
+	        var point, dx = x - node.x, dy = y - node.y, distance2 = dx * dx + dy * dy;
+	        if (distance2 < minDistance2) {
+	          var distance = Math.sqrt(minDistance2 = distance2);
+	          x0 = x - distance, y0 = y - distance;
+	          x3 = x + distance, y3 = y + distance;
+	          closestPoint = point;
+	        }
+	      }
+	      var children = node.nodes, xm = (x1 + x2) * .5, ym = (y1 + y2) * .5, right = x >= xm, below = y >= ym;
+	      for (var i = below << 1 | right, j = i + 4; i < j; ++i) {
+	        if (node = children[i & 3]) switch (i & 3) {
+	         case 0:
+	          find(node, x1, y1, xm, ym);
+	          break;
+	
+	         case 1:
+	          find(node, xm, y1, x2, ym);
+	          break;
+	
+	         case 2:
+	          find(node, x1, ym, xm, y2);
+	          break;
+	
+	         case 3:
+	          find(node, xm, ym, x2, y2);
+	          break;
+	        }
+	      }
+	    })(root, x0, y0, x3, y3);
+	    return closestPoint;
 	  }
 	  d3.interpolateRgb = d3_interpolateRgb;
 	  function d3_interpolateRgb(a, b) {
@@ -5784,7 +5916,7 @@
 	  }
 	  d3.interpolators = [ function(a, b) {
 	    var t = typeof b;
-	    return (t === "string" ? d3_rgb_names.has(b) || /^(#|rgb\(|hsl\()/.test(b) ? d3_interpolateRgb : d3_interpolateString : b instanceof d3_color ? d3_interpolateRgb : Array.isArray(b) ? d3_interpolateArray : t === "object" && isNaN(b) ? d3_interpolateObject : d3_interpolateNumber)(a, b);
+	    return (t === "string" ? d3_rgb_names.has(b.toLowerCase()) || /^(#|rgb\(|hsl\()/i.test(b) ? d3_interpolateRgb : d3_interpolateString : b instanceof d3_color ? d3_interpolateRgb : Array.isArray(b) ? d3_interpolateArray : t === "object" && isNaN(b) ? d3_interpolateObject : d3_interpolateNumber)(a, b);
 	  } ];
 	  d3.interpolateArray = d3_interpolateArray;
 	  function d3_interpolateArray(a, b) {
@@ -6389,8 +6521,8 @@
 	            neighbors[o.target.index].push(o.source);
 	          }
 	        }
-	        var candidates = neighbors[i], j = -1, m = candidates.length, x;
-	        while (++j < m) if (!isNaN(x = candidates[j][dimension])) return x;
+	        var candidates = neighbors[i], j = -1, l = candidates.length, x;
+	        while (++j < l) if (!isNaN(x = candidates[j][dimension])) return x;
 	        return Math.random() * size;
 	      }
 	      return force.resume();
@@ -6597,49 +6729,50 @@
 	    return d3_layout_hierarchyRebind(partition, hierarchy);
 	  };
 	  d3.layout.pie = function() {
-	    var value = Number, sort = d3_layout_pieSortByValue, startAngle = 0, endAngle = τ;
+	    var value = Number, sort = d3_layout_pieSortByValue, startAngle = 0, endAngle = τ, padAngle = 0;
 	    function pie(data) {
-	      var values = data.map(function(d, i) {
+	      var n = data.length, values = data.map(function(d, i) {
 	        return +value.call(pie, d, i);
-	      });
-	      var a = +(typeof startAngle === "function" ? startAngle.apply(this, arguments) : startAngle);
-	      var k = ((typeof endAngle === "function" ? endAngle.apply(this, arguments) : endAngle) - a) / d3.sum(values);
-	      var index = d3.range(data.length);
+	      }), a = +(typeof startAngle === "function" ? startAngle.apply(this, arguments) : startAngle), da = (typeof endAngle === "function" ? endAngle.apply(this, arguments) : endAngle) - a, p = Math.min(Math.abs(da) / n, +(typeof padAngle === "function" ? padAngle.apply(this, arguments) : padAngle)), pa = p * (da < 0 ? -1 : 1), k = (da - n * pa) / d3.sum(values), index = d3.range(n), arcs = [], v;
 	      if (sort != null) index.sort(sort === d3_layout_pieSortByValue ? function(i, j) {
 	        return values[j] - values[i];
 	      } : function(i, j) {
 	        return sort(data[i], data[j]);
 	      });
-	      var arcs = [];
 	      index.forEach(function(i) {
-	        var d;
 	        arcs[i] = {
 	          data: data[i],
-	          value: d = values[i],
+	          value: v = values[i],
 	          startAngle: a,
-	          endAngle: a += d * k
+	          endAngle: a += v * k + pa,
+	          padAngle: p
 	        };
 	      });
 	      return arcs;
 	    }
-	    pie.value = function(x) {
+	    pie.value = function(_) {
 	      if (!arguments.length) return value;
-	      value = x;
+	      value = _;
 	      return pie;
 	    };
-	    pie.sort = function(x) {
+	    pie.sort = function(_) {
 	      if (!arguments.length) return sort;
-	      sort = x;
+	      sort = _;
 	      return pie;
 	    };
-	    pie.startAngle = function(x) {
+	    pie.startAngle = function(_) {
 	      if (!arguments.length) return startAngle;
-	      startAngle = x;
+	      startAngle = _;
 	      return pie;
 	    };
-	    pie.endAngle = function(x) {
+	    pie.endAngle = function(_) {
 	      if (!arguments.length) return endAngle;
-	      endAngle = x;
+	      endAngle = _;
+	      return pie;
+	    };
+	    pie.padAngle = function(_) {
+	      if (!arguments.length) return padAngle;
+	      padAngle = _;
 	      return pie;
 	    };
 	    return pie;
@@ -7738,11 +7871,24 @@
 	    };
 	    scale.rangePoints = function(x, padding) {
 	      if (arguments.length < 2) padding = 0;
-	      var start = x[0], stop = x[1], step = (stop - start) / (Math.max(1, domain.length - 1) + padding);
-	      range = steps(domain.length < 2 ? (start + stop) / 2 : start + step * padding / 2, step);
+	      var start = x[0], stop = x[1], step = domain.length < 2 ? (start = (start + stop) / 2, 
+	      0) : (stop - start) / (domain.length - 1 + padding);
+	      range = steps(start + step * padding / 2, step);
 	      rangeBand = 0;
 	      ranger = {
 	        t: "rangePoints",
+	        a: arguments
+	      };
+	      return scale;
+	    };
+	    scale.rangeRoundPoints = function(x, padding) {
+	      if (arguments.length < 2) padding = 0;
+	      var start = x[0], stop = x[1], step = domain.length < 2 ? (start = stop = Math.round((start + stop) / 2), 
+	      0) : (stop - start) / (domain.length - 1 + padding) | 0;
+	      range = steps(start + Math.round(step * padding / 2 + (stop - start - (domain.length - 1 + padding) * step) / 2), step);
+	      rangeBand = 0;
+	      ranger = {
+	        t: "rangeRoundPoints",
 	        a: arguments
 	      };
 	      return scale;
@@ -7763,8 +7909,8 @@
 	    scale.rangeRoundBands = function(x, padding, outerPadding) {
 	      if (arguments.length < 2) padding = 0;
 	      if (arguments.length < 3) outerPadding = padding;
-	      var reverse = x[1] < x[0], start = x[reverse - 0], stop = x[1 - reverse], step = Math.floor((stop - start) / (domain.length - padding + 2 * outerPadding)), error = stop - start - (domain.length - padding) * step;
-	      range = steps(start + Math.round(error / 2), step);
+	      var reverse = x[1] < x[0], start = x[reverse - 0], stop = x[1 - reverse], step = Math.floor((stop - start) / (domain.length - padding + 2 * outerPadding));
+	      range = steps(start + Math.round((stop - start - (domain.length - padding) * step) / 2), step);
 	      if (reverse) range.reverse();
 	      rangeBand = Math.round(step * (1 - padding));
 	      ranger = {
@@ -7921,12 +8067,86 @@
 	    return identity;
 	  }
 	  d3.svg = {};
+	  function d3_zero() {
+	    return 0;
+	  }
 	  d3.svg.arc = function() {
-	    var innerRadius = d3_svg_arcInnerRadius, outerRadius = d3_svg_arcOuterRadius, startAngle = d3_svg_arcStartAngle, endAngle = d3_svg_arcEndAngle;
+	    var innerRadius = d3_svg_arcInnerRadius, outerRadius = d3_svg_arcOuterRadius, cornerRadius = d3_zero, padRadius = d3_svg_arcAuto, startAngle = d3_svg_arcStartAngle, endAngle = d3_svg_arcEndAngle, padAngle = d3_svg_arcPadAngle;
 	    function arc() {
-	      var r0 = innerRadius.apply(this, arguments), r1 = outerRadius.apply(this, arguments), a0 = startAngle.apply(this, arguments) + d3_svg_arcOffset, a1 = endAngle.apply(this, arguments) + d3_svg_arcOffset, da = (a1 < a0 && (da = a0, 
-	      a0 = a1, a1 = da), a1 - a0), df = da < π ? "0" : "1", c0 = Math.cos(a0), s0 = Math.sin(a0), c1 = Math.cos(a1), s1 = Math.sin(a1);
-	      return da >= d3_svg_arcMax ? r0 ? "M0," + r1 + "A" + r1 + "," + r1 + " 0 1,1 0," + -r1 + "A" + r1 + "," + r1 + " 0 1,1 0," + r1 + "M0," + r0 + "A" + r0 + "," + r0 + " 0 1,0 0," + -r0 + "A" + r0 + "," + r0 + " 0 1,0 0," + r0 + "Z" : "M0," + r1 + "A" + r1 + "," + r1 + " 0 1,1 0," + -r1 + "A" + r1 + "," + r1 + " 0 1,1 0," + r1 + "Z" : r0 ? "M" + r1 * c0 + "," + r1 * s0 + "A" + r1 + "," + r1 + " 0 " + df + ",1 " + r1 * c1 + "," + r1 * s1 + "L" + r0 * c1 + "," + r0 * s1 + "A" + r0 + "," + r0 + " 0 " + df + ",0 " + r0 * c0 + "," + r0 * s0 + "Z" : "M" + r1 * c0 + "," + r1 * s0 + "A" + r1 + "," + r1 + " 0 " + df + ",1 " + r1 * c1 + "," + r1 * s1 + "L0,0" + "Z";
+	      var r0 = Math.max(0, +innerRadius.apply(this, arguments)), r1 = Math.max(0, +outerRadius.apply(this, arguments)), a0 = startAngle.apply(this, arguments) - halfπ, a1 = endAngle.apply(this, arguments) - halfπ, da = Math.abs(a1 - a0), cw = a0 > a1 ? 0 : 1;
+	      if (r1 < r0) rc = r1, r1 = r0, r0 = rc;
+	      if (da >= τε) return circleSegment(r1, cw) + (r0 ? circleSegment(r0, 1 - cw) : "") + "Z";
+	      var rc, cr, rp, ap, p0 = 0, p1 = 0, x0, y0, x1, y1, x2, y2, x3, y3, path = [];
+	      if (ap = (+padAngle.apply(this, arguments) || 0) / 2) {
+	        rp = padRadius === d3_svg_arcAuto ? Math.sqrt(r0 * r0 + r1 * r1) : +padRadius.apply(this, arguments);
+	        if (!cw) p1 *= -1;
+	        if (r1) p1 = d3_asin(rp / r1 * Math.sin(ap));
+	        if (r0) p0 = d3_asin(rp / r0 * Math.sin(ap));
+	      }
+	      if (r1) {
+	        x0 = r1 * Math.cos(a0 + p1);
+	        y0 = r1 * Math.sin(a0 + p1);
+	        x1 = r1 * Math.cos(a1 - p1);
+	        y1 = r1 * Math.sin(a1 - p1);
+	        var l1 = Math.abs(a1 - a0 - 2 * p1) <= π ? 0 : 1;
+	        if (p1 && d3_svg_arcSweep(x0, y0, x1, y1) === cw ^ l1) {
+	          var h1 = (a0 + a1) / 2;
+	          x0 = r1 * Math.cos(h1);
+	          y0 = r1 * Math.sin(h1);
+	          x1 = y1 = null;
+	        }
+	      } else {
+	        x0 = y0 = 0;
+	      }
+	      if (r0) {
+	        x2 = r0 * Math.cos(a1 - p0);
+	        y2 = r0 * Math.sin(a1 - p0);
+	        x3 = r0 * Math.cos(a0 + p0);
+	        y3 = r0 * Math.sin(a0 + p0);
+	        var l0 = Math.abs(a0 - a1 + 2 * p0) <= π ? 0 : 1;
+	        if (p0 && d3_svg_arcSweep(x2, y2, x3, y3) === 1 - cw ^ l0) {
+	          var h0 = (a0 + a1) / 2;
+	          x2 = r0 * Math.cos(h0);
+	          y2 = r0 * Math.sin(h0);
+	          x3 = y3 = null;
+	        }
+	      } else {
+	        x2 = y2 = 0;
+	      }
+	      if ((rc = Math.min(Math.abs(r1 - r0) / 2, +cornerRadius.apply(this, arguments))) > .001) {
+	        cr = r0 < r1 ^ cw ? 0 : 1;
+	        var oc = x3 == null ? [ x2, y2 ] : x1 == null ? [ x0, y0 ] : d3_geom_polygonIntersect([ x0, y0 ], [ x3, y3 ], [ x1, y1 ], [ x2, y2 ]), ax = x0 - oc[0], ay = y0 - oc[1], bx = x1 - oc[0], by = y1 - oc[1], kc = 1 / Math.sin(Math.acos((ax * bx + ay * by) / (Math.sqrt(ax * ax + ay * ay) * Math.sqrt(bx * bx + by * by))) / 2), lc = Math.sqrt(oc[0] * oc[0] + oc[1] * oc[1]);
+	        if (x1 != null) {
+	          var rc1 = Math.min(rc, (r1 - lc) / (kc + 1)), t30 = d3_svg_arcCornerTangents(x3 == null ? [ x2, y2 ] : [ x3, y3 ], [ x0, y0 ], r1, rc1, cw), t12 = d3_svg_arcCornerTangents([ x1, y1 ], [ x2, y2 ], r1, rc1, cw);
+	          if (rc === rc1) {
+	            path.push("M", t30[0], "A", rc1, ",", rc1, " 0 0,", cr, " ", t30[1], "A", r1, ",", r1, " 0 ", 1 - cw ^ d3_svg_arcSweep(t30[1][0], t30[1][1], t12[1][0], t12[1][1]), ",", cw, " ", t12[1], "A", rc1, ",", rc1, " 0 0,", cr, " ", t12[0]);
+	          } else {
+	            path.push("M", t30[0], "A", rc1, ",", rc1, " 0 1,", cr, " ", t12[0]);
+	          }
+	        } else {
+	          path.push("M", x0, ",", y0);
+	        }
+	        if (x3 != null) {
+	          var rc0 = Math.min(rc, (r0 - lc) / (kc - 1)), t03 = d3_svg_arcCornerTangents([ x0, y0 ], [ x3, y3 ], r0, -rc0, cw), t21 = d3_svg_arcCornerTangents([ x2, y2 ], x1 == null ? [ x0, y0 ] : [ x1, y1 ], r0, -rc0, cw);
+	          if (rc === rc0) {
+	            path.push("L", t21[0], "A", rc0, ",", rc0, " 0 0,", cr, " ", t21[1], "A", r0, ",", r0, " 0 ", cw ^ d3_svg_arcSweep(t21[1][0], t21[1][1], t03[1][0], t03[1][1]), ",", 1 - cw, " ", t03[1], "A", rc0, ",", rc0, " 0 0,", cr, " ", t03[0]);
+	          } else {
+	            path.push("L", t21[0], "A", rc0, ",", rc0, " 0 0,", cr, " ", t03[0]);
+	          }
+	        } else {
+	          path.push("L", x2, ",", y2);
+	        }
+	      } else {
+	        path.push("M", x0, ",", y0);
+	        if (x1 != null) path.push("A", r1, ",", r1, " 0 ", l1, ",", cw, " ", x1, ",", y1);
+	        path.push("L", x2, ",", y2);
+	        if (x3 != null) path.push("A", r0, ",", r0, " 0 ", l0, ",", 1 - cw, " ", x3, ",", y3);
+	      }
+	      path.push("Z");
+	      return path.join("");
+	    }
+	    function circleSegment(r1, cw) {
+	      return "M0," + r1 + "A" + r1 + "," + r1 + " 0 1," + cw + " 0," + -r1 + "A" + r1 + "," + r1 + " 0 1," + cw + " 0," + r1;
 	    }
 	    arc.innerRadius = function(v) {
 	      if (!arguments.length) return innerRadius;
@@ -7936,6 +8156,16 @@
 	    arc.outerRadius = function(v) {
 	      if (!arguments.length) return outerRadius;
 	      outerRadius = d3_functor(v);
+	      return arc;
+	    };
+	    arc.cornerRadius = function(v) {
+	      if (!arguments.length) return cornerRadius;
+	      cornerRadius = d3_functor(v);
+	      return arc;
+	    };
+	    arc.padRadius = function(v) {
+	      if (!arguments.length) return padRadius;
+	      padRadius = v == d3_svg_arcAuto ? d3_svg_arcAuto : d3_functor(v);
 	      return arc;
 	    };
 	    arc.startAngle = function(v) {
@@ -7948,13 +8178,18 @@
 	      endAngle = d3_functor(v);
 	      return arc;
 	    };
+	    arc.padAngle = function(v) {
+	      if (!arguments.length) return padAngle;
+	      padAngle = d3_functor(v);
+	      return arc;
+	    };
 	    arc.centroid = function() {
-	      var r = (innerRadius.apply(this, arguments) + outerRadius.apply(this, arguments)) / 2, a = (startAngle.apply(this, arguments) + endAngle.apply(this, arguments)) / 2 + d3_svg_arcOffset;
+	      var r = (+innerRadius.apply(this, arguments) + +outerRadius.apply(this, arguments)) / 2, a = (+startAngle.apply(this, arguments) + +endAngle.apply(this, arguments)) / 2 - halfπ;
 	      return [ Math.cos(a) * r, Math.sin(a) * r ];
 	    };
 	    return arc;
 	  };
-	  var d3_svg_arcOffset = -halfπ, d3_svg_arcMax = τ - ε;
+	  var d3_svg_arcAuto = "auto";
 	  function d3_svg_arcInnerRadius(d) {
 	    return d.innerRadius;
 	  }
@@ -7966,6 +8201,17 @@
 	  }
 	  function d3_svg_arcEndAngle(d) {
 	    return d.endAngle;
+	  }
+	  function d3_svg_arcPadAngle(d) {
+	    return d && d.padAngle;
+	  }
+	  function d3_svg_arcSweep(x0, y0, x1, y1) {
+	    return (x0 - x1) * y0 - (y0 - y1) * x0 > 0 ? 0 : 1;
+	  }
+	  function d3_svg_arcCornerTangents(p0, p1, r1, rc, cw) {
+	    var x01 = p0[0] - p1[0], y01 = p0[1] - p1[1], lo = (cw ? rc : -rc) / Math.sqrt(x01 * x01 + y01 * y01), ox = lo * y01, oy = -lo * x01, x1 = p0[0] + ox, y1 = p0[1] + oy, x2 = p1[0] + ox, y2 = p1[1] + oy, x3 = (x1 + x2) / 2, y3 = (y1 + y2) / 2, dx = x2 - x1, dy = y2 - y1, d2 = dx * dx + dy * dy, r = r1 - rc, D = x1 * y2 - x2 * y1, d = (dy < 0 ? -1 : 1) * Math.sqrt(r * r * d2 - D * D), cx0 = (D * dy - dx * d) / d2, cy0 = (-D * dx - dy * d) / d2, cx1 = (D * dy + dx * d) / d2, cy1 = (-D * dx + dy * d) / d2, dx0 = cx0 - x3, dy0 = cy0 - y3, dx1 = cx1 - x3, dy1 = cy1 - y3;
+	    if (dx0 * dx0 + dy0 * dy0 > dx1 * dx1 + dy1 * dy1) cx0 = cx1, cy0 = cy1;
+	    return [ [ cx0 - ox, cy0 - oy ], [ cx0 * r1 / r, cy0 * r1 / r ] ];
 	  }
 	  function d3_svg_line(projection) {
 	    var x = d3_geom_pointX, y = d3_geom_pointY, defined = d3_true, interpolate = d3_svg_lineLinear, interpolateKey = interpolate.key, tension = .7;
@@ -8057,7 +8303,7 @@
 	    return path.join("");
 	  }
 	  function d3_svg_lineCardinalOpen(points, tension) {
-	    return points.length < 4 ? d3_svg_lineLinear(points) : points[1] + d3_svg_lineHermite(points.slice(1, points.length - 1), d3_svg_lineCardinalTangents(points, tension));
+	    return points.length < 4 ? d3_svg_lineLinear(points) : points[1] + d3_svg_lineHermite(points.slice(1, -1), d3_svg_lineCardinalTangents(points, tension));
 	  }
 	  function d3_svg_lineCardinalClosed(points, tension) {
 	    return points.length < 3 ? d3_svg_lineLinear(points) : points[0] + d3_svg_lineHermite((points.push(points[0]), 
@@ -8227,7 +8473,7 @@
 	    while (++i < n) {
 	      point = points[i];
 	      r = point[0];
-	      a = point[1] + d3_svg_arcOffset;
+	      a = point[1] - halfπ;
 	      point[0] = r * Math.cos(a);
 	      point[1] = r * Math.sin(a);
 	    }
@@ -8328,7 +8574,7 @@
 	      return "M" + s.p0 + arc(s.r, s.p1, s.a1 - s.a0) + (equals(s, t) ? curve(s.r, s.p1, s.r, s.p0) : curve(s.r, s.p1, t.r, t.p0) + arc(t.r, t.p1, t.a1 - t.a0) + curve(t.r, t.p1, s.r, s.p0)) + "Z";
 	    }
 	    function subgroup(self, f, d, i) {
-	      var subgroup = f.call(self, d, i), r = radius.call(self, subgroup, i), a0 = startAngle.call(self, subgroup, i) + d3_svg_arcOffset, a1 = endAngle.call(self, subgroup, i) + d3_svg_arcOffset;
+	      var subgroup = f.call(self, d, i), r = radius.call(self, subgroup, i), a0 = startAngle.call(self, subgroup, i) - halfπ, a1 = endAngle.call(self, subgroup, i) - halfπ;
 	      return {
 	        r: r,
 	        a0: a0,
@@ -8418,7 +8664,7 @@
 	  };
 	  function d3_svg_diagonalRadialProjection(projection) {
 	    return function() {
-	      var d = projection.apply(this, arguments), r = d[0], a = d[1] + d3_svg_arcOffset;
+	      var d = projection.apply(this, arguments), r = d[0], a = d[1] - halfπ;
 	      return [ r * Math.cos(a), r * Math.sin(a) ];
 	    };
 	  }
@@ -8474,8 +8720,39 @@
 	  });
 	  d3.svg.symbolTypes = d3_svg_symbols.keys();
 	  var d3_svg_symbolSqrt3 = Math.sqrt(3), d3_svg_symbolTan30 = Math.tan(30 * d3_radians);
-	  function d3_transition(groups, id) {
+	  d3_selectionPrototype.transition = function(name) {
+	    var id = d3_transitionInheritId || ++d3_transitionId, ns = d3_transitionNamespace(name), subgroups = [], subgroup, node, transition = d3_transitionInherit || {
+	      time: Date.now(),
+	      ease: d3_ease_cubicInOut,
+	      delay: 0,
+	      duration: 250
+	    };
+	    for (var j = -1, m = this.length; ++j < m; ) {
+	      subgroups.push(subgroup = []);
+	      for (var group = this[j], i = -1, n = group.length; ++i < n; ) {
+	        if (node = group[i]) d3_transitionNode(node, i, ns, id, transition);
+	        subgroup.push(node);
+	      }
+	    }
+	    return d3_transition(subgroups, ns, id);
+	  };
+	  d3_selectionPrototype.interrupt = function(name) {
+	    return this.each(name == null ? d3_selection_interrupt : d3_selection_interruptNS(d3_transitionNamespace(name)));
+	  };
+	  var d3_selection_interrupt = d3_selection_interruptNS(d3_transitionNamespace());
+	  function d3_selection_interruptNS(ns) {
+	    return function() {
+	      var lock, active;
+	      if ((lock = this[ns]) && (active = lock[lock.active])) {
+	        if (--lock.count) delete lock[lock.active]; else delete this[ns];
+	        lock.active += .5;
+	        active.event && active.event.interrupt.call(this, this.__data__, active.index);
+	      }
+	    };
+	  }
+	  function d3_transition(groups, ns, id) {
 	    d3_subclass(groups, d3_transitionPrototype);
+	    groups.namespace = ns;
 	    groups.id = id;
 	    return groups;
 	  }
@@ -8484,44 +8761,44 @@
 	  d3_transitionPrototype.empty = d3_selectionPrototype.empty;
 	  d3_transitionPrototype.node = d3_selectionPrototype.node;
 	  d3_transitionPrototype.size = d3_selectionPrototype.size;
-	  d3.transition = function(selection) {
-	    return arguments.length ? d3_transitionInheritId ? selection.transition() : selection : d3_selectionRoot.transition();
+	  d3.transition = function(selection, name) {
+	    return selection && selection.transition ? d3_transitionInheritId ? selection.transition(name) : selection : d3.selection().transition(selection);
 	  };
 	  d3.transition.prototype = d3_transitionPrototype;
 	  d3_transitionPrototype.select = function(selector) {
-	    var id = this.id, subgroups = [], subgroup, subnode, node;
+	    var id = this.id, ns = this.namespace, subgroups = [], subgroup, subnode, node;
 	    selector = d3_selection_selector(selector);
 	    for (var j = -1, m = this.length; ++j < m; ) {
 	      subgroups.push(subgroup = []);
 	      for (var group = this[j], i = -1, n = group.length; ++i < n; ) {
 	        if ((node = group[i]) && (subnode = selector.call(node, node.__data__, i, j))) {
 	          if ("__data__" in node) subnode.__data__ = node.__data__;
-	          d3_transitionNode(subnode, i, id, node.__transition__[id]);
+	          d3_transitionNode(subnode, i, ns, id, node[ns][id]);
 	          subgroup.push(subnode);
 	        } else {
 	          subgroup.push(null);
 	        }
 	      }
 	    }
-	    return d3_transition(subgroups, id);
+	    return d3_transition(subgroups, ns, id);
 	  };
 	  d3_transitionPrototype.selectAll = function(selector) {
-	    var id = this.id, subgroups = [], subgroup, subnodes, node, subnode, transition;
+	    var id = this.id, ns = this.namespace, subgroups = [], subgroup, subnodes, node, subnode, transition;
 	    selector = d3_selection_selectorAll(selector);
 	    for (var j = -1, m = this.length; ++j < m; ) {
 	      for (var group = this[j], i = -1, n = group.length; ++i < n; ) {
 	        if (node = group[i]) {
-	          transition = node.__transition__[id];
+	          transition = node[ns][id];
 	          subnodes = selector.call(node, node.__data__, i, j);
 	          subgroups.push(subgroup = []);
 	          for (var k = -1, o = subnodes.length; ++k < o; ) {
-	            if (subnode = subnodes[k]) d3_transitionNode(subnode, k, id, transition);
+	            if (subnode = subnodes[k]) d3_transitionNode(subnode, k, ns, id, transition);
 	            subgroup.push(subnode);
 	          }
 	        }
 	      }
 	    }
-	    return d3_transition(subgroups, id);
+	    return d3_transition(subgroups, ns, id);
 	  };
 	  d3_transitionPrototype.filter = function(filter) {
 	    var subgroups = [], subgroup, group, node;
@@ -8534,23 +8811,23 @@
 	        }
 	      }
 	    }
-	    return d3_transition(subgroups, this.id);
+	    return d3_transition(subgroups, this.namespace, this.id);
 	  };
 	  d3_transitionPrototype.tween = function(name, tween) {
-	    var id = this.id;
-	    if (arguments.length < 2) return this.node().__transition__[id].tween.get(name);
+	    var id = this.id, ns = this.namespace;
+	    if (arguments.length < 2) return this.node()[ns][id].tween.get(name);
 	    return d3_selection_each(this, tween == null ? function(node) {
-	      node.__transition__[id].tween.remove(name);
+	      node[ns][id].tween.remove(name);
 	    } : function(node) {
-	      node.__transition__[id].tween.set(name, tween);
+	      node[ns][id].tween.set(name, tween);
 	    });
 	  };
 	  function d3_transition_tween(groups, name, value, tween) {
-	    var id = groups.id;
+	    var id = groups.id, ns = groups.namespace;
 	    return d3_selection_each(groups, typeof value === "function" ? function(node, i, j) {
-	      node.__transition__[id].tween.set(name, tween(value.call(node, node.__data__, i, j)));
+	      node[ns][id].tween.set(name, tween(value.call(node, node.__data__, i, j)));
 	    } : (value = tween(value), function(node) {
-	      node.__transition__[id].tween.set(name, value);
+	      node[ns][id].tween.set(name, value);
 	    }));
 	  }
 	  d3_transitionPrototype.attr = function(nameNS, value) {
@@ -8614,7 +8891,7 @@
 	    }
 	    function styleString(b) {
 	      return b == null ? styleNull : (b += "", function() {
-	        var a = d3_window.getComputedStyle(this, null).getPropertyValue(name), i;
+	        var a = d3_window(this).getComputedStyle(this, null).getPropertyValue(name), i;
 	        return a !== b && (i = d3_interpolate(a, b), function(t) {
 	          this.style.setProperty(name, i(t), priority);
 	        });
@@ -8625,7 +8902,7 @@
 	  d3_transitionPrototype.styleTween = function(name, tween, priority) {
 	    if (arguments.length < 3) priority = "";
 	    function styleTween(d, i) {
-	      var f = tween.call(this, d, i, d3_window.getComputedStyle(this, null).getPropertyValue(name));
+	      var f = tween.call(this, d, i, d3_window(this).getComputedStyle(this, null).getPropertyValue(name));
 	      return f && function(t) {
 	        this.style.setProperty(name, f(t), priority);
 	      };
@@ -8642,73 +8919,84 @@
 	    };
 	  }
 	  d3_transitionPrototype.remove = function() {
+	    var ns = this.namespace;
 	    return this.each("end.transition", function() {
 	      var p;
-	      if (this.__transition__.count < 2 && (p = this.parentNode)) p.removeChild(this);
+	      if (this[ns].count < 2 && (p = this.parentNode)) p.removeChild(this);
 	    });
 	  };
 	  d3_transitionPrototype.ease = function(value) {
-	    var id = this.id;
-	    if (arguments.length < 1) return this.node().__transition__[id].ease;
+	    var id = this.id, ns = this.namespace;
+	    if (arguments.length < 1) return this.node()[ns][id].ease;
 	    if (typeof value !== "function") value = d3.ease.apply(d3, arguments);
 	    return d3_selection_each(this, function(node) {
-	      node.__transition__[id].ease = value;
+	      node[ns][id].ease = value;
 	    });
 	  };
 	  d3_transitionPrototype.delay = function(value) {
-	    var id = this.id;
-	    if (arguments.length < 1) return this.node().__transition__[id].delay;
+	    var id = this.id, ns = this.namespace;
+	    if (arguments.length < 1) return this.node()[ns][id].delay;
 	    return d3_selection_each(this, typeof value === "function" ? function(node, i, j) {
-	      node.__transition__[id].delay = +value.call(node, node.__data__, i, j);
+	      node[ns][id].delay = +value.call(node, node.__data__, i, j);
 	    } : (value = +value, function(node) {
-	      node.__transition__[id].delay = value;
+	      node[ns][id].delay = value;
 	    }));
 	  };
 	  d3_transitionPrototype.duration = function(value) {
-	    var id = this.id;
-	    if (arguments.length < 1) return this.node().__transition__[id].duration;
+	    var id = this.id, ns = this.namespace;
+	    if (arguments.length < 1) return this.node()[ns][id].duration;
 	    return d3_selection_each(this, typeof value === "function" ? function(node, i, j) {
-	      node.__transition__[id].duration = Math.max(1, value.call(node, node.__data__, i, j));
+	      node[ns][id].duration = Math.max(1, value.call(node, node.__data__, i, j));
 	    } : (value = Math.max(1, value), function(node) {
-	      node.__transition__[id].duration = value;
+	      node[ns][id].duration = value;
 	    }));
 	  };
 	  d3_transitionPrototype.each = function(type, listener) {
-	    var id = this.id;
+	    var id = this.id, ns = this.namespace;
 	    if (arguments.length < 2) {
 	      var inherit = d3_transitionInherit, inheritId = d3_transitionInheritId;
-	      d3_transitionInheritId = id;
-	      d3_selection_each(this, function(node, i, j) {
-	        d3_transitionInherit = node.__transition__[id];
-	        type.call(node, node.__data__, i, j);
-	      });
-	      d3_transitionInherit = inherit;
-	      d3_transitionInheritId = inheritId;
+	      try {
+	        d3_transitionInheritId = id;
+	        d3_selection_each(this, function(node, i, j) {
+	          d3_transitionInherit = node[ns][id];
+	          type.call(node, node.__data__, i, j);
+	        });
+	      } finally {
+	        d3_transitionInherit = inherit;
+	        d3_transitionInheritId = inheritId;
+	      }
 	    } else {
 	      d3_selection_each(this, function(node) {
-	        var transition = node.__transition__[id];
-	        (transition.event || (transition.event = d3.dispatch("start", "end"))).on(type, listener);
+	        var transition = node[ns][id];
+	        (transition.event || (transition.event = d3.dispatch("start", "end", "interrupt"))).on(type, listener);
 	      });
 	    }
 	    return this;
 	  };
 	  d3_transitionPrototype.transition = function() {
-	    var id0 = this.id, id1 = ++d3_transitionId, subgroups = [], subgroup, group, node, transition;
+	    var id0 = this.id, id1 = ++d3_transitionId, ns = this.namespace, subgroups = [], subgroup, group, node, transition;
 	    for (var j = 0, m = this.length; j < m; j++) {
 	      subgroups.push(subgroup = []);
 	      for (var group = this[j], i = 0, n = group.length; i < n; i++) {
 	        if (node = group[i]) {
-	          transition = Object.create(node.__transition__[id0]);
-	          transition.delay += transition.duration;
-	          d3_transitionNode(node, i, id1, transition);
+	          transition = node[ns][id0];
+	          d3_transitionNode(node, i, ns, id1, {
+	            time: transition.time,
+	            ease: transition.ease,
+	            delay: transition.delay + transition.duration,
+	            duration: transition.duration
+	          });
 	        }
 	        subgroup.push(node);
 	      }
 	    }
-	    return d3_transition(subgroups, id1);
+	    return d3_transition(subgroups, ns, id1);
 	  };
-	  function d3_transitionNode(node, i, id, inherit) {
-	    var lock = node.__transition__ || (node.__transition__ = {
+	  function d3_transitionNamespace(name) {
+	    return name == null ? "__transition__" : "__transition_" + name + "__";
+	  }
+	  function d3_transitionNode(node, i, ns, id, inherit) {
+	    var lock = node[ns] || (node[ns] = {
 	      active: 0,
 	      count: 0
 	    }), transition = lock[id];
@@ -8717,43 +9005,53 @@
 	      transition = lock[id] = {
 	        tween: new d3_Map(),
 	        time: time,
-	        ease: inherit.ease,
 	        delay: inherit.delay,
-	        duration: inherit.duration
+	        duration: inherit.duration,
+	        ease: inherit.ease,
+	        index: i
 	      };
+	      inherit = null;
 	      ++lock.count;
 	      d3.timer(function(elapsed) {
-	        var d = node.__data__, ease = transition.ease, delay = transition.delay, duration = transition.duration, timer = d3_timer_active, tweened = [];
+	        var delay = transition.delay, duration, ease, timer = d3_timer_active, tweened = [];
 	        timer.t = delay + time;
 	        if (delay <= elapsed) return start(elapsed - delay);
 	        timer.c = start;
 	        function start(elapsed) {
 	          if (lock.active > id) return stop();
+	          var active = lock[lock.active];
+	          if (active) {
+	            --lock.count;
+	            delete lock[lock.active];
+	            active.event && active.event.interrupt.call(node, node.__data__, active.index);
+	          }
 	          lock.active = id;
-	          transition.event && transition.event.start.call(node, d, i);
+	          transition.event && transition.event.start.call(node, node.__data__, i);
 	          transition.tween.forEach(function(key, value) {
-	            if (value = value.call(node, d, i)) {
+	            if (value = value.call(node, node.__data__, i)) {
 	              tweened.push(value);
 	            }
 	          });
+	          ease = transition.ease;
+	          duration = transition.duration;
 	          d3.timer(function() {
 	            timer.c = tick(elapsed || 1) ? d3_true : tick;
 	            return 1;
 	          }, 0, time);
 	        }
 	        function tick(elapsed) {
-	          if (lock.active !== id) return stop();
+	          if (lock.active !== id) return 1;
 	          var t = elapsed / duration, e = ease(t), n = tweened.length;
 	          while (n > 0) {
 	            tweened[--n].call(node, e);
 	          }
 	          if (t >= 1) {
-	            transition.event && transition.event.end.call(node, d, i);
+	            transition.event && transition.event.end.call(node, node.__data__, i);
 	            return stop();
 	          }
 	        }
 	        function stop() {
-	          if (--lock.count) delete lock[id]; else delete node.__transition__;
+	          if (--lock.count) delete lock[id]; else delete node[ns];
 	          return 1;
 	        }
 	      }, 0, time);
@@ -8970,8 +9268,8 @@
 	      g.selectAll(".extent,.e>rect,.w>rect").attr("height", yExtent[1] - yExtent[0]);
 	    }
 	    function brushstart() {
-	      var target = this, eventTarget = d3.select(d3.event.target), event_ = event.of(target, arguments), g = d3.select(target), resizing = eventTarget.datum(), resizingX = !/^(n|s)$/.test(resizing) && x, resizingY = !/^(e|w)$/.test(resizing) && y, dragging = eventTarget.classed("extent"), dragRestore = d3_event_dragSuppress(), center, origin = d3.mouse(target), offset;
-	      var w = d3.select(d3_window).on("keydown.brush", keydown).on("keyup.brush", keyup);
+	      var target = this, eventTarget = d3.select(d3.event.target), event_ = event.of(target, arguments), g = d3.select(target), resizing = eventTarget.datum(), resizingX = !/^(n|s)$/.test(resizing) && x, resizingY = !/^(e|w)$/.test(resizing) && y, dragging = eventTarget.classed("extent"), dragRestore = d3_event_dragSuppress(target), center, origin = d3.mouse(target), offset;
+	      var w = d3.select(d3_window(target)).on("keydown.brush", keydown).on("keyup.brush", keyup);
 	      if (d3.event.changedTouches) {
 	        w.on("touchmove.brush", brushmove).on("touchend.brush", brushend);
 	      } else {
@@ -19001,7 +19299,6 @@
 	                                .margins({top: 5, right: 5, bottom: 5, left: 5}) //margins are good for positioning
 	                                .group(totalFundingGroup)
 	                                .dimension(countryDimension)
-	                                .valueAccessor(function(d){return d;})
 	                                .totalCapacity(maxCountryValue)
 	                                .orientation('horizontal') //vertical still needs work
 	                                .gap(5)
@@ -19028,7 +19325,8 @@
 	            }
 	            return title + _markerFormat(marker.value);
 	        },
-	        _defaultMarkerHeight = 40, _defaultMarkerWidth = 20, _defaultToolTips = true;
+	        _defaultMarkerHeight = 40, _defaultMarkerWidth = 20, _defaultToolTips = true,
+	        _valueAccessor = function(d) {return d;};
 	
 	    //dimension is not required because this comp onent only has one dimension
 	    _chart._mandatoryAttributes (['group']);
@@ -19083,6 +19381,16 @@
 	        return _chart.valueAccessor()(valObj);
 	
 	    });
+	
+	    /** 
+	        #### .valueAccessor(function)
+	        Set the value accessor function. Bar gauge comes with a default that should work in most cases.
+	    **/
+	    _chart.valueAccessor = function(_) {
+	        if(!arguments.length) return _valueAccessor;
+	        _valueAccessor = _;
+	        return _chart;
+	    };
 	
 	    /**
 	        #### .orientation(string)
@@ -20702,7 +21010,7 @@
 							allNegativeData = false;
 							insertNode(row, columnName, columnIndex);
 						}
-						else {
+						else if(columnIndex === 0){ //do not want to add duplicate negative values for each level
 							_totalNegativeValue += Number(row[measureColumn]);
 						}
 					});
@@ -30832,7 +31140,7 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	var map = {
-		"./src/javascripts/filter-builder": 9
+		"./src/javascripts/quick-defaults": 9
 	};
 	function webpackContext(req) {
 		return __webpack_require__(webpackContextResolve(req));
@@ -30852,301 +31160,65 @@
 /* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var dc = __webpack_require__(2),
-	    inflection = __webpack_require__(10);
+	var inflection = __webpack_require__(10),
+	  dtip = __webpack_require__(11)(d3);
 	
-	// styles
-	__webpack_require__(11);
-	
-	__webpack_require__(15);
-	__webpack_require__(23);
-	__webpack_require__(25);
-	
-	module.exports = function (parent, chartGroup) {
+	var quickDefaults = function(dc) {
 	  
-	    var _chart = dc.baseMixin({});    
-	    var _filterSources = [];
-	    _chart._mandatoryAttributes([]);
+	  var original = {};
 	
-	    _chart.filterSources = function(_) {
-	        // _ is of the following format:
-	        // [{chart: yourDcChartObject, icon: 'fontawesome-class', label: 'Your Label'}]
-	        if (!arguments.length) return _filterSources;
-	        _filterSources = _;
-	        return _chart;
-	    };
+	  original.rowChart = dc.rowChart;
+	  dc.rowChart = function(parent, opts) {
+	    var _chart = original.rowChart(parent);
 	
-	    _chart._doRender = function () {
-	        var hasFilters = false;
-	        var filtered = _filterSources.filter(function(d){ return d.chart.filters().length > 0;});
-	        var notFiltered = _filterSources.filter(function(d){ return d.chart.filters().length === 0;});
-	        if (filtered.length > 0) hasFilters = true;
+	    _chart.elasticX(true);
 	
-	        _chart.root().classed('filter-builder', true);
-	        _chart.root().html('');
-	        _chart.root().append('h2').html('<i class="fa fa-2x fa-filter"></i><span class="hide-visually">Filter</span>');
-	        var list = _chart.root().append('ul');
+	    return _chart;
+	  };
 	
-	        var addFilterButton = list.append('li').classed('add-filter', true);
-	        addFilterButton.append('i')
-	          .classed({'fa': true, 'fa-plus': true});
-	        filterMenu(addFilterButton, notFiltered);
+	  original.pieChart = dc.pieChart;
+	  dc.pieChart = function(parent, opts) {
+	    var _chart = original.pieChart(parent);
 	
-	        if (hasFilters) {
-	          var filteredFieldsRoot = list.selectAll('li.filtered-field')
-	              .data(filtered)
-	            .enter().append('li').classed('filtered-field', true);
+	    _chart.renderLabel(false);
 	
-	          var fieldLabels = filteredFieldsRoot.selectAll('span.field-label')
-	              .data(function(d){return [d];})
-	            .enter().append('span').classed('field-label', true)
-	            .text(function(d){return d.label;});
+	    return _chart;
+	  };
 	
-	          var filteredFields = filteredFieldsRoot.selectAll('ul')
-	             .data(function(d){return [d];})
-	            .enter().append('ul')
-	            .classed('filter-value-list', true);
+	  original.geoChoroplethChart = dc.geoChoroplethChart;
+	  dc.geoChoroplethChart = function(parent, opts) {
+	    var _chart = original.geoChoroplethChart(parent);
 	
-	          var filterValues = filteredFields.selectAll('li.filter-value')
-	              .data(function(d){return d.chart.filters().map(function(v){return {chart: d.chart, filterValue: v};});})
-	            .enter().append('li')
-	            .classed('filter-value', true)
-	            .text(function(d){return tryLabel(d);})
-	            .on('click', function(d){
-	              d.chart.filter(d.filterValue); // dc base .filter() function works for removal as well as addition of filters
-	              dc.redrawAll();
-	              d3.event.stopPropagation();
-	            });
+	    //Add zoom markup
+	    _chart.root().append("div").classed("zoomControlsContainer", true);
+	    _chart.root().select(".zoomControlsContainer").append("div").classed("zoomButton", true);
+	    _chart.root().select(".zoomControlsContainer").append("div").classed("resetZoomButton", true);
 	
-	          var addValueButton = filteredFields.selectAll('li.add-value')
-	            .data(function(d){return [d];})
-	            .enter()
-	            .append('li')
-	            .classed({'add-value': true, 'filter-value': true})  
-	            .append('i')
-	            .classed({'fa': true, 'fa-plus': true})
-	            .on("click", function(){
-	              showValueOptions(this);
-	              d3.event.stopPropagation();
-	            });
-	            
-	          valuePicker(addValueButton);
+	    //Defaults for colors and data
+	    var _colorRange = ["#a9c8f4", "#7fa1d2", "#5479b0", "#2a518e", "#002A6C"];
+	    var _zeroColor = '#ccc';
+	    var _colorDomain = [100, 60000];
 	
-	
-	          var clearFilterButton = filteredFieldsRoot.selectAll('span.close')
-	            .data(function(d){return [d.chart];})
-	            .enter()
-	            .append('span')  
-	            .classed({'close': true})
-	            .on('click', function(chart){
-	              chart.filterAll();
-	              dc.redrawAll();
-	              d3.event.stopPropagation();
-	            })
-	            .append('i')
-	            .classed({'fa': true, 'fa-times': true});
-	        }
-	
-	        return _chart;
-	    };
-	
-	    function tryLabel(filterItem){
-	      if (filterItem.chart.label && filterItem.chart.label() !== undefined){
-	        return filterItem.chart.label()({key: filterItem.filterValue}) || "N/A";
-	      } 
-	      return filterItem.filterValue || "N/A";
-	    }
-	
-	    function optionSort(a, b){
-	      var aLabel = tryLabel(a);
-	      var bLabel = tryLabel(b);
-	
-	      if (aLabel > bLabel) {
-	        return 1;
-	      }
-	      if (aLabel < bLabel){
-	        return -1;
-	      }
-	      return 0;
-	    }
-	
-	    _chart._doRedraw = function(){
-	        return _chart._doRender();
-	    };
-	
-	    // Filter Menu
-	    function filterMenu(parent, options){
-	      var _parentElement;
-	      if (parent.on === undefined) {
-	        _parentElement = d3.select(parent);
-	      } else {
-	        _parentElement = parent;
-	      } 
-	      
-	      var _dimensionListContainer = _parentElement.append('div')
-	        .classed({'picker-choices': true, 'dimension-list-container': true}).style('display', 'none');
-	
-	      var _dimListHeader = _dimensionListContainer.append('div')
-	        .classed('header', true)
-	        .on('click', function(){
-	          _dimensionListContainer.style('display', 'none');
-	          _dimensionList.selectAll('div.picker-choices').style('display', 'none');
-	          _dimensionList.selectAll('li.selected').classed('selected', false);
-	          d3.event.stopPropagation();
-	        });
-	
-	      _dimListHeader.append('div')
-	        .classed({'fa': true, 'fa-times': true, 'close-button': true});
-	
-	      _dimListHeader.append('div')
-	        .text('Add a Filter on')
-	        .classed({'header-label': true});
-	
-	      var _dimensionList = _dimensionListContainer.append('ul')
-	        .classed({'dimension-list': true});
-	
-	      var _dimensionOptions = _dimensionList.selectAll('li.dimension-option')
-	          .data(options)
-	        .enter().append('li')
-	        .attr('class', function(d){
-	          return (d.options && d.options.class);
-	        })
-	        .classed('dimension-option', true)
-	        .text(function(d){return d.label;})
-	        .on('click', function(d){
-	          showValueOptions(this, _parentElement);
-	          d3.event.stopPropagation();
-	        });
-	
-	      valuePicker(_dimensionOptions);
-	
-	
-	      _parentElement.on('click', function(){
-	        blurMenus();
-	        d3.select('.dimension-list-container').style("display", "block");
-	        try{
-	          d3.event.stopPropagation();
-	        } catch(e) {
-	          // swallow
-	        }
+	    _chart.colors(d3.scale.quantize().range(_colorRange))
+	      .colorDomain(_colorDomain)
+	      .colorCalculator(function (d) {
+	        if(d === undefined) return _zeroColor;
+	        if(d < 1 )return _zeroColor;
+	        return _chart.colors()(Math.sqrt(d)); 
+	      })
+	      .projection(d3.geo.mercator())
+	      .enableZoom(true)
+	      .afterZoom(function(g, s){
+	        g.selectAll('.country').selectAll('path').style('stroke-width',0.75 / s + 'px');
 	      });
 	
-	    }
+	    return _chart;
+	  };
 	
-	    function valuePicker(selection){
+	  return dc;
+	};
 	
-	      var _valueListContainer = selection.selectAll('div.value-list-container')
-	          .data(function(d){return [d];})
-	        .enter().append('div')
-	        .classed({'picker-choices': true,'value-list-container': true}).style("display", "none");
-	
-	      var _valueListHeader = _valueListContainer.selectAll('div.header')
-	          .data(function(d){return [d];})
-	        .enter().append('div')
-	        .classed('header', true)
-	        .on('click', function(){
-	          _valueListContainer.style('display', 'none');
-	          _valueList.selectAll('div.picker-choices').style('display', 'none');
-	          _valueList.selectAll('li.selected').classed('selected', false);
-	          d3.event.stopPropagation();
-	        });
-	
-	      _valueListHeader.append('div')
-	        .append('i')
-	        .classed({'fa': true, 'fa-times': true, 'close-button': true});
-	        
-	
-	      _valueListHeader.append('div')
-	        .text(function(d){return 'Choose a value for "' + d.label +'"';})
-	        .classed({'header-label': true});;
-	
-	      var _listFilterContainer = _valueListContainer
-	        .append('div')
-	        .classed('listFilterContainer', true);
-	
-	      _listFilterContainer
-	        .append('i')
-	        .classed('fa fa-2x fa-search', true);
-	
-	      _listFilterContainer
-	          .data(function(d){return [d];})
-	        .append('input')
-	        .attr('placeholder','Filter the list below...')
-	        .on("click", function(d) {
-	          d3.event.stopPropagation();
-	        })
-	        .on('input', function(d){
-	          that = this;
-	          dc.events.trigger(function(){
-	            selection.select('ul.'+dc.utils.nameToId(d.label)).selectAll('li.value-option')
-	              .classed('hidden', function(d){
-	                var re = new RegExp(that.value, 'i');
-	                return this.textContent.search(re) < 0; 
-	              });
-	          }, 200);
-	        });
-	
-	      var _valueList = _valueListContainer.selectAll('ul.value-list')
-	          .data(function(d){return [d];})
-	        .enter().append('ul')
-	        .attr('class', function(d){return dc.utils.nameToId(d.label);})
-	        .classed({'value-list': true});
-	    
-	      var _valueOptions = _valueList.selectAll('li.value-option')
-	          .data(function(d){
-	            return d.chart.group().top(Infinity)
-	              .map(function(i){ return {chart: d.chart, filterValue: i.key};})
-	              .filter(function(i){
-	                return i.chart.filters().indexOf(i.filterValue) < 0;
-	              })
-	              .sort(optionSort);
-	          })
-	        .enter().append('li')
-	        .text(function(d){return tryLabel(d);})
-	        .classed('value-option', true)
-	        .on('click', function(d){
-	          d.chart.filter(d.filterValue);
-	          dc.redrawAll();
-	          d3.event.stopPropagation();
-	        });
-	        
-	    }
-	
-	    function showValueOptions(element, parentElement){
-	      var _element;
-	      if (element.on === undefined) {
-	        _element = d3.select(element);
-	      } else {
-	        _element = element;
-	      } 
-	      if (parentElement) {
-	        parentElement.selectAll('ul.dimension-list .value-list-container').style('display', 'none');
-	        parentElement.selectAll('ul.dimension-list li').classed('selected', false);
-	      }  
-	      else {
-	        blurMenus();
-	      }
-	
-	      _element.select('.value-list-container').style('display','block');
-	      _element.classed('selected', true);
-	    }
-	
-	    function blurMenus() {
-	      d3.selectAll(".value-list-container")[0].forEach(function(valueOptionList) {
-	        d3.select(valueOptionList).style('display', "none");
-	      });
-	
-	      d3.select('.dimension-list-container').style("display", "none");
-	
-	    }
-	
-	    d3.select("html").on("click", function(){
-	      d3.selectAll('.picker-choices').style('display', 'none');
-	    });
-	
-	    return _chart.anchor(parent, chartGroup);
-	  }; 
-
+	module.exports = quickDefaults;
 
 /***/ },
 /* 10 */
@@ -31796,20 +31868,564 @@
 /* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
+	var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;// d3.tip
+	// Copyright (c) 2013 Justin Palmer
+	//
+	// Tooltips for d3.js SVG visualizations
+	
+	(function (root, factory) {
+	  if (true) {
+	    // AMD. Register as an anonymous module with d3 as a dependency.
+	    !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(3)], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory), __WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ? (__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__))
+	  } else if (typeof module === 'object' && module.exports) {
+	    // CommonJS
+	    module.exports = function(d3) {
+	      d3.tip = factory(d3)
+	      return d3.tip
+	    }
+	  } else {
+	    // Browser global.
+	    factory(root.d3)
+	  }
+	}(this, function (d3) {
+	
+	  // Public - contructs a new tooltip
+	  //
+	  // Returns a tip
+	  d3.tip = function() {
+	    var direction = d3_tip_direction,
+	        offset    = d3_tip_offset,
+	        html      = d3_tip_html,
+	        node      = initNode(),
+	        svg       = null,
+	        point     = null,
+	        target    = null,
+	        positionAnchor = d3_tip_positionAnchor;
+	
+	    function tip(vis) {
+	      svg = getSVGNode(vis)
+	      point = svg.createSVGPoint()
+	      document.body.appendChild(node)
+	    }
+	
+	    // Public - show the tooltip on the screen
+	    //
+	    // Returns a tip
+	    tip.show = function() {
+	      var args = Array.prototype.slice.call(arguments)
+	      if(args[args.length - 1] instanceof SVGElement) target = args.pop()
+	
+	      var content = html.apply(this, args),
+	          poffset = offset.apply(this, args),
+	          dir     = direction.apply(this, args),
+	          nodel   = d3.select(node),
+	          i       = directions.length,
+	          coords,
+	          scrollTop  = document.documentElement.scrollTop || document.body.scrollTop,
+	          scrollLeft = document.documentElement.scrollLeft || document.body.scrollLeft
+	
+	      nodel.html(content)
+	        .style({ opacity: 1, 'pointer-events': 'all', 'z-index': 100 })
+	
+	      while(i--) nodel.classed(directions[i], false)
+	      coords = direction_callbacks.get(dir).apply(this)
+	      var rightEdge =  coords.left + poffset[1] + scrollLeft + nodel.property('offsetWidth');
+	      var bottomEdge = coords.top +  poffset[0] + scrollTop + nodel.property('offsetHeight');
+	      var overFlowRight = tipOverFlowRight(rightEdge);
+	      var overFlowBottom = tipOverFlowBottom(bottomEdge);
+	      var leftEdge = coords.left + poffset[1] + scrollLeft;
+	      var overFlowLeft = tipOverFlowLeft(leftEdge);
+	      var topEdge = coords.top + poffset[0] + scrollTop;
+	
+	      if(overFlowRight) leftEdge -= overFlowRight;
+	      if(overFlowLeft) leftEdge += overFlowLeft;
+	      if(overFlowBottom) topEdge -= overFlowBottom;
+	
+	      if(positionAnchor() === 'shape') {
+	        nodel.classed(dir, true).style({
+	          top: topEdge + 'px',
+	          left: leftEdge + 'px'
+	        });
+	      }
+	      else if(positionAnchor() === 'mouse') {
+	        nodel.classed(dir, true);
+	        tip.updatePosition(poffset);
+	      }
+	      
+	      return tip
+	    }
+	
+	    // Public - hide the tooltip
+	    //
+	    // Returns a tip
+	    tip.hide = function() {
+	      var nodel = d3.select(node)
+	      nodel.style({ opacity: 0, 'pointer-events': 'none', 'z-index': -1 })
+	      return tip
+	    }
+	
+	    //Public - update position of tooltip based on mouse
+	    //
+	    // Returns a tip
+	    tip.updatePosition = function(v) {
+	      var nodel = d3.select(node);
+	      var mouseX = d3.mouse(d3.select("html").node())[0] + 10;
+	      var mouseY = d3.mouse(d3.select("html").node())[1] + 20;
+	      var rightEdge = mouseX + nodel.property('offsetWidth');
+	      var bottomEdge = mouseY + nodel.property('offsetHeight');
+	      var overFlowRight = tipOverFlowRight(rightEdge);
+	      var overFlowLeft = tipOverFlowLeft(mouseX);
+	      var overFlowBottom = tipOverFlowBottom(bottomEdge);
+	
+	      if(v.length) {
+	        mouseX += v[0];
+	        mouseY += v[1];
+	      }
+	      if(overFlowRight) mouseX -= overFlowRight;
+	      if(overFlowLeft) mouseX += overFlowLeft;
+	      if(overFlowBottom) mouseY -= overFlowBottom;
+	
+	      nodel.style({
+	        top: mouseY + 'px',
+	        left: mouseX + 'px'
+	      });
+	      return tip;
+	    };
+	
+	    function tipOverFlowRight(rightEdge) {
+	      var windowWidth = window.outerWidth;
+	      if(rightEdge > windowWidth)
+	        return rightEdge - windowWidth;
+	      else
+	        return false;
+	    }
+	
+	    function tipOverFlowLeft(leftEdge) {
+	      var windowWidth = window.outerWidth;
+	      if(leftEdge < 0)
+	        return -(leftEdge);
+	      else
+	        return false;
+	    }
+	
+	    function tipOverFlowBottom(bottomEdge) {
+	      var scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+	      var windowHeight = window.innerHeight + scrollTop;
+	      if(bottomEdge > windowHeight)
+	        return bottomEdge - windowHeight;
+	      else
+	        return false;
+	    }
+	    // Public: Proxy attr calls to the d3 tip container.  Sets or gets attribute value.
+	    //
+	    // n - name of the attribute
+	    // v - value of the attribute
+	    //
+	    // Returns tip or attribute value
+	    tip.attr = function(n, v) {
+	      if (arguments.length < 2 && typeof n === 'string') {
+	        return d3.select(node).attr(n)
+	      } else {
+	        var args =  Array.prototype.slice.call(arguments)
+	        d3.selection.prototype.attr.apply(d3.select(node), args)
+	      }
+	
+	      return tip
+	    }
+	
+	    // Public: Proxy style calls to the d3 tip container.  Sets or gets a style value.
+	    //
+	    // n - name of the property
+	    // v - value of the property
+	    //
+	    // Returns tip or style property value
+	    tip.style = function(n, v) {
+	      if (arguments.length < 2 && typeof n === 'string') {
+	        return d3.select(node).style(n)
+	      } else {
+	        var args =  Array.prototype.slice.call(arguments)
+	        d3.selection.prototype.style.apply(d3.select(node), args)
+	      }
+	
+	      return tip
+	    }
+	
+	    // Public: Set or get the direction of the tooltip
+	    //
+	    // v - One of n(north), s(south), e(east), or w(west), nw(northwest),
+	    //     sw(southwest), ne(northeast) or se(southeast)
+	    //
+	    // Returns tip or direction
+	    tip.direction = function(v) {
+	      if (!arguments.length) return direction
+	      direction = v == null ? v : d3.functor(v)
+	
+	      return tip
+	    }
+	
+	    // Public: Set or get the position anchor of the tool tip.
+	    //
+	    // v - either 'ordinal' - the default position that uses ordinal positioning
+	    // or 'mouse' - to position the tool tip wherever the mouse goes on the selected node
+	    //
+	    // Returns tip or position
+	    tip.positionAnchor = function(v) {
+	      if (!arguments.length) return positionAnchor;
+	      positionAnchor = v == null ? v : d3.functor(v);
+	
+	      return tip;
+	    };
+	
+	    // Public: Sets or gets the offset of the tip
+	    //
+	    // v - Array of [x, y] offset
+	    //
+	    // Returns offset or
+	    tip.offset = function(v) {
+	      if (!arguments.length) return offset
+	      offset = v == null ? v : d3.functor(v)
+	
+	      return tip
+	    }
+	
+	    // Public: sets or gets the html value of the tooltip
+	    //
+	    // v - String value of the tip
+	    //
+	    // Returns html value or tip
+	    tip.html = function(v) {
+	      if (!arguments.length) return html
+	      html = v == null ? v : d3.functor(v)
+	
+	      return tip
+	    }
+	
+	    function d3_tip_direction() { return 'n' }
+	    function d3_tip_offset() { return [0, 0] }
+	    function d3_tip_html() { return ' ' }
+	    function d3_tip_positionAnchor() { return 'shape';}
+	
+	    var direction_callbacks = d3.map({
+	      n:  direction_n,
+	      s:  direction_s,
+	      e:  direction_e,
+	      w:  direction_w,
+	      nw: direction_nw,
+	      ne: direction_ne,
+	      sw: direction_sw,
+	      se: direction_se
+	    }),
+	
+	    directions = direction_callbacks.keys()
+	
+	    function direction_n() {
+	      var bbox = getScreenBBox()
+	      return {
+	        top:  bbox.n.y - node.offsetHeight,
+	        left: bbox.n.x - node.offsetWidth / 2
+	      }
+	    }
+	
+	    function direction_s() {
+	      var bbox = getScreenBBox()
+	      return {
+	        top:  bbox.s.y,
+	        left: bbox.s.x - node.offsetWidth / 2
+	      }
+	    }
+	
+	    function direction_e() {
+	      var bbox = getScreenBBox()
+	      return {
+	        top:  bbox.e.y - node.offsetHeight / 2,
+	        left: bbox.e.x
+	      }
+	    }
+	
+	    function direction_w() {
+	      var bbox = getScreenBBox()
+	      return {
+	        top:  bbox.w.y - node.offsetHeight / 2,
+	        left: bbox.w.x - node.offsetWidth
+	      }
+	    }
+	
+	    function direction_nw() {
+	      var bbox = getScreenBBox()
+	      return {
+	        top:  bbox.nw.y - node.offsetHeight,
+	        left: bbox.nw.x - node.offsetWidth
+	      }
+	    }
+	
+	    function direction_ne() {
+	      var bbox = getScreenBBox()
+	      return {
+	        top:  bbox.ne.y - node.offsetHeight,
+	        left: bbox.ne.x
+	      }
+	    }
+	
+	    function direction_sw() {
+	      var bbox = getScreenBBox()
+	      return {
+	        top:  bbox.sw.y,
+	        left: bbox.sw.x - node.offsetWidth
+	      }
+	    }
+	
+	    function direction_se() {
+	      var bbox = getScreenBBox()
+	      return {
+	        top:  bbox.se.y,
+	        left: bbox.e.x
+	      }
+	    }
+	
+	    function initNode() {
+	      var node = d3.select(document.createElement('div'))
+	      node.style({
+	        position: 'absolute',
+	        top: 0,
+	        opacity: 0,
+	        'pointer-events': 'none',
+	        'box-sizing': 'border-box'
+	      })
+	
+	      return node.node()
+	    }
+	
+	    function getSVGNode(el) {
+	      el = el.node()
+	      if(el.tagName.toLowerCase() === 'svg')
+	        return el
+	
+	      return el.ownerSVGElement
+	    }
+	
+	    // Private - gets the screen coordinates of a shape
+	    //
+	    // Given a shape on the screen, will return an SVGPoint for the directions
+	    // n(north), s(south), e(east), w(west), ne(northeast), se(southeast), nw(northwest),
+	    // sw(southwest).
+	    //
+	    //    +-+-+
+	    //    |   |
+	    //    +   +
+	    //    |   |
+	    //    +-+-+
+	    //
+	    // Returns an Object {n, s, e, w, nw, sw, ne, se}
+	    function getScreenBBox() {
+	      var targetel   = target || d3.event.target;
+	
+	      while ('undefined' === typeof targetel.getScreenCTM && 'undefined' === targetel.parentNode) {
+	          targetel = targetel.parentNode;
+	      }
+	
+	      var bbox       = {},
+	          matrix     = targetel.getScreenCTM(),
+	          tbbox      = targetel.getBBox(),
+	          width      = tbbox.width,
+	          height     = tbbox.height,
+	          x          = tbbox.x,
+	          y          = tbbox.y
+	
+	      point.x = x
+	      point.y = y
+	      bbox.nw = point.matrixTransform(matrix)
+	      point.x += width
+	      bbox.ne = point.matrixTransform(matrix)
+	      point.y += height
+	      bbox.se = point.matrixTransform(matrix)
+	      point.x -= width
+	      bbox.sw = point.matrixTransform(matrix)
+	      point.y -= height / 2
+	      bbox.w  = point.matrixTransform(matrix)
+	      point.x += width
+	      bbox.e = point.matrixTransform(matrix)
+	      point.x -= width / 2
+	      point.y -= height / 2
+	      bbox.n = point.matrixTransform(matrix)
+	      point.y += height
+	      bbox.s = point.matrixTransform(matrix)
+	
+	      return bbox
+	    }
+	
+	    return tip
+	  };
+	  return d3.tip
+	}));
+
+
+/***/ },
+/* 12 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var map = {
+		"./src/javascripts/tool-tipsify": 13
+	};
+	function webpackContext(req) {
+		return __webpack_require__(webpackContextResolve(req));
+	};
+	function webpackContextResolve(req) {
+		return map[req] || (function() { throw new Error("Cannot find module '" + req + "'.") }());
+	};
+	webpackContext.keys = function webpackContextKeys() {
+		return Object.keys(map);
+	};
+	webpackContext.resolve = webpackContextResolve;
+	module.exports = webpackContext;
+	webpackContext.id = 12;
+
+
+/***/ },
+/* 13 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var inflection = __webpack_require__(10),
+	    dtip = __webpack_require__(11)(d3);
+	
+	__webpack_require__(14);
+	
+	var addToolTipsifyToDc = function(dc){
+	  var original = {};
+	  
+	  original.rowChart = dc.rowChart;
+	  dc.rowChart = function(parent, opts) {
+	    var _chart = original.rowChart(parent);
+	    _chart = toolTipsifyMixin(_chart, 'g.row');
+	    _chart.toolTipsify();
+	
+	    return _chart;
+	  };
+	
+	  original.pieChart = dc.pieChart;
+	  dc.pieChart = function(parent, opts) {
+	    var _chart = original.pieChart(parent);
+	    _chart = toolTipsifyMixin(_chart, 'g.pie-slice');
+	    _chart.toolTipsify();
+	
+	    return _chart;
+	  };
+	
+	  original.barChart = dc.barChart;
+	  dc.barChart = function(parent, opts) {
+	    var _chart = original.barChart(parent);
+	    _chart = toolTipsifyMixin(_chart, 'rect.bar');
+	    _chart.toolTipsify();
+	
+	    return _chart;
+	  };
+	
+	  original.geoChoroplethChart = dc.geoChoroplethChart;
+	  dc.geoChoroplethChart = function(parent, opts) {
+	    var _chart = original.geoChoroplethChart(parent);
+	
+	    _chart = toolTipsifyMixin(_chart, 'g.country');
+	
+	    var geoChoroContent = function(d) {
+	      var dataItem = _chart.data().filter(function(i){return i.key === d.id})[0];
+	      if (dataItem === undefined) return "<label>" + d.properties.name + "</label><br/>No Data";
+	      return "<label>" + _chart.label()(dataItem) + "</label><br/>" + _chart.valueAccessor()(dataItem);
+	    }
+	
+	    _chart.toolTipsify({content: geoChoroContent});
+	
+	    return _chart;
+	  };
+	
+	  return dc;
+	};
+	
+	var toolTipsifyMixin = function(chart, tippableSelector){
+	
+	  chart.toolTipsify = function(options){
+	    // default & override setup for formatter
+	    var formatter = d3.format(",");
+	    if (options && options.formatter) {
+	      formatter = options.formatter;
+	    }
+	
+	    // default setup for content & position 
+	    var content = function(d) {
+	      var label = chart.label()(d) || chart.label()(d.data);
+	      var value = d.value || d.data.value;
+	      return "<label>" + label + "</label><br/>" + formatter(value);
+	    };
+	    var position = 'mouse';
+	    var offset = [0, 0]; 
+	
+	    // override content and position via options
+	    if (options && options.content) {
+	      content = options.content;
+	    }
+	    if (options && options.position) {
+	      position = options.position;
+	    }
+	    if(options && options.offset) {
+	      offset = options.offset;
+	    }
+	    
+	    var d3TipClass = 'd3-tip';
+	    if (position === 'mouse') {
+	      d3TipClass = 'd3-tip-mouse';
+	    }
+	
+	    chart.renderlet(function(){
+	      var ttId = chart.root().attr('id') + '-tip';
+	
+	      var tt = d3.tip()
+	        .attr('class', d3TipClass)
+	        .attr('id', ttId)
+	        .html(content)
+	        .offset(offset);
+	
+	      if (position === 'mouse') {
+	        tt.positionAnchor(position)
+	      }
+	      else {
+	        tt.direction(position);
+	      }
+	
+	      var tippables = chart.selectAll(tippableSelector); 
+	
+	      // HACK...
+	      if (!d3.select('#' + ttId).empty()) d3.select('#' + ttId).remove(); 
+	
+	      tippables.call(tt);
+	      tippables.on('mouseover', tt.show)
+	               .on('mouseout', tt.hide);
+	      if(position === 'mouse') {
+	        tippables.on('mousemove', tt.updatePosition);
+	      }
+	    });
+	  };
+	
+	  return chart;
+	};
+	
+	module.exports = addToolTipsifyToDc;
+
+/***/ },
+/* 14 */
+/***/ function(module, exports, __webpack_require__) {
+
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(12);
+	var content = __webpack_require__(15);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
-	var update = __webpack_require__(14)(content, {});
+	var update = __webpack_require__(17)(content, {});
 	if(content.locals) module.exports = content.locals;
 	// Hot Module Replacement
 	if(false) {
 		// When the styles change, update the <style> tags
 		if(!content.locals) {
-			module.hot.accept("!!./../../node_modules/css-loader/index.js!./../../node_modules/sass-loader/index.js!./filter-builder.scss", function() {
-				var newContent = require("!!./../../node_modules/css-loader/index.js!./../../node_modules/sass-loader/index.js!./filter-builder.scss");
+			module.hot.accept("!!./../../node_modules/css-loader/index.js!./../../node_modules/sass-loader/index.js!./tool-tipsify.scss", function() {
+				var newContent = require("!!./../../node_modules/css-loader/index.js!./../../node_modules/sass-loader/index.js!./tool-tipsify.scss");
 				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
 				update(newContent);
 			});
@@ -31819,21 +32435,21 @@
 	}
 
 /***/ },
-/* 12 */
+/* 15 */
 /***/ function(module, exports, __webpack_require__) {
 
-	exports = module.exports = __webpack_require__(13)();
+	exports = module.exports = __webpack_require__(16)();
 	// imports
 	
 	
 	// module
-	exports.push([module.id, ".row.row-filter {\n  /* optional foundation row layout */\n  background-color: rgba(120, 120, 120, 0.15);\n  padding: 0;\n  font-size: 12px;\n  min-height: 33px; }\n  .row.row-filter .filter-builder {\n    background-color: transparent; }\n\n.filter-builder {\n  background-color: rgba(120, 120, 120, 0.15);\n  padding: 0;\n  font-size: 12px;\n  min-height: 33px;\n  pointer-events: none;\n  width: 100%; }\n  .filter-builder h2 {\n    margin: 0;\n    font-size: 12px;\n    position: absolute;\n    z-index: 0;\n    top: 3px; }\n  .filter-builder i.fa {\n    color: #666; }\n  .filter-builder ul {\n    padding: 0;\n    margin: 0;\n    list-style-type: none; }\n  .filter-builder li {\n    display: inline;\n    float: left; }\n  .filter-builder li.filtered-field {\n    background-color: #fff;\n    color: #666;\n    border: 1px solid #ccc;\n    margin: 3px 0 3px 1em;\n    padding: 0;\n    float: left;\n    border-radius: 5px;\n    font-size: 12px;\n    line-height: 1.5;\n    text-indent: 0;\n    overflow: hidden; }\n    .filter-builder li.filtered-field:first-child {\n      margin-left: 24px; }\n    .filter-builder li.filtered-field.no-tag {\n      background-color: transparent;\n      border-width: 0;\n      text-indent: 20px;\n      font-size: 12px; }\n      .filter-builder li.filtered-field.no-tag:hover {\n        color: #666;\n        background-color: transparent; }\n    .filter-builder li.filtered-field span {\n      display: table-cell;\n      height: 100%;\n      vertical-align: top;\n      padding: 3px 2px 3px 4px; }\n      .filter-builder li.filtered-field span.field-label {\n        cursor: default;\n        font-weight: bold;\n        padding-left: 4px;\n        white-space: nowrap; }\n      .filter-builder li.filtered-field span.close {\n        cursor: pointer;\n        padding-right: 3px;\n        pointer-events: auto; }\n        .filter-builder li.filtered-field span.close:hover .fa-times {\n          color: #C2113A; }\n        .filter-builder li.filtered-field span.close .fa-times {\n          font-size: 14px; }\n    .filter-builder li.filtered-field ul.filter-value-list {\n      display: table-cell; }\n      .filter-builder li.filtered-field ul.filter-value-list > li {\n        margin: 0px;\n        padding: 3px 5px;\n        pointer-events: auto; }\n        .filter-builder li.filtered-field ul.filter-value-list > li.filter-value {\n          font-weight: normal;\n          font-size: 12px;\n          border: 1px solid #d3d3d3;\n          margin: 2px 0 2px 3px;\n          padding: 0 4px;\n          border-radius: 4px;\n          cursor: pointer;\n          transition: all 140ms ease; }\n          .filter-builder li.filtered-field ul.filter-value-list > li.filter-value:hover {\n            text-decoration: line-through;\n            border-color: #eaeaea;\n            color: #aaa; }\n        .filter-builder li.filtered-field ul.filter-value-list > li.add-value {\n          padding: 0 4px;\n          margin-left: 2px;\n          border-color: #fff;\n          cursor: pointer;\n          line-height: 18px; }\n          .filter-builder li.filtered-field ul.filter-value-list > li.add-value .fa-plus {\n            border: 1px solid #dfdfdf;\n            padding: 1px 3px 1px 3px;\n            border-radius: 3px;\n            display: inline; }\n          .filter-builder li.filtered-field ul.filter-value-list > li.add-value:hover {\n            border-color: #fff; }\n            .filter-builder li.filtered-field ul.filter-value-list > li.add-value:hover .fa-plus {\n              color: #007e40;\n              border-color: #dadada;\n              box-shadow: 0 0 7px rgba(0, 0, 0, 0.17) inset; }\n  .filter-builder li.filtered-field .picker-choices,\n  .filter-builder li.add-filter .picker-choices {\n    border: 1px solid #ddd;\n    border-bottom-color: #ccc;\n    position: absolute;\n    z-index: 99;\n    background-color: rgba(255, 255, 255, 0.95);\n    max-height: 26em;\n    width: 36%;\n    left: 0;\n    top: 32px;\n    box-shadow: 2px 3px 2px rgba(0, 0, 0, 0.1), 0px 0px 7px rgba(0, 0, 0, 0.08) inset; }\n    .filter-builder li.filtered-field .picker-choices .value-list-container,\n    .filter-builder li.add-filter .picker-choices .value-list-container {\n      left: -180%;\n      top: 27px;\n      min-width: 174%;\n      max-height: 24em !important;\n      overflow-x: hidden;\n      overflow-y: hidden;\n      transition: all 380ms ease; }\n    .filter-builder li.filtered-field .picker-choices .value-list,\n    .filter-builder li.add-filter .picker-choices .value-list {\n      left: -180%;\n      top: 27px;\n      min-width: 100%;\n      max-height: 14em !important;\n      overflow: auto;\n      overflow-x: hidden;\n      transition: all 380ms ease; }\n    .filter-builder li.filtered-field .picker-choices div.header,\n    .filter-builder li.add-filter .picker-choices div.header {\n      position: relative;\n      font-family: 'Abel', Helvetica, Arial, sans-serif;\n      font-size: 12px;\n      padding: 0.1rem 0.3rem 0.1rem 0.9375rem;\n      border-bottom: 1px solid #ddd;\n      height: 1.4rem;\n      line-height: 1.4rem;\n      color: #999;\n      background-color: #fff;\n      pointer-events: auto;\n      cursor: pointer; }\n      .filter-builder li.filtered-field .picker-choices div.header .close-button,\n      .filter-builder li.add-filter .picker-choices div.header .close-button {\n        width: 15px;\n        float: right;\n        cursor: pointer;\n        text-align: right;\n        padding: 4px 0px 0 0;\n        font-size: 14px; }\n      .filter-builder li.filtered-field .picker-choices div.header:hover .fa-times,\n      .filter-builder li.add-filter .picker-choices div.header:hover .fa-times {\n        color: #C2113A; }\n    .filter-builder li.filtered-field .picker-choices li,\n    .filter-builder li.add-filter .picker-choices li {\n      display: block;\n      cursor: pointer;\n      border: none;\n      float: none;\n      padding: 0.4rem 0.9375rem;\n      font-size: 12px;\n      line-height: 1.1rem;\n      pointer-events: auto; }\n      .filter-builder li.filtered-field .picker-choices li:hover,\n      .filter-builder li.add-filter .picker-choices li:hover {\n        background-color: #EEE; }\n      .filter-builder li.filtered-field .picker-choices li.selected,\n      .filter-builder li.add-filter .picker-choices li.selected {\n        background-color: #ddd; }\n        .filter-builder li.filtered-field .picker-choices li.selected .value-list-container,\n        .filter-builder li.add-filter .picker-choices li.selected .value-list-container {\n          left: 100%;\n          transition: all 180ms ease;\n          overflow: hidden; }\n  .filter-builder li.add-filter + li.filtered-field {\n    margin-left: 0; }\n  .filter-builder .listFilterContainer {\n    background-color: #eee;\n    border-bottom: 1px solid #dbdbdb;\n    padding: .7%;\n    box-shadow: 0 0 5px rgba(120, 120, 120, 0.2);\n    position: relative; }\n    .filter-builder .listFilterContainer i.fa {\n      font-size: 1.2em;\n      position: absolute;\n      margin-top: 6px;\n      margin-left: 6px; }\n    .filter-builder .listFilterContainer input {\n      width: 100%;\n      padding: 5px 5px 5px 21px;\n      font-family: \"Helvetica Neue\", \"Helvetica\", Helvetica, Arial, sans-serif;\n      font-size: 12px;\n      background-color: #fff;\n      border-radius: 3px;\n      border: 1px solid #bbb; }\n  .filter-builder .add-value .listFilterContainer {\n    padding: .5%; }\n    .filter-builder .add-value .listFilterContainer i.fa {\n      margin-top: 5px;\n      margin-left: 5px; }\n    .filter-builder .add-value .listFilterContainer input {\n      padding-top: 4px;\n      padding-left: 20px; }\n  .filter-builder ::-webkit-input-placeholder {\n    font-family: 'Abel', Helvetica, Arial, sans-serif; }\n  .filter-builder :-moz-placeholder {\n    /* Firefox 18- */\n    font-family: 'Abel', Helvetica, Arial, sans-serif; }\n  .filter-builder ::-moz-placeholder {\n    /* Firefox 19+ */\n    font-family: 'Abel', Helvetica, Arial, sans-serif; }\n  .filter-builder :-ms-input-placeholder {\n    font-family: 'Abel', Helvetica, Arial, sans-serif; }\n  .filter-builder li.add-filter i.fa-plus {\n    display: block;\n    padding: 8px 3px 5px 16px;\n    position: relative;\n    left: -1px;\n    z-index: 1;\n    cursor: pointer;\n    top: 4px;\n    pointer-events: auto; }\n  .filter-builder li.add-filter:hover i.fa-plus {\n    color: #007e40; }\n  .filter-builder li.filtered-field .picker-choices {\n    overflow-y: hidden;\n    overflow-x: hidden;\n    width: 98%; }\n    .filter-builder li.filtered-field .picker-choices li {\n      color: #666; }\n  .filter-builder .dimension-list-container, .filter-builder .value-list-container {\n    display: none; }\n  .filter-builder .value-list-container li.hidden.value-option {\n    display: none; }\n", ""]);
+	exports.push([module.id, ".d3-tip-mouse {\n  font-size: 13px;\n  line-height: 16px;\n  padding: 8px;\n  background: rgba(0, 0, 0, 0.8);\n  color: #fff;\n  border-radius: 2px;\n  pointer-events: none;\n  z-index: 100;\n  outline: none; }\n  .d3-tip-mouse label {\n    font-family: 'Abel', Helvetica, Arial, sans-serif;\n    font-weight: 400; }\n\n.d3-tip {\n  font-size: 13px;\n  line-height: 16px;\n  padding: 8px;\n  background: rgba(0, 0, 0, 0.8);\n  color: #fff;\n  border-radius: 2px;\n  pointer-events: none;\n  z-index: 100;\n  outline: none;\n  /* Creates a small triangle extender for the tooltip */\n  /* Northward tooltips */\n  /* Eastward tooltips */\n  /* Southward tooltips */\n  /* Westward tooltips */ }\n  .d3-tip label {\n    font-family: 'Abel', Helvetica, Arial, sans-serif;\n    font-weight: 400; }\n  .d3-tip:after {\n    box-sizing: border-box;\n    display: inline;\n    font-size: 10px;\n    width: 100%;\n    line-height: 1;\n    color: rgba(0, 0, 0, 0.8);\n    position: absolute;\n    pointer-events: none;\n    z-index: 100; }\n  .d3-tip.n:after {\n    content: \"\\25BC\";\n    top: auto;\n    bottom: -7px;\n    left: 0;\n    text-align: center; }\n  .d3-tip.ne:after {\n    content: \"\\25BC\";\n    top: auto;\n    bottom: -7px;\n    left: 0;\n    text-align: left;\n    padding-left: 8px; }\n  .d3-tip.nw:after {\n    content: \"\\25BC\";\n    top: auto;\n    bottom: -7px;\n    left: 0;\n    text-align: right;\n    padding-right: 8px; }\n  .d3-tip.e:after {\n    content: \"\\25C0\";\n    margin: -4px 0 0 0;\n    top: 50%;\n    left: -7px; }\n  .d3-tip.s:after {\n    content: \"\\25B2\";\n    margin: 0 0 1px 0;\n    top: -8px;\n    left: 0;\n    text-align: center; }\n  .d3-tip.w:after {\n    content: \"\\25B6\";\n    margin: -4px 0 0 -2px;\n    top: 50%;\n    left: 100%; }\n", ""]);
 	
 	// exports
 
 
 /***/ },
-/* 13 */
+/* 16 */
 /***/ function(module, exports) {
 
 	/*
@@ -31889,7 +32505,7 @@
 
 
 /***/ },
-/* 14 */
+/* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/*
@@ -32114,16 +32730,219 @@
 
 
 /***/ },
-/* 15 */
+/* 18 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var map = {
+		"./src/javascripts/size-boxify": 19
+	};
+	function webpackContext(req) {
+		return __webpack_require__(webpackContextResolve(req));
+	};
+	function webpackContextResolve(req) {
+		return map[req] || (function() { throw new Error("Cannot find module '" + req + "'.") }());
+	};
+	webpackContext.keys = function webpackContextKeys() {
+		return Object.keys(map);
+	};
+	webpackContext.resolve = webpackContextResolve;
+	module.exports = webpackContext;
+	webpackContext.id = 18;
+
+
+/***/ },
+/* 19 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var dc = __webpack_require__(2);
+	
+	// styles
+	__webpack_require__(20);
+	
+	__webpack_require__(22);
+	__webpack_require__(30);
+	__webpack_require__(32);
+	
+	var sizeBoxify = function(dc) {
+	  var original = {};
+	
+	  original.rowChart = dc.rowChart;
+	  dc.rowChart = function(parent, opts) {
+	    var _chart = original.rowChart(parent);
+	
+	    _chart = sizeBoxifyMixin(_chart); 
+	
+	    _chart.resize = function() {
+	      _chart.height(_chart.getDynamicHeight())
+	        .width(_chart.getDynamicWidth())
+	        .render();
+	
+	    };
+	
+	    window.addEventListener('resize', _chart.resize, true);
+	
+	    _chart.width(_chart.getDynamicWidth()).height(_chart.getDynamicHeight());
+	    return _chart;
+	  };
+	
+	  original.pieChart = dc.pieChart;
+	  dc.pieChart = function(parent, opts) {
+	    var _chart = original.pieChart(parent);
+	
+	    _chart = sizeBoxifyMixin(_chart);
+	
+	    _chart.getDynamicRadius = function() {
+	      if(_chart.getDynamicHeight() < _chart.getDynamicWidth())
+	        return _chart.getDynamicHeight()/2;
+	      else
+	        return _chart.getDynamicWidth()/2;
+	    };
+	
+	    _chart.getInnerRadius = function() {
+	      return _chart.getDynamicRadius() * (3/5);
+	    };
+	
+	    _chart.resize = function() {
+	      _chart.height(_chart.getDynamicHeight()).width(_chart.getDynamicWidth())
+	        .innerRadius(_chart.getInnerRadius()).radius(_chart.getDynamicRadius())
+	        .cx(_chart.getDynamicRadius())
+	        .legend(dc.legend().x((_chart.getDynamicRadius() * 2) + 10).y(12).itemHeight(12).gap(2))
+	        .render();
+	    };
+	
+	    window.addEventListener('resize', _chart.resize, true);
+	
+	    _chart.width(_chart.getDynamicWidth()).height(_chart.getDynamicHeight())
+	      .innerRadius(_chart.getInnerRadius()).radius(_chart.getDynamicRadius())
+	      .cx(_chart.getDynamicRadius())
+	      .legend(dc.legend().x((_chart.getDynamicRadius() * 2) + 10).y(12).itemHeight(12).gap(2));
+	    return _chart;
+	  };
+	
+	  original.barChart = dc.barChart;
+	  dc.barChart = function(parent, opts) {
+	    var _chart = original.barChart(parent);
+	
+	    _chart = sizeBoxifyMixin(_chart);
+	
+	    _chart.resize = function() {
+	      _chart.width(_chart.getDynamicWidth())
+	        .height(_chart.getDynamicHeight())
+	        .rescale();
+	      _chart.render();
+	    };
+	
+	    window.addEventListener('resize', _chart.resize, true);
+	
+	    _chart.width(_chart.getDynamicWidth()).height(_chart.getDynamicHeight());
+	    return _chart;
+	  };
+	
+	  original.geoChoroplethChart = dc.geoChoroplethChart;
+	  dc.geoChoroplethChart = function(parent, opts) {
+	    var _chart = original.geoChoroplethChart(parent);
+	    var projectionWidth = 960;
+	
+	    _chart = sizeBoxifyMixin(_chart);
+	
+	    _chart.getProjectionScale = function() {
+	      return (_chart.getDynamicWidth()/projectionWidth) * 153;
+	    };
+	
+	    _chart.getProjection = function() {
+	      return d3.geo.mercator().scale(_chart.getProjectionScale()).translate([_chart.getDynamicWidth()/2, _chart.getDynamicHeight()/2]);
+	    };
+	
+	    _chart.resize = function() {
+	      _chart.width(_chart.getDynamicWidth())
+	        .height(_chart.getDynamicHeight())
+	        .projection(_chart.getProjection())
+	        .render();
+	    };
+	
+	    window.addEventListener('resize', _chart.resize, true);
+	
+	    _chart.width(_chart.getDynamicWidth()).height(_chart.getDynamicHeight())
+	      .projection(_chart.getProjection());
+	    return _chart;
+	  };
+	
+	  return dc;
+	};
+	
+	var sizeBoxifyMixin = function(chart) {
+	
+	  var container = chart.root()[0][0];
+	  chart.root().classed('size-boxified', true);
+	
+	  chart.getDynamicHeight = function() {
+	      return container.offsetHeight;
+	    };
+	
+	  chart.getDynamicWidth = function() {
+	    return container.offsetWidth;
+	  };
+	
+	  return chart;
+	}
+	
+	module.exports = sizeBoxify;
+	
+	
+	
+
+
+/***/ },
+/* 20 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(16);
+	var content = __webpack_require__(21);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
-	var update = __webpack_require__(14)(content, {});
+	var update = __webpack_require__(17)(content, {});
+	if(content.locals) module.exports = content.locals;
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		if(!content.locals) {
+			module.hot.accept("!!./../../node_modules/css-loader/index.js!./../../node_modules/sass-loader/index.js!./size-boxify.scss", function() {
+				var newContent = require("!!./../../node_modules/css-loader/index.js!./../../node_modules/sass-loader/index.js!./size-boxify.scss");
+				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+				update(newContent);
+			});
+		}
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
+	}
+
+/***/ },
+/* 21 */
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(16)();
+	// imports
+	
+	
+	// module
+	exports.push([module.id, ".size-boxified {\n  width: 100%;\n  height: 100%; }\n", ""]);
+	
+	// exports
+
+
+/***/ },
+/* 22 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// style-loader: Adds some css to the DOM by adding a <style> tag
+	
+	// load the styles
+	var content = __webpack_require__(23);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// add the styles to the DOM
+	var update = __webpack_require__(17)(content, {});
 	if(content.locals) module.exports = content.locals;
 	// Hot Module Replacement
 	if(false) {
@@ -32140,66 +32959,66 @@
 	}
 
 /***/ },
-/* 16 */
+/* 23 */
 /***/ function(module, exports, __webpack_require__) {
 
-	exports = module.exports = __webpack_require__(13)();
+	exports = module.exports = __webpack_require__(16)();
 	// imports
 	
 	
 	// module
-	exports.push([module.id, "/*!\n *  Font Awesome 4.4.0 by @davegandy - http://fontawesome.io - @fontawesome\n *  License - http://fontawesome.io/license (Font: SIL OFL 1.1, CSS: MIT License)\n */\n/* FONT PATH\n * -------------------------- */\n@font-face {\n  font-family: 'FontAwesome';\n  src: url(" + __webpack_require__(17) + ");\n  src: url(" + __webpack_require__(18) + "?#iefix&v=4.4.0) format('embedded-opentype'), url(" + __webpack_require__(19) + ") format('woff2'), url(" + __webpack_require__(20) + ") format('woff'), url(" + __webpack_require__(21) + ") format('truetype'), url(" + __webpack_require__(22) + "#fontawesomeregular) format('svg');\n  font-weight: normal;\n  font-style: normal;\n}\n.fa {\n  display: inline-block;\n  font: normal normal normal 14px/1 FontAwesome;\n  font-size: inherit;\n  text-rendering: auto;\n  -webkit-font-smoothing: antialiased;\n  -moz-osx-font-smoothing: grayscale;\n}\n/* makes the font 33% larger relative to the icon container */\n.fa-lg {\n  font-size: 1.33333333em;\n  line-height: 0.75em;\n  vertical-align: -15%;\n}\n.fa-2x {\n  font-size: 2em;\n}\n.fa-3x {\n  font-size: 3em;\n}\n.fa-4x {\n  font-size: 4em;\n}\n.fa-5x {\n  font-size: 5em;\n}\n.fa-fw {\n  width: 1.28571429em;\n  text-align: center;\n}\n.fa-ul {\n  padding-left: 0;\n  margin-left: 2.14285714em;\n  list-style-type: none;\n}\n.fa-ul > li {\n  position: relative;\n}\n.fa-li {\n  position: absolute;\n  left: -2.14285714em;\n  width: 2.14285714em;\n  top: 0.14285714em;\n  text-align: center;\n}\n.fa-li.fa-lg {\n  left: -1.85714286em;\n}\n.fa-border {\n  padding: .2em .25em .15em;\n  border: solid 0.08em #eeeeee;\n  border-radius: .1em;\n}\n.fa-pull-left {\n  float: left;\n}\n.fa-pull-right {\n  float: right;\n}\n.fa.fa-pull-left {\n  margin-right: .3em;\n}\n.fa.fa-pull-right {\n  margin-left: .3em;\n}\n/* Deprecated as of 4.4.0 */\n.pull-right {\n  float: right;\n}\n.pull-left {\n  float: left;\n}\n.fa.pull-left {\n  margin-right: .3em;\n}\n.fa.pull-right {\n  margin-left: .3em;\n}\n.fa-spin {\n  -webkit-animation: fa-spin 2s infinite linear;\n  animation: fa-spin 2s infinite linear;\n}\n.fa-pulse {\n  -webkit-animation: fa-spin 1s infinite steps(8);\n  animation: fa-spin 1s infinite steps(8);\n}\n@-webkit-keyframes fa-spin {\n  0% {\n    -webkit-transform: rotate(0deg);\n    transform: rotate(0deg);\n  }\n  100% {\n    -webkit-transform: rotate(359deg);\n    transform: rotate(359deg);\n  }\n}\n@keyframes fa-spin {\n  0% {\n    -webkit-transform: rotate(0deg);\n    transform: rotate(0deg);\n  }\n  100% {\n    -webkit-transform: rotate(359deg);\n    transform: rotate(359deg);\n  }\n}\n.fa-rotate-90 {\n  filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=1);\n  -webkit-transform: rotate(90deg);\n  -ms-transform: rotate(90deg);\n  transform: rotate(90deg);\n}\n.fa-rotate-180 {\n  filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=2);\n  -webkit-transform: rotate(180deg);\n  -ms-transform: rotate(180deg);\n  transform: rotate(180deg);\n}\n.fa-rotate-270 {\n  filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=3);\n  -webkit-transform: rotate(270deg);\n  -ms-transform: rotate(270deg);\n  transform: rotate(270deg);\n}\n.fa-flip-horizontal {\n  filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=0, mirror=1);\n  -webkit-transform: scale(-1, 1);\n  -ms-transform: scale(-1, 1);\n  transform: scale(-1, 1);\n}\n.fa-flip-vertical {\n  filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=2, mirror=1);\n  -webkit-transform: scale(1, -1);\n  -ms-transform: scale(1, -1);\n  transform: scale(1, -1);\n}\n:root .fa-rotate-90,\n:root .fa-rotate-180,\n:root .fa-rotate-270,\n:root .fa-flip-horizontal,\n:root .fa-flip-vertical {\n  filter: none;\n}\n.fa-stack {\n  position: relative;\n  display: inline-block;\n  width: 2em;\n  height: 2em;\n  line-height: 2em;\n  vertical-align: middle;\n}\n.fa-stack-1x,\n.fa-stack-2x {\n  position: absolute;\n  left: 0;\n  width: 100%;\n  text-align: center;\n}\n.fa-stack-1x {\n  line-height: inherit;\n}\n.fa-stack-2x {\n  font-size: 2em;\n}\n.fa-inverse {\n  color: #ffffff;\n}\n/* Font Awesome uses the Unicode Private Use Area (PUA) to ensure screen\n   readers do not read off random characters that represent icons */\n.fa-glass:before {\n  content: \"\\F000\";\n}\n.fa-music:before {\n  content: \"\\F001\";\n}\n.fa-search:before {\n  content: \"\\F002\";\n}\n.fa-envelope-o:before {\n  content: \"\\F003\";\n}\n.fa-heart:before {\n  content: \"\\F004\";\n}\n.fa-star:before {\n  content: \"\\F005\";\n}\n.fa-star-o:before {\n  content: \"\\F006\";\n}\n.fa-user:before {\n  content: \"\\F007\";\n}\n.fa-film:before {\n  content: \"\\F008\";\n}\n.fa-th-large:before {\n  content: \"\\F009\";\n}\n.fa-th:before {\n  content: \"\\F00A\";\n}\n.fa-th-list:before {\n  content: \"\\F00B\";\n}\n.fa-check:before {\n  content: \"\\F00C\";\n}\n.fa-remove:before,\n.fa-close:before,\n.fa-times:before {\n  content: \"\\F00D\";\n}\n.fa-search-plus:before {\n  content: \"\\F00E\";\n}\n.fa-search-minus:before {\n  content: \"\\F010\";\n}\n.fa-power-off:before {\n  content: \"\\F011\";\n}\n.fa-signal:before {\n  content: \"\\F012\";\n}\n.fa-gear:before,\n.fa-cog:before {\n  content: \"\\F013\";\n}\n.fa-trash-o:before {\n  content: \"\\F014\";\n}\n.fa-home:before {\n  content: \"\\F015\";\n}\n.fa-file-o:before {\n  content: \"\\F016\";\n}\n.fa-clock-o:before {\n  content: \"\\F017\";\n}\n.fa-road:before {\n  content: \"\\F018\";\n}\n.fa-download:before {\n  content: \"\\F019\";\n}\n.fa-arrow-circle-o-down:before {\n  content: \"\\F01A\";\n}\n.fa-arrow-circle-o-up:before {\n  content: \"\\F01B\";\n}\n.fa-inbox:before {\n  content: \"\\F01C\";\n}\n.fa-play-circle-o:before {\n  content: \"\\F01D\";\n}\n.fa-rotate-right:before,\n.fa-repeat:before {\n  content: \"\\F01E\";\n}\n.fa-refresh:before {\n  content: \"\\F021\";\n}\n.fa-list-alt:before {\n  content: \"\\F022\";\n}\n.fa-lock:before {\n  content: \"\\F023\";\n}\n.fa-flag:before {\n  content: \"\\F024\";\n}\n.fa-headphones:before {\n  content: \"\\F025\";\n}\n.fa-volume-off:before {\n  content: \"\\F026\";\n}\n.fa-volume-down:before {\n  content: \"\\F027\";\n}\n.fa-volume-up:before {\n  content: \"\\F028\";\n}\n.fa-qrcode:before {\n  content: \"\\F029\";\n}\n.fa-barcode:before {\n  content: \"\\F02A\";\n}\n.fa-tag:before {\n  content: \"\\F02B\";\n}\n.fa-tags:before {\n  content: \"\\F02C\";\n}\n.fa-book:before {\n  content: \"\\F02D\";\n}\n.fa-bookmark:before {\n  content: \"\\F02E\";\n}\n.fa-print:before {\n  content: \"\\F02F\";\n}\n.fa-camera:before {\n  content: \"\\F030\";\n}\n.fa-font:before {\n  content: \"\\F031\";\n}\n.fa-bold:before {\n  content: \"\\F032\";\n}\n.fa-italic:before {\n  content: \"\\F033\";\n}\n.fa-text-height:before {\n  content: \"\\F034\";\n}\n.fa-text-width:before {\n  content: \"\\F035\";\n}\n.fa-align-left:before {\n  content: \"\\F036\";\n}\n.fa-align-center:before {\n  content: \"\\F037\";\n}\n.fa-align-right:before {\n  content: \"\\F038\";\n}\n.fa-align-justify:before {\n  content: \"\\F039\";\n}\n.fa-list:before {\n  content: \"\\F03A\";\n}\n.fa-dedent:before,\n.fa-outdent:before {\n  content: \"\\F03B\";\n}\n.fa-indent:before {\n  content: \"\\F03C\";\n}\n.fa-video-camera:before {\n  content: \"\\F03D\";\n}\n.fa-photo:before,\n.fa-image:before,\n.fa-picture-o:before {\n  content: \"\\F03E\";\n}\n.fa-pencil:before {\n  content: \"\\F040\";\n}\n.fa-map-marker:before {\n  content: \"\\F041\";\n}\n.fa-adjust:before {\n  content: \"\\F042\";\n}\n.fa-tint:before {\n  content: \"\\F043\";\n}\n.fa-edit:before,\n.fa-pencil-square-o:before {\n  content: \"\\F044\";\n}\n.fa-share-square-o:before {\n  content: \"\\F045\";\n}\n.fa-check-square-o:before {\n  content: \"\\F046\";\n}\n.fa-arrows:before {\n  content: \"\\F047\";\n}\n.fa-step-backward:before {\n  content: \"\\F048\";\n}\n.fa-fast-backward:before {\n  content: \"\\F049\";\n}\n.fa-backward:before {\n  content: \"\\F04A\";\n}\n.fa-play:before {\n  content: \"\\F04B\";\n}\n.fa-pause:before {\n  content: \"\\F04C\";\n}\n.fa-stop:before {\n  content: \"\\F04D\";\n}\n.fa-forward:before {\n  content: \"\\F04E\";\n}\n.fa-fast-forward:before {\n  content: \"\\F050\";\n}\n.fa-step-forward:before {\n  content: \"\\F051\";\n}\n.fa-eject:before {\n  content: \"\\F052\";\n}\n.fa-chevron-left:before {\n  content: \"\\F053\";\n}\n.fa-chevron-right:before {\n  content: \"\\F054\";\n}\n.fa-plus-circle:before {\n  content: \"\\F055\";\n}\n.fa-minus-circle:before {\n  content: \"\\F056\";\n}\n.fa-times-circle:before {\n  content: \"\\F057\";\n}\n.fa-check-circle:before {\n  content: \"\\F058\";\n}\n.fa-question-circle:before {\n  content: \"\\F059\";\n}\n.fa-info-circle:before {\n  content: \"\\F05A\";\n}\n.fa-crosshairs:before {\n  content: \"\\F05B\";\n}\n.fa-times-circle-o:before {\n  content: \"\\F05C\";\n}\n.fa-check-circle-o:before {\n  content: \"\\F05D\";\n}\n.fa-ban:before {\n  content: \"\\F05E\";\n}\n.fa-arrow-left:before {\n  content: \"\\F060\";\n}\n.fa-arrow-right:before {\n  content: \"\\F061\";\n}\n.fa-arrow-up:before {\n  content: \"\\F062\";\n}\n.fa-arrow-down:before {\n  content: \"\\F063\";\n}\n.fa-mail-forward:before,\n.fa-share:before {\n  content: \"\\F064\";\n}\n.fa-expand:before {\n  content: \"\\F065\";\n}\n.fa-compress:before {\n  content: \"\\F066\";\n}\n.fa-plus:before {\n  content: \"\\F067\";\n}\n.fa-minus:before {\n  content: \"\\F068\";\n}\n.fa-asterisk:before {\n  content: \"\\F069\";\n}\n.fa-exclamation-circle:before {\n  content: \"\\F06A\";\n}\n.fa-gift:before {\n  content: \"\\F06B\";\n}\n.fa-leaf:before {\n  content: \"\\F06C\";\n}\n.fa-fire:before {\n  content: \"\\F06D\";\n}\n.fa-eye:before {\n  content: \"\\F06E\";\n}\n.fa-eye-slash:before {\n  content: \"\\F070\";\n}\n.fa-warning:before,\n.fa-exclamation-triangle:before {\n  content: \"\\F071\";\n}\n.fa-plane:before {\n  content: \"\\F072\";\n}\n.fa-calendar:before {\n  content: \"\\F073\";\n}\n.fa-random:before {\n  content: \"\\F074\";\n}\n.fa-comment:before {\n  content: \"\\F075\";\n}\n.fa-magnet:before {\n  content: \"\\F076\";\n}\n.fa-chevron-up:before {\n  content: \"\\F077\";\n}\n.fa-chevron-down:before {\n  content: \"\\F078\";\n}\n.fa-retweet:before {\n  content: \"\\F079\";\n}\n.fa-shopping-cart:before {\n  content: \"\\F07A\";\n}\n.fa-folder:before {\n  content: \"\\F07B\";\n}\n.fa-folder-open:before {\n  content: \"\\F07C\";\n}\n.fa-arrows-v:before {\n  content: \"\\F07D\";\n}\n.fa-arrows-h:before {\n  content: \"\\F07E\";\n}\n.fa-bar-chart-o:before,\n.fa-bar-chart:before {\n  content: \"\\F080\";\n}\n.fa-twitter-square:before {\n  content: \"\\F081\";\n}\n.fa-facebook-square:before {\n  content: \"\\F082\";\n}\n.fa-camera-retro:before {\n  content: \"\\F083\";\n}\n.fa-key:before {\n  content: \"\\F084\";\n}\n.fa-gears:before,\n.fa-cogs:before {\n  content: \"\\F085\";\n}\n.fa-comments:before {\n  content: \"\\F086\";\n}\n.fa-thumbs-o-up:before {\n  content: \"\\F087\";\n}\n.fa-thumbs-o-down:before {\n  content: \"\\F088\";\n}\n.fa-star-half:before {\n  content: \"\\F089\";\n}\n.fa-heart-o:before {\n  content: \"\\F08A\";\n}\n.fa-sign-out:before {\n  content: \"\\F08B\";\n}\n.fa-linkedin-square:before {\n  content: \"\\F08C\";\n}\n.fa-thumb-tack:before {\n  content: \"\\F08D\";\n}\n.fa-external-link:before {\n  content: \"\\F08E\";\n}\n.fa-sign-in:before {\n  content: \"\\F090\";\n}\n.fa-trophy:before {\n  content: \"\\F091\";\n}\n.fa-github-square:before {\n  content: \"\\F092\";\n}\n.fa-upload:before {\n  content: \"\\F093\";\n}\n.fa-lemon-o:before {\n  content: \"\\F094\";\n}\n.fa-phone:before {\n  content: \"\\F095\";\n}\n.fa-square-o:before {\n  content: \"\\F096\";\n}\n.fa-bookmark-o:before {\n  content: \"\\F097\";\n}\n.fa-phone-square:before {\n  content: \"\\F098\";\n}\n.fa-twitter:before {\n  content: \"\\F099\";\n}\n.fa-facebook-f:before,\n.fa-facebook:before {\n  content: \"\\F09A\";\n}\n.fa-github:before {\n  content: \"\\F09B\";\n}\n.fa-unlock:before {\n  content: \"\\F09C\";\n}\n.fa-credit-card:before {\n  content: \"\\F09D\";\n}\n.fa-feed:before,\n.fa-rss:before {\n  content: \"\\F09E\";\n}\n.fa-hdd-o:before {\n  content: \"\\F0A0\";\n}\n.fa-bullhorn:before {\n  content: \"\\F0A1\";\n}\n.fa-bell:before {\n  content: \"\\F0F3\";\n}\n.fa-certificate:before {\n  content: \"\\F0A3\";\n}\n.fa-hand-o-right:before {\n  content: \"\\F0A4\";\n}\n.fa-hand-o-left:before {\n  content: \"\\F0A5\";\n}\n.fa-hand-o-up:before {\n  content: \"\\F0A6\";\n}\n.fa-hand-o-down:before {\n  content: \"\\F0A7\";\n}\n.fa-arrow-circle-left:before {\n  content: \"\\F0A8\";\n}\n.fa-arrow-circle-right:before {\n  content: \"\\F0A9\";\n}\n.fa-arrow-circle-up:before {\n  content: \"\\F0AA\";\n}\n.fa-arrow-circle-down:before {\n  content: \"\\F0AB\";\n}\n.fa-globe:before {\n  content: \"\\F0AC\";\n}\n.fa-wrench:before {\n  content: \"\\F0AD\";\n}\n.fa-tasks:before {\n  content: \"\\F0AE\";\n}\n.fa-filter:before {\n  content: \"\\F0B0\";\n}\n.fa-briefcase:before {\n  content: \"\\F0B1\";\n}\n.fa-arrows-alt:before {\n  content: \"\\F0B2\";\n}\n.fa-group:before,\n.fa-users:before {\n  content: \"\\F0C0\";\n}\n.fa-chain:before,\n.fa-link:before {\n  content: \"\\F0C1\";\n}\n.fa-cloud:before {\n  content: \"\\F0C2\";\n}\n.fa-flask:before {\n  content: \"\\F0C3\";\n}\n.fa-cut:before,\n.fa-scissors:before {\n  content: \"\\F0C4\";\n}\n.fa-copy:before,\n.fa-files-o:before {\n  content: \"\\F0C5\";\n}\n.fa-paperclip:before {\n  content: \"\\F0C6\";\n}\n.fa-save:before,\n.fa-floppy-o:before {\n  content: \"\\F0C7\";\n}\n.fa-square:before {\n  content: \"\\F0C8\";\n}\n.fa-navicon:before,\n.fa-reorder:before,\n.fa-bars:before {\n  content: \"\\F0C9\";\n}\n.fa-list-ul:before {\n  content: \"\\F0CA\";\n}\n.fa-list-ol:before {\n  content: \"\\F0CB\";\n}\n.fa-strikethrough:before {\n  content: \"\\F0CC\";\n}\n.fa-underline:before {\n  content: \"\\F0CD\";\n}\n.fa-table:before {\n  content: \"\\F0CE\";\n}\n.fa-magic:before {\n  content: \"\\F0D0\";\n}\n.fa-truck:before {\n  content: \"\\F0D1\";\n}\n.fa-pinterest:before {\n  content: \"\\F0D2\";\n}\n.fa-pinterest-square:before {\n  content: \"\\F0D3\";\n}\n.fa-google-plus-square:before {\n  content: \"\\F0D4\";\n}\n.fa-google-plus:before {\n  content: \"\\F0D5\";\n}\n.fa-money:before {\n  content: \"\\F0D6\";\n}\n.fa-caret-down:before {\n  content: \"\\F0D7\";\n}\n.fa-caret-up:before {\n  content: \"\\F0D8\";\n}\n.fa-caret-left:before {\n  content: \"\\F0D9\";\n}\n.fa-caret-right:before {\n  content: \"\\F0DA\";\n}\n.fa-columns:before {\n  content: \"\\F0DB\";\n}\n.fa-unsorted:before,\n.fa-sort:before {\n  content: \"\\F0DC\";\n}\n.fa-sort-down:before,\n.fa-sort-desc:before {\n  content: \"\\F0DD\";\n}\n.fa-sort-up:before,\n.fa-sort-asc:before {\n  content: \"\\F0DE\";\n}\n.fa-envelope:before {\n  content: \"\\F0E0\";\n}\n.fa-linkedin:before {\n  content: \"\\F0E1\";\n}\n.fa-rotate-left:before,\n.fa-undo:before {\n  content: \"\\F0E2\";\n}\n.fa-legal:before,\n.fa-gavel:before {\n  content: \"\\F0E3\";\n}\n.fa-dashboard:before,\n.fa-tachometer:before {\n  content: \"\\F0E4\";\n}\n.fa-comment-o:before {\n  content: \"\\F0E5\";\n}\n.fa-comments-o:before {\n  content: \"\\F0E6\";\n}\n.fa-flash:before,\n.fa-bolt:before {\n  content: \"\\F0E7\";\n}\n.fa-sitemap:before {\n  content: \"\\F0E8\";\n}\n.fa-umbrella:before {\n  content: \"\\F0E9\";\n}\n.fa-paste:before,\n.fa-clipboard:before {\n  content: \"\\F0EA\";\n}\n.fa-lightbulb-o:before {\n  content: \"\\F0EB\";\n}\n.fa-exchange:before {\n  content: \"\\F0EC\";\n}\n.fa-cloud-download:before {\n  content: \"\\F0ED\";\n}\n.fa-cloud-upload:before {\n  content: \"\\F0EE\";\n}\n.fa-user-md:before {\n  content: \"\\F0F0\";\n}\n.fa-stethoscope:before {\n  content: \"\\F0F1\";\n}\n.fa-suitcase:before {\n  content: \"\\F0F2\";\n}\n.fa-bell-o:before {\n  content: \"\\F0A2\";\n}\n.fa-coffee:before {\n  content: \"\\F0F4\";\n}\n.fa-cutlery:before {\n  content: \"\\F0F5\";\n}\n.fa-file-text-o:before {\n  content: \"\\F0F6\";\n}\n.fa-building-o:before {\n  content: \"\\F0F7\";\n}\n.fa-hospital-o:before {\n  content: \"\\F0F8\";\n}\n.fa-ambulance:before {\n  content: \"\\F0F9\";\n}\n.fa-medkit:before {\n  content: \"\\F0FA\";\n}\n.fa-fighter-jet:before {\n  content: \"\\F0FB\";\n}\n.fa-beer:before {\n  content: \"\\F0FC\";\n}\n.fa-h-square:before {\n  content: \"\\F0FD\";\n}\n.fa-plus-square:before {\n  content: \"\\F0FE\";\n}\n.fa-angle-double-left:before {\n  content: \"\\F100\";\n}\n.fa-angle-double-right:before {\n  content: \"\\F101\";\n}\n.fa-angle-double-up:before {\n  content: \"\\F102\";\n}\n.fa-angle-double-down:before {\n  content: \"\\F103\";\n}\n.fa-angle-left:before {\n  content: \"\\F104\";\n}\n.fa-angle-right:before {\n  content: \"\\F105\";\n}\n.fa-angle-up:before {\n  content: \"\\F106\";\n}\n.fa-angle-down:before {\n  content: \"\\F107\";\n}\n.fa-desktop:before {\n  content: \"\\F108\";\n}\n.fa-laptop:before {\n  content: \"\\F109\";\n}\n.fa-tablet:before {\n  content: \"\\F10A\";\n}\n.fa-mobile-phone:before,\n.fa-mobile:before {\n  content: \"\\F10B\";\n}\n.fa-circle-o:before {\n  content: \"\\F10C\";\n}\n.fa-quote-left:before {\n  content: \"\\F10D\";\n}\n.fa-quote-right:before {\n  content: \"\\F10E\";\n}\n.fa-spinner:before {\n  content: \"\\F110\";\n}\n.fa-circle:before {\n  content: \"\\F111\";\n}\n.fa-mail-reply:before,\n.fa-reply:before {\n  content: \"\\F112\";\n}\n.fa-github-alt:before {\n  content: \"\\F113\";\n}\n.fa-folder-o:before {\n  content: \"\\F114\";\n}\n.fa-folder-open-o:before {\n  content: \"\\F115\";\n}\n.fa-smile-o:before {\n  content: \"\\F118\";\n}\n.fa-frown-o:before {\n  content: \"\\F119\";\n}\n.fa-meh-o:before {\n  content: \"\\F11A\";\n}\n.fa-gamepad:before {\n  content: \"\\F11B\";\n}\n.fa-keyboard-o:before {\n  content: \"\\F11C\";\n}\n.fa-flag-o:before {\n  content: \"\\F11D\";\n}\n.fa-flag-checkered:before {\n  content: \"\\F11E\";\n}\n.fa-terminal:before {\n  content: \"\\F120\";\n}\n.fa-code:before {\n  content: \"\\F121\";\n}\n.fa-mail-reply-all:before,\n.fa-reply-all:before {\n  content: \"\\F122\";\n}\n.fa-star-half-empty:before,\n.fa-star-half-full:before,\n.fa-star-half-o:before {\n  content: \"\\F123\";\n}\n.fa-location-arrow:before {\n  content: \"\\F124\";\n}\n.fa-crop:before {\n  content: \"\\F125\";\n}\n.fa-code-fork:before {\n  content: \"\\F126\";\n}\n.fa-unlink:before,\n.fa-chain-broken:before {\n  content: \"\\F127\";\n}\n.fa-question:before {\n  content: \"\\F128\";\n}\n.fa-info:before {\n  content: \"\\F129\";\n}\n.fa-exclamation:before {\n  content: \"\\F12A\";\n}\n.fa-superscript:before {\n  content: \"\\F12B\";\n}\n.fa-subscript:before {\n  content: \"\\F12C\";\n}\n.fa-eraser:before {\n  content: \"\\F12D\";\n}\n.fa-puzzle-piece:before {\n  content: \"\\F12E\";\n}\n.fa-microphone:before {\n  content: \"\\F130\";\n}\n.fa-microphone-slash:before {\n  content: \"\\F131\";\n}\n.fa-shield:before {\n  content: \"\\F132\";\n}\n.fa-calendar-o:before {\n  content: \"\\F133\";\n}\n.fa-fire-extinguisher:before {\n  content: \"\\F134\";\n}\n.fa-rocket:before {\n  content: \"\\F135\";\n}\n.fa-maxcdn:before {\n  content: \"\\F136\";\n}\n.fa-chevron-circle-left:before {\n  content: \"\\F137\";\n}\n.fa-chevron-circle-right:before {\n  content: \"\\F138\";\n}\n.fa-chevron-circle-up:before {\n  content: \"\\F139\";\n}\n.fa-chevron-circle-down:before {\n  content: \"\\F13A\";\n}\n.fa-html5:before {\n  content: \"\\F13B\";\n}\n.fa-css3:before {\n  content: \"\\F13C\";\n}\n.fa-anchor:before {\n  content: \"\\F13D\";\n}\n.fa-unlock-alt:before {\n  content: \"\\F13E\";\n}\n.fa-bullseye:before {\n  content: \"\\F140\";\n}\n.fa-ellipsis-h:before {\n  content: \"\\F141\";\n}\n.fa-ellipsis-v:before {\n  content: \"\\F142\";\n}\n.fa-rss-square:before {\n  content: \"\\F143\";\n}\n.fa-play-circle:before {\n  content: \"\\F144\";\n}\n.fa-ticket:before {\n  content: \"\\F145\";\n}\n.fa-minus-square:before {\n  content: \"\\F146\";\n}\n.fa-minus-square-o:before {\n  content: \"\\F147\";\n}\n.fa-level-up:before {\n  content: \"\\F148\";\n}\n.fa-level-down:before {\n  content: \"\\F149\";\n}\n.fa-check-square:before {\n  content: \"\\F14A\";\n}\n.fa-pencil-square:before {\n  content: \"\\F14B\";\n}\n.fa-external-link-square:before {\n  content: \"\\F14C\";\n}\n.fa-share-square:before {\n  content: \"\\F14D\";\n}\n.fa-compass:before {\n  content: \"\\F14E\";\n}\n.fa-toggle-down:before,\n.fa-caret-square-o-down:before {\n  content: \"\\F150\";\n}\n.fa-toggle-up:before,\n.fa-caret-square-o-up:before {\n  content: \"\\F151\";\n}\n.fa-toggle-right:before,\n.fa-caret-square-o-right:before {\n  content: \"\\F152\";\n}\n.fa-euro:before,\n.fa-eur:before {\n  content: \"\\F153\";\n}\n.fa-gbp:before {\n  content: \"\\F154\";\n}\n.fa-dollar:before,\n.fa-usd:before {\n  content: \"\\F155\";\n}\n.fa-rupee:before,\n.fa-inr:before {\n  content: \"\\F156\";\n}\n.fa-cny:before,\n.fa-rmb:before,\n.fa-yen:before,\n.fa-jpy:before {\n  content: \"\\F157\";\n}\n.fa-ruble:before,\n.fa-rouble:before,\n.fa-rub:before {\n  content: \"\\F158\";\n}\n.fa-won:before,\n.fa-krw:before {\n  content: \"\\F159\";\n}\n.fa-bitcoin:before,\n.fa-btc:before {\n  content: \"\\F15A\";\n}\n.fa-file:before {\n  content: \"\\F15B\";\n}\n.fa-file-text:before {\n  content: \"\\F15C\";\n}\n.fa-sort-alpha-asc:before {\n  content: \"\\F15D\";\n}\n.fa-sort-alpha-desc:before {\n  content: \"\\F15E\";\n}\n.fa-sort-amount-asc:before {\n  content: \"\\F160\";\n}\n.fa-sort-amount-desc:before {\n  content: \"\\F161\";\n}\n.fa-sort-numeric-asc:before {\n  content: \"\\F162\";\n}\n.fa-sort-numeric-desc:before {\n  content: \"\\F163\";\n}\n.fa-thumbs-up:before {\n  content: \"\\F164\";\n}\n.fa-thumbs-down:before {\n  content: \"\\F165\";\n}\n.fa-youtube-square:before {\n  content: \"\\F166\";\n}\n.fa-youtube:before {\n  content: \"\\F167\";\n}\n.fa-xing:before {\n  content: \"\\F168\";\n}\n.fa-xing-square:before {\n  content: \"\\F169\";\n}\n.fa-youtube-play:before {\n  content: \"\\F16A\";\n}\n.fa-dropbox:before {\n  content: \"\\F16B\";\n}\n.fa-stack-overflow:before {\n  content: \"\\F16C\";\n}\n.fa-instagram:before {\n  content: \"\\F16D\";\n}\n.fa-flickr:before {\n  content: \"\\F16E\";\n}\n.fa-adn:before {\n  content: \"\\F170\";\n}\n.fa-bitbucket:before {\n  content: \"\\F171\";\n}\n.fa-bitbucket-square:before {\n  content: \"\\F172\";\n}\n.fa-tumblr:before {\n  content: \"\\F173\";\n}\n.fa-tumblr-square:before {\n  content: \"\\F174\";\n}\n.fa-long-arrow-down:before {\n  content: \"\\F175\";\n}\n.fa-long-arrow-up:before {\n  content: \"\\F176\";\n}\n.fa-long-arrow-left:before {\n  content: \"\\F177\";\n}\n.fa-long-arrow-right:before {\n  content: \"\\F178\";\n}\n.fa-apple:before {\n  content: \"\\F179\";\n}\n.fa-windows:before {\n  content: \"\\F17A\";\n}\n.fa-android:before {\n  content: \"\\F17B\";\n}\n.fa-linux:before {\n  content: \"\\F17C\";\n}\n.fa-dribbble:before {\n  content: \"\\F17D\";\n}\n.fa-skype:before {\n  content: \"\\F17E\";\n}\n.fa-foursquare:before {\n  content: \"\\F180\";\n}\n.fa-trello:before {\n  content: \"\\F181\";\n}\n.fa-female:before {\n  content: \"\\F182\";\n}\n.fa-male:before {\n  content: \"\\F183\";\n}\n.fa-gittip:before,\n.fa-gratipay:before {\n  content: \"\\F184\";\n}\n.fa-sun-o:before {\n  content: \"\\F185\";\n}\n.fa-moon-o:before {\n  content: \"\\F186\";\n}\n.fa-archive:before {\n  content: \"\\F187\";\n}\n.fa-bug:before {\n  content: \"\\F188\";\n}\n.fa-vk:before {\n  content: \"\\F189\";\n}\n.fa-weibo:before {\n  content: \"\\F18A\";\n}\n.fa-renren:before {\n  content: \"\\F18B\";\n}\n.fa-pagelines:before {\n  content: \"\\F18C\";\n}\n.fa-stack-exchange:before {\n  content: \"\\F18D\";\n}\n.fa-arrow-circle-o-right:before {\n  content: \"\\F18E\";\n}\n.fa-arrow-circle-o-left:before {\n  content: \"\\F190\";\n}\n.fa-toggle-left:before,\n.fa-caret-square-o-left:before {\n  content: \"\\F191\";\n}\n.fa-dot-circle-o:before {\n  content: \"\\F192\";\n}\n.fa-wheelchair:before {\n  content: \"\\F193\";\n}\n.fa-vimeo-square:before {\n  content: \"\\F194\";\n}\n.fa-turkish-lira:before,\n.fa-try:before {\n  content: \"\\F195\";\n}\n.fa-plus-square-o:before {\n  content: \"\\F196\";\n}\n.fa-space-shuttle:before {\n  content: \"\\F197\";\n}\n.fa-slack:before {\n  content: \"\\F198\";\n}\n.fa-envelope-square:before {\n  content: \"\\F199\";\n}\n.fa-wordpress:before {\n  content: \"\\F19A\";\n}\n.fa-openid:before {\n  content: \"\\F19B\";\n}\n.fa-institution:before,\n.fa-bank:before,\n.fa-university:before {\n  content: \"\\F19C\";\n}\n.fa-mortar-board:before,\n.fa-graduation-cap:before {\n  content: \"\\F19D\";\n}\n.fa-yahoo:before {\n  content: \"\\F19E\";\n}\n.fa-google:before {\n  content: \"\\F1A0\";\n}\n.fa-reddit:before {\n  content: \"\\F1A1\";\n}\n.fa-reddit-square:before {\n  content: \"\\F1A2\";\n}\n.fa-stumbleupon-circle:before {\n  content: \"\\F1A3\";\n}\n.fa-stumbleupon:before {\n  content: \"\\F1A4\";\n}\n.fa-delicious:before {\n  content: \"\\F1A5\";\n}\n.fa-digg:before {\n  content: \"\\F1A6\";\n}\n.fa-pied-piper:before {\n  content: \"\\F1A7\";\n}\n.fa-pied-piper-alt:before {\n  content: \"\\F1A8\";\n}\n.fa-drupal:before {\n  content: \"\\F1A9\";\n}\n.fa-joomla:before {\n  content: \"\\F1AA\";\n}\n.fa-language:before {\n  content: \"\\F1AB\";\n}\n.fa-fax:before {\n  content: \"\\F1AC\";\n}\n.fa-building:before {\n  content: \"\\F1AD\";\n}\n.fa-child:before {\n  content: \"\\F1AE\";\n}\n.fa-paw:before {\n  content: \"\\F1B0\";\n}\n.fa-spoon:before {\n  content: \"\\F1B1\";\n}\n.fa-cube:before {\n  content: \"\\F1B2\";\n}\n.fa-cubes:before {\n  content: \"\\F1B3\";\n}\n.fa-behance:before {\n  content: \"\\F1B4\";\n}\n.fa-behance-square:before {\n  content: \"\\F1B5\";\n}\n.fa-steam:before {\n  content: \"\\F1B6\";\n}\n.fa-steam-square:before {\n  content: \"\\F1B7\";\n}\n.fa-recycle:before {\n  content: \"\\F1B8\";\n}\n.fa-automobile:before,\n.fa-car:before {\n  content: \"\\F1B9\";\n}\n.fa-cab:before,\n.fa-taxi:before {\n  content: \"\\F1BA\";\n}\n.fa-tree:before {\n  content: \"\\F1BB\";\n}\n.fa-spotify:before {\n  content: \"\\F1BC\";\n}\n.fa-deviantart:before {\n  content: \"\\F1BD\";\n}\n.fa-soundcloud:before {\n  content: \"\\F1BE\";\n}\n.fa-database:before {\n  content: \"\\F1C0\";\n}\n.fa-file-pdf-o:before {\n  content: \"\\F1C1\";\n}\n.fa-file-word-o:before {\n  content: \"\\F1C2\";\n}\n.fa-file-excel-o:before {\n  content: \"\\F1C3\";\n}\n.fa-file-powerpoint-o:before {\n  content: \"\\F1C4\";\n}\n.fa-file-photo-o:before,\n.fa-file-picture-o:before,\n.fa-file-image-o:before {\n  content: \"\\F1C5\";\n}\n.fa-file-zip-o:before,\n.fa-file-archive-o:before {\n  content: \"\\F1C6\";\n}\n.fa-file-sound-o:before,\n.fa-file-audio-o:before {\n  content: \"\\F1C7\";\n}\n.fa-file-movie-o:before,\n.fa-file-video-o:before {\n  content: \"\\F1C8\";\n}\n.fa-file-code-o:before {\n  content: \"\\F1C9\";\n}\n.fa-vine:before {\n  content: \"\\F1CA\";\n}\n.fa-codepen:before {\n  content: \"\\F1CB\";\n}\n.fa-jsfiddle:before {\n  content: \"\\F1CC\";\n}\n.fa-life-bouy:before,\n.fa-life-buoy:before,\n.fa-life-saver:before,\n.fa-support:before,\n.fa-life-ring:before {\n  content: \"\\F1CD\";\n}\n.fa-circle-o-notch:before {\n  content: \"\\F1CE\";\n}\n.fa-ra:before,\n.fa-rebel:before {\n  content: \"\\F1D0\";\n}\n.fa-ge:before,\n.fa-empire:before {\n  content: \"\\F1D1\";\n}\n.fa-git-square:before {\n  content: \"\\F1D2\";\n}\n.fa-git:before {\n  content: \"\\F1D3\";\n}\n.fa-y-combinator-square:before,\n.fa-yc-square:before,\n.fa-hacker-news:before {\n  content: \"\\F1D4\";\n}\n.fa-tencent-weibo:before {\n  content: \"\\F1D5\";\n}\n.fa-qq:before {\n  content: \"\\F1D6\";\n}\n.fa-wechat:before,\n.fa-weixin:before {\n  content: \"\\F1D7\";\n}\n.fa-send:before,\n.fa-paper-plane:before {\n  content: \"\\F1D8\";\n}\n.fa-send-o:before,\n.fa-paper-plane-o:before {\n  content: \"\\F1D9\";\n}\n.fa-history:before {\n  content: \"\\F1DA\";\n}\n.fa-circle-thin:before {\n  content: \"\\F1DB\";\n}\n.fa-header:before {\n  content: \"\\F1DC\";\n}\n.fa-paragraph:before {\n  content: \"\\F1DD\";\n}\n.fa-sliders:before {\n  content: \"\\F1DE\";\n}\n.fa-share-alt:before {\n  content: \"\\F1E0\";\n}\n.fa-share-alt-square:before {\n  content: \"\\F1E1\";\n}\n.fa-bomb:before {\n  content: \"\\F1E2\";\n}\n.fa-soccer-ball-o:before,\n.fa-futbol-o:before {\n  content: \"\\F1E3\";\n}\n.fa-tty:before {\n  content: \"\\F1E4\";\n}\n.fa-binoculars:before {\n  content: \"\\F1E5\";\n}\n.fa-plug:before {\n  content: \"\\F1E6\";\n}\n.fa-slideshare:before {\n  content: \"\\F1E7\";\n}\n.fa-twitch:before {\n  content: \"\\F1E8\";\n}\n.fa-yelp:before {\n  content: \"\\F1E9\";\n}\n.fa-newspaper-o:before {\n  content: \"\\F1EA\";\n}\n.fa-wifi:before {\n  content: \"\\F1EB\";\n}\n.fa-calculator:before {\n  content: \"\\F1EC\";\n}\n.fa-paypal:before {\n  content: \"\\F1ED\";\n}\n.fa-google-wallet:before {\n  content: \"\\F1EE\";\n}\n.fa-cc-visa:before {\n  content: \"\\F1F0\";\n}\n.fa-cc-mastercard:before {\n  content: \"\\F1F1\";\n}\n.fa-cc-discover:before {\n  content: \"\\F1F2\";\n}\n.fa-cc-amex:before {\n  content: \"\\F1F3\";\n}\n.fa-cc-paypal:before {\n  content: \"\\F1F4\";\n}\n.fa-cc-stripe:before {\n  content: \"\\F1F5\";\n}\n.fa-bell-slash:before {\n  content: \"\\F1F6\";\n}\n.fa-bell-slash-o:before {\n  content: \"\\F1F7\";\n}\n.fa-trash:before {\n  content: \"\\F1F8\";\n}\n.fa-copyright:before {\n  content: \"\\F1F9\";\n}\n.fa-at:before {\n  content: \"\\F1FA\";\n}\n.fa-eyedropper:before {\n  content: \"\\F1FB\";\n}\n.fa-paint-brush:before {\n  content: \"\\F1FC\";\n}\n.fa-birthday-cake:before {\n  content: \"\\F1FD\";\n}\n.fa-area-chart:before {\n  content: \"\\F1FE\";\n}\n.fa-pie-chart:before {\n  content: \"\\F200\";\n}\n.fa-line-chart:before {\n  content: \"\\F201\";\n}\n.fa-lastfm:before {\n  content: \"\\F202\";\n}\n.fa-lastfm-square:before {\n  content: \"\\F203\";\n}\n.fa-toggle-off:before {\n  content: \"\\F204\";\n}\n.fa-toggle-on:before {\n  content: \"\\F205\";\n}\n.fa-bicycle:before {\n  content: \"\\F206\";\n}\n.fa-bus:before {\n  content: \"\\F207\";\n}\n.fa-ioxhost:before {\n  content: \"\\F208\";\n}\n.fa-angellist:before {\n  content: \"\\F209\";\n}\n.fa-cc:before {\n  content: \"\\F20A\";\n}\n.fa-shekel:before,\n.fa-sheqel:before,\n.fa-ils:before {\n  content: \"\\F20B\";\n}\n.fa-meanpath:before {\n  content: \"\\F20C\";\n}\n.fa-buysellads:before {\n  content: \"\\F20D\";\n}\n.fa-connectdevelop:before {\n  content: \"\\F20E\";\n}\n.fa-dashcube:before {\n  content: \"\\F210\";\n}\n.fa-forumbee:before {\n  content: \"\\F211\";\n}\n.fa-leanpub:before {\n  content: \"\\F212\";\n}\n.fa-sellsy:before {\n  content: \"\\F213\";\n}\n.fa-shirtsinbulk:before {\n  content: \"\\F214\";\n}\n.fa-simplybuilt:before {\n  content: \"\\F215\";\n}\n.fa-skyatlas:before {\n  content: \"\\F216\";\n}\n.fa-cart-plus:before {\n  content: \"\\F217\";\n}\n.fa-cart-arrow-down:before {\n  content: \"\\F218\";\n}\n.fa-diamond:before {\n  content: \"\\F219\";\n}\n.fa-ship:before {\n  content: \"\\F21A\";\n}\n.fa-user-secret:before {\n  content: \"\\F21B\";\n}\n.fa-motorcycle:before {\n  content: \"\\F21C\";\n}\n.fa-street-view:before {\n  content: \"\\F21D\";\n}\n.fa-heartbeat:before {\n  content: \"\\F21E\";\n}\n.fa-venus:before {\n  content: \"\\F221\";\n}\n.fa-mars:before {\n  content: \"\\F222\";\n}\n.fa-mercury:before {\n  content: \"\\F223\";\n}\n.fa-intersex:before,\n.fa-transgender:before {\n  content: \"\\F224\";\n}\n.fa-transgender-alt:before {\n  content: \"\\F225\";\n}\n.fa-venus-double:before {\n  content: \"\\F226\";\n}\n.fa-mars-double:before {\n  content: \"\\F227\";\n}\n.fa-venus-mars:before {\n  content: \"\\F228\";\n}\n.fa-mars-stroke:before {\n  content: \"\\F229\";\n}\n.fa-mars-stroke-v:before {\n  content: \"\\F22A\";\n}\n.fa-mars-stroke-h:before {\n  content: \"\\F22B\";\n}\n.fa-neuter:before {\n  content: \"\\F22C\";\n}\n.fa-genderless:before {\n  content: \"\\F22D\";\n}\n.fa-facebook-official:before {\n  content: \"\\F230\";\n}\n.fa-pinterest-p:before {\n  content: \"\\F231\";\n}\n.fa-whatsapp:before {\n  content: \"\\F232\";\n}\n.fa-server:before {\n  content: \"\\F233\";\n}\n.fa-user-plus:before {\n  content: \"\\F234\";\n}\n.fa-user-times:before {\n  content: \"\\F235\";\n}\n.fa-hotel:before,\n.fa-bed:before {\n  content: \"\\F236\";\n}\n.fa-viacoin:before {\n  content: \"\\F237\";\n}\n.fa-train:before {\n  content: \"\\F238\";\n}\n.fa-subway:before {\n  content: \"\\F239\";\n}\n.fa-medium:before {\n  content: \"\\F23A\";\n}\n.fa-yc:before,\n.fa-y-combinator:before {\n  content: \"\\F23B\";\n}\n.fa-optin-monster:before {\n  content: \"\\F23C\";\n}\n.fa-opencart:before {\n  content: \"\\F23D\";\n}\n.fa-expeditedssl:before {\n  content: \"\\F23E\";\n}\n.fa-battery-4:before,\n.fa-battery-full:before {\n  content: \"\\F240\";\n}\n.fa-battery-3:before,\n.fa-battery-three-quarters:before {\n  content: \"\\F241\";\n}\n.fa-battery-2:before,\n.fa-battery-half:before {\n  content: \"\\F242\";\n}\n.fa-battery-1:before,\n.fa-battery-quarter:before {\n  content: \"\\F243\";\n}\n.fa-battery-0:before,\n.fa-battery-empty:before {\n  content: \"\\F244\";\n}\n.fa-mouse-pointer:before {\n  content: \"\\F245\";\n}\n.fa-i-cursor:before {\n  content: \"\\F246\";\n}\n.fa-object-group:before {\n  content: \"\\F247\";\n}\n.fa-object-ungroup:before {\n  content: \"\\F248\";\n}\n.fa-sticky-note:before {\n  content: \"\\F249\";\n}\n.fa-sticky-note-o:before {\n  content: \"\\F24A\";\n}\n.fa-cc-jcb:before {\n  content: \"\\F24B\";\n}\n.fa-cc-diners-club:before {\n  content: \"\\F24C\";\n}\n.fa-clone:before {\n  content: \"\\F24D\";\n}\n.fa-balance-scale:before {\n  content: \"\\F24E\";\n}\n.fa-hourglass-o:before {\n  content: \"\\F250\";\n}\n.fa-hourglass-1:before,\n.fa-hourglass-start:before {\n  content: \"\\F251\";\n}\n.fa-hourglass-2:before,\n.fa-hourglass-half:before {\n  content: \"\\F252\";\n}\n.fa-hourglass-3:before,\n.fa-hourglass-end:before {\n  content: \"\\F253\";\n}\n.fa-hourglass:before {\n  content: \"\\F254\";\n}\n.fa-hand-grab-o:before,\n.fa-hand-rock-o:before {\n  content: \"\\F255\";\n}\n.fa-hand-stop-o:before,\n.fa-hand-paper-o:before {\n  content: \"\\F256\";\n}\n.fa-hand-scissors-o:before {\n  content: \"\\F257\";\n}\n.fa-hand-lizard-o:before {\n  content: \"\\F258\";\n}\n.fa-hand-spock-o:before {\n  content: \"\\F259\";\n}\n.fa-hand-pointer-o:before {\n  content: \"\\F25A\";\n}\n.fa-hand-peace-o:before {\n  content: \"\\F25B\";\n}\n.fa-trademark:before {\n  content: \"\\F25C\";\n}\n.fa-registered:before {\n  content: \"\\F25D\";\n}\n.fa-creative-commons:before {\n  content: \"\\F25E\";\n}\n.fa-gg:before {\n  content: \"\\F260\";\n}\n.fa-gg-circle:before {\n  content: \"\\F261\";\n}\n.fa-tripadvisor:before {\n  content: \"\\F262\";\n}\n.fa-odnoklassniki:before {\n  content: \"\\F263\";\n}\n.fa-odnoklassniki-square:before {\n  content: \"\\F264\";\n}\n.fa-get-pocket:before {\n  content: \"\\F265\";\n}\n.fa-wikipedia-w:before {\n  content: \"\\F266\";\n}\n.fa-safari:before {\n  content: \"\\F267\";\n}\n.fa-chrome:before {\n  content: \"\\F268\";\n}\n.fa-firefox:before {\n  content: \"\\F269\";\n}\n.fa-opera:before {\n  content: \"\\F26A\";\n}\n.fa-internet-explorer:before {\n  content: \"\\F26B\";\n}\n.fa-tv:before,\n.fa-television:before {\n  content: \"\\F26C\";\n}\n.fa-contao:before {\n  content: \"\\F26D\";\n}\n.fa-500px:before {\n  content: \"\\F26E\";\n}\n.fa-amazon:before {\n  content: \"\\F270\";\n}\n.fa-calendar-plus-o:before {\n  content: \"\\F271\";\n}\n.fa-calendar-minus-o:before {\n  content: \"\\F272\";\n}\n.fa-calendar-times-o:before {\n  content: \"\\F273\";\n}\n.fa-calendar-check-o:before {\n  content: \"\\F274\";\n}\n.fa-industry:before {\n  content: \"\\F275\";\n}\n.fa-map-pin:before {\n  content: \"\\F276\";\n}\n.fa-map-signs:before {\n  content: \"\\F277\";\n}\n.fa-map-o:before {\n  content: \"\\F278\";\n}\n.fa-map:before {\n  content: \"\\F279\";\n}\n.fa-commenting:before {\n  content: \"\\F27A\";\n}\n.fa-commenting-o:before {\n  content: \"\\F27B\";\n}\n.fa-houzz:before {\n  content: \"\\F27C\";\n}\n.fa-vimeo:before {\n  content: \"\\F27D\";\n}\n.fa-black-tie:before {\n  content: \"\\F27E\";\n}\n.fa-fonticons:before {\n  content: \"\\F280\";\n}\n", ""]);
+	exports.push([module.id, "/*!\n *  Font Awesome 4.4.0 by @davegandy - http://fontawesome.io - @fontawesome\n *  License - http://fontawesome.io/license (Font: SIL OFL 1.1, CSS: MIT License)\n */\n/* FONT PATH\n * -------------------------- */\n@font-face {\n  font-family: 'FontAwesome';\n  src: url(" + __webpack_require__(24) + ");\n  src: url(" + __webpack_require__(25) + "?#iefix&v=4.4.0) format('embedded-opentype'), url(" + __webpack_require__(26) + ") format('woff2'), url(" + __webpack_require__(27) + ") format('woff'), url(" + __webpack_require__(28) + ") format('truetype'), url(" + __webpack_require__(29) + "#fontawesomeregular) format('svg');\n  font-weight: normal;\n  font-style: normal;\n}\n.fa {\n  display: inline-block;\n  font: normal normal normal 14px/1 FontAwesome;\n  font-size: inherit;\n  text-rendering: auto;\n  -webkit-font-smoothing: antialiased;\n  -moz-osx-font-smoothing: grayscale;\n}\n/* makes the font 33% larger relative to the icon container */\n.fa-lg {\n  font-size: 1.33333333em;\n  line-height: 0.75em;\n  vertical-align: -15%;\n}\n.fa-2x {\n  font-size: 2em;\n}\n.fa-3x {\n  font-size: 3em;\n}\n.fa-4x {\n  font-size: 4em;\n}\n.fa-5x {\n  font-size: 5em;\n}\n.fa-fw {\n  width: 1.28571429em;\n  text-align: center;\n}\n.fa-ul {\n  padding-left: 0;\n  margin-left: 2.14285714em;\n  list-style-type: none;\n}\n.fa-ul > li {\n  position: relative;\n}\n.fa-li {\n  position: absolute;\n  left: -2.14285714em;\n  width: 2.14285714em;\n  top: 0.14285714em;\n  text-align: center;\n}\n.fa-li.fa-lg {\n  left: -1.85714286em;\n}\n.fa-border {\n  padding: .2em .25em .15em;\n  border: solid 0.08em #eeeeee;\n  border-radius: .1em;\n}\n.fa-pull-left {\n  float: left;\n}\n.fa-pull-right {\n  float: right;\n}\n.fa.fa-pull-left {\n  margin-right: .3em;\n}\n.fa.fa-pull-right {\n  margin-left: .3em;\n}\n/* Deprecated as of 4.4.0 */\n.pull-right {\n  float: right;\n}\n.pull-left {\n  float: left;\n}\n.fa.pull-left {\n  margin-right: .3em;\n}\n.fa.pull-right {\n  margin-left: .3em;\n}\n.fa-spin {\n  -webkit-animation: fa-spin 2s infinite linear;\n  animation: fa-spin 2s infinite linear;\n}\n.fa-pulse {\n  -webkit-animation: fa-spin 1s infinite steps(8);\n  animation: fa-spin 1s infinite steps(8);\n}\n@-webkit-keyframes fa-spin {\n  0% {\n    -webkit-transform: rotate(0deg);\n    transform: rotate(0deg);\n  }\n  100% {\n    -webkit-transform: rotate(359deg);\n    transform: rotate(359deg);\n  }\n}\n@keyframes fa-spin {\n  0% {\n    -webkit-transform: rotate(0deg);\n    transform: rotate(0deg);\n  }\n  100% {\n    -webkit-transform: rotate(359deg);\n    transform: rotate(359deg);\n  }\n}\n.fa-rotate-90 {\n  filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=1);\n  -webkit-transform: rotate(90deg);\n  -ms-transform: rotate(90deg);\n  transform: rotate(90deg);\n}\n.fa-rotate-180 {\n  filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=2);\n  -webkit-transform: rotate(180deg);\n  -ms-transform: rotate(180deg);\n  transform: rotate(180deg);\n}\n.fa-rotate-270 {\n  filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=3);\n  -webkit-transform: rotate(270deg);\n  -ms-transform: rotate(270deg);\n  transform: rotate(270deg);\n}\n.fa-flip-horizontal {\n  filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=0, mirror=1);\n  -webkit-transform: scale(-1, 1);\n  -ms-transform: scale(-1, 1);\n  transform: scale(-1, 1);\n}\n.fa-flip-vertical {\n  filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=2, mirror=1);\n  -webkit-transform: scale(1, -1);\n  -ms-transform: scale(1, -1);\n  transform: scale(1, -1);\n}\n:root .fa-rotate-90,\n:root .fa-rotate-180,\n:root .fa-rotate-270,\n:root .fa-flip-horizontal,\n:root .fa-flip-vertical {\n  filter: none;\n}\n.fa-stack {\n  position: relative;\n  display: inline-block;\n  width: 2em;\n  height: 2em;\n  line-height: 2em;\n  vertical-align: middle;\n}\n.fa-stack-1x,\n.fa-stack-2x {\n  position: absolute;\n  left: 0;\n  width: 100%;\n  text-align: center;\n}\n.fa-stack-1x {\n  line-height: inherit;\n}\n.fa-stack-2x {\n  font-size: 2em;\n}\n.fa-inverse {\n  color: #ffffff;\n}\n/* Font Awesome uses the Unicode Private Use Area (PUA) to ensure screen\n   readers do not read off random characters that represent icons */\n.fa-glass:before {\n  content: \"\\F000\";\n}\n.fa-music:before {\n  content: \"\\F001\";\n}\n.fa-search:before {\n  content: \"\\F002\";\n}\n.fa-envelope-o:before {\n  content: \"\\F003\";\n}\n.fa-heart:before {\n  content: \"\\F004\";\n}\n.fa-star:before {\n  content: \"\\F005\";\n}\n.fa-star-o:before {\n  content: \"\\F006\";\n}\n.fa-user:before {\n  content: \"\\F007\";\n}\n.fa-film:before {\n  content: \"\\F008\";\n}\n.fa-th-large:before {\n  content: \"\\F009\";\n}\n.fa-th:before {\n  content: \"\\F00A\";\n}\n.fa-th-list:before {\n  content: \"\\F00B\";\n}\n.fa-check:before {\n  content: \"\\F00C\";\n}\n.fa-remove:before,\n.fa-close:before,\n.fa-times:before {\n  content: \"\\F00D\";\n}\n.fa-search-plus:before {\n  content: \"\\F00E\";\n}\n.fa-search-minus:before {\n  content: \"\\F010\";\n}\n.fa-power-off:before {\n  content: \"\\F011\";\n}\n.fa-signal:before {\n  content: \"\\F012\";\n}\n.fa-gear:before,\n.fa-cog:before {\n  content: \"\\F013\";\n}\n.fa-trash-o:before {\n  content: \"\\F014\";\n}\n.fa-home:before {\n  content: \"\\F015\";\n}\n.fa-file-o:before {\n  content: \"\\F016\";\n}\n.fa-clock-o:before {\n  content: \"\\F017\";\n}\n.fa-road:before {\n  content: \"\\F018\";\n}\n.fa-download:before {\n  content: \"\\F019\";\n}\n.fa-arrow-circle-o-down:before {\n  content: \"\\F01A\";\n}\n.fa-arrow-circle-o-up:before {\n  content: \"\\F01B\";\n}\n.fa-inbox:before {\n  content: \"\\F01C\";\n}\n.fa-play-circle-o:before {\n  content: \"\\F01D\";\n}\n.fa-rotate-right:before,\n.fa-repeat:before {\n  content: \"\\F01E\";\n}\n.fa-refresh:before {\n  content: \"\\F021\";\n}\n.fa-list-alt:before {\n  content: \"\\F022\";\n}\n.fa-lock:before {\n  content: \"\\F023\";\n}\n.fa-flag:before {\n  content: \"\\F024\";\n}\n.fa-headphones:before {\n  content: \"\\F025\";\n}\n.fa-volume-off:before {\n  content: \"\\F026\";\n}\n.fa-volume-down:before {\n  content: \"\\F027\";\n}\n.fa-volume-up:before {\n  content: \"\\F028\";\n}\n.fa-qrcode:before {\n  content: \"\\F029\";\n}\n.fa-barcode:before {\n  content: \"\\F02A\";\n}\n.fa-tag:before {\n  content: \"\\F02B\";\n}\n.fa-tags:before {\n  content: \"\\F02C\";\n}\n.fa-book:before {\n  content: \"\\F02D\";\n}\n.fa-bookmark:before {\n  content: \"\\F02E\";\n}\n.fa-print:before {\n  content: \"\\F02F\";\n}\n.fa-camera:before {\n  content: \"\\F030\";\n}\n.fa-font:before {\n  content: \"\\F031\";\n}\n.fa-bold:before {\n  content: \"\\F032\";\n}\n.fa-italic:before {\n  content: \"\\F033\";\n}\n.fa-text-height:before {\n  content: \"\\F034\";\n}\n.fa-text-width:before {\n  content: \"\\F035\";\n}\n.fa-align-left:before {\n  content: \"\\F036\";\n}\n.fa-align-center:before {\n  content: \"\\F037\";\n}\n.fa-align-right:before {\n  content: \"\\F038\";\n}\n.fa-align-justify:before {\n  content: \"\\F039\";\n}\n.fa-list:before {\n  content: \"\\F03A\";\n}\n.fa-dedent:before,\n.fa-outdent:before {\n  content: \"\\F03B\";\n}\n.fa-indent:before {\n  content: \"\\F03C\";\n}\n.fa-video-camera:before {\n  content: \"\\F03D\";\n}\n.fa-photo:before,\n.fa-image:before,\n.fa-picture-o:before {\n  content: \"\\F03E\";\n}\n.fa-pencil:before {\n  content: \"\\F040\";\n}\n.fa-map-marker:before {\n  content: \"\\F041\";\n}\n.fa-adjust:before {\n  content: \"\\F042\";\n}\n.fa-tint:before {\n  content: \"\\F043\";\n}\n.fa-edit:before,\n.fa-pencil-square-o:before {\n  content: \"\\F044\";\n}\n.fa-share-square-o:before {\n  content: \"\\F045\";\n}\n.fa-check-square-o:before {\n  content: \"\\F046\";\n}\n.fa-arrows:before {\n  content: \"\\F047\";\n}\n.fa-step-backward:before {\n  content: \"\\F048\";\n}\n.fa-fast-backward:before {\n  content: \"\\F049\";\n}\n.fa-backward:before {\n  content: \"\\F04A\";\n}\n.fa-play:before {\n  content: \"\\F04B\";\n}\n.fa-pause:before {\n  content: \"\\F04C\";\n}\n.fa-stop:before {\n  content: \"\\F04D\";\n}\n.fa-forward:before {\n  content: \"\\F04E\";\n}\n.fa-fast-forward:before {\n  content: \"\\F050\";\n}\n.fa-step-forward:before {\n  content: \"\\F051\";\n}\n.fa-eject:before {\n  content: \"\\F052\";\n}\n.fa-chevron-left:before {\n  content: \"\\F053\";\n}\n.fa-chevron-right:before {\n  content: \"\\F054\";\n}\n.fa-plus-circle:before {\n  content: \"\\F055\";\n}\n.fa-minus-circle:before {\n  content: \"\\F056\";\n}\n.fa-times-circle:before {\n  content: \"\\F057\";\n}\n.fa-check-circle:before {\n  content: \"\\F058\";\n}\n.fa-question-circle:before {\n  content: \"\\F059\";\n}\n.fa-info-circle:before {\n  content: \"\\F05A\";\n}\n.fa-crosshairs:before {\n  content: \"\\F05B\";\n}\n.fa-times-circle-o:before {\n  content: \"\\F05C\";\n}\n.fa-check-circle-o:before {\n  content: \"\\F05D\";\n}\n.fa-ban:before {\n  content: \"\\F05E\";\n}\n.fa-arrow-left:before {\n  content: \"\\F060\";\n}\n.fa-arrow-right:before {\n  content: \"\\F061\";\n}\n.fa-arrow-up:before {\n  content: \"\\F062\";\n}\n.fa-arrow-down:before {\n  content: \"\\F063\";\n}\n.fa-mail-forward:before,\n.fa-share:before {\n  content: \"\\F064\";\n}\n.fa-expand:before {\n  content: \"\\F065\";\n}\n.fa-compress:before {\n  content: \"\\F066\";\n}\n.fa-plus:before {\n  content: \"\\F067\";\n}\n.fa-minus:before {\n  content: \"\\F068\";\n}\n.fa-asterisk:before {\n  content: \"\\F069\";\n}\n.fa-exclamation-circle:before {\n  content: \"\\F06A\";\n}\n.fa-gift:before {\n  content: \"\\F06B\";\n}\n.fa-leaf:before {\n  content: \"\\F06C\";\n}\n.fa-fire:before {\n  content: \"\\F06D\";\n}\n.fa-eye:before {\n  content: \"\\F06E\";\n}\n.fa-eye-slash:before {\n  content: \"\\F070\";\n}\n.fa-warning:before,\n.fa-exclamation-triangle:before {\n  content: \"\\F071\";\n}\n.fa-plane:before {\n  content: \"\\F072\";\n}\n.fa-calendar:before {\n  content: \"\\F073\";\n}\n.fa-random:before {\n  content: \"\\F074\";\n}\n.fa-comment:before {\n  content: \"\\F075\";\n}\n.fa-magnet:before {\n  content: \"\\F076\";\n}\n.fa-chevron-up:before {\n  content: \"\\F077\";\n}\n.fa-chevron-down:before {\n  content: \"\\F078\";\n}\n.fa-retweet:before {\n  content: \"\\F079\";\n}\n.fa-shopping-cart:before {\n  content: \"\\F07A\";\n}\n.fa-folder:before {\n  content: \"\\F07B\";\n}\n.fa-folder-open:before {\n  content: \"\\F07C\";\n}\n.fa-arrows-v:before {\n  content: \"\\F07D\";\n}\n.fa-arrows-h:before {\n  content: \"\\F07E\";\n}\n.fa-bar-chart-o:before,\n.fa-bar-chart:before {\n  content: \"\\F080\";\n}\n.fa-twitter-square:before {\n  content: \"\\F081\";\n}\n.fa-facebook-square:before {\n  content: \"\\F082\";\n}\n.fa-camera-retro:before {\n  content: \"\\F083\";\n}\n.fa-key:before {\n  content: \"\\F084\";\n}\n.fa-gears:before,\n.fa-cogs:before {\n  content: \"\\F085\";\n}\n.fa-comments:before {\n  content: \"\\F086\";\n}\n.fa-thumbs-o-up:before {\n  content: \"\\F087\";\n}\n.fa-thumbs-o-down:before {\n  content: \"\\F088\";\n}\n.fa-star-half:before {\n  content: \"\\F089\";\n}\n.fa-heart-o:before {\n  content: \"\\F08A\";\n}\n.fa-sign-out:before {\n  content: \"\\F08B\";\n}\n.fa-linkedin-square:before {\n  content: \"\\F08C\";\n}\n.fa-thumb-tack:before {\n  content: \"\\F08D\";\n}\n.fa-external-link:before {\n  content: \"\\F08E\";\n}\n.fa-sign-in:before {\n  content: \"\\F090\";\n}\n.fa-trophy:before {\n  content: \"\\F091\";\n}\n.fa-github-square:before {\n  content: \"\\F092\";\n}\n.fa-upload:before {\n  content: \"\\F093\";\n}\n.fa-lemon-o:before {\n  content: \"\\F094\";\n}\n.fa-phone:before {\n  content: \"\\F095\";\n}\n.fa-square-o:before {\n  content: \"\\F096\";\n}\n.fa-bookmark-o:before {\n  content: \"\\F097\";\n}\n.fa-phone-square:before {\n  content: \"\\F098\";\n}\n.fa-twitter:before {\n  content: \"\\F099\";\n}\n.fa-facebook-f:before,\n.fa-facebook:before {\n  content: \"\\F09A\";\n}\n.fa-github:before {\n  content: \"\\F09B\";\n}\n.fa-unlock:before {\n  content: \"\\F09C\";\n}\n.fa-credit-card:before {\n  content: \"\\F09D\";\n}\n.fa-feed:before,\n.fa-rss:before {\n  content: \"\\F09E\";\n}\n.fa-hdd-o:before {\n  content: \"\\F0A0\";\n}\n.fa-bullhorn:before {\n  content: \"\\F0A1\";\n}\n.fa-bell:before {\n  content: \"\\F0F3\";\n}\n.fa-certificate:before {\n  content: \"\\F0A3\";\n}\n.fa-hand-o-right:before {\n  content: \"\\F0A4\";\n}\n.fa-hand-o-left:before {\n  content: \"\\F0A5\";\n}\n.fa-hand-o-up:before {\n  content: \"\\F0A6\";\n}\n.fa-hand-o-down:before {\n  content: \"\\F0A7\";\n}\n.fa-arrow-circle-left:before {\n  content: \"\\F0A8\";\n}\n.fa-arrow-circle-right:before {\n  content: \"\\F0A9\";\n}\n.fa-arrow-circle-up:before {\n  content: \"\\F0AA\";\n}\n.fa-arrow-circle-down:before {\n  content: \"\\F0AB\";\n}\n.fa-globe:before {\n  content: \"\\F0AC\";\n}\n.fa-wrench:before {\n  content: \"\\F0AD\";\n}\n.fa-tasks:before {\n  content: \"\\F0AE\";\n}\n.fa-filter:before {\n  content: \"\\F0B0\";\n}\n.fa-briefcase:before {\n  content: \"\\F0B1\";\n}\n.fa-arrows-alt:before {\n  content: \"\\F0B2\";\n}\n.fa-group:before,\n.fa-users:before {\n  content: \"\\F0C0\";\n}\n.fa-chain:before,\n.fa-link:before {\n  content: \"\\F0C1\";\n}\n.fa-cloud:before {\n  content: \"\\F0C2\";\n}\n.fa-flask:before {\n  content: \"\\F0C3\";\n}\n.fa-cut:before,\n.fa-scissors:before {\n  content: \"\\F0C4\";\n}\n.fa-copy:before,\n.fa-files-o:before {\n  content: \"\\F0C5\";\n}\n.fa-paperclip:before {\n  content: \"\\F0C6\";\n}\n.fa-save:before,\n.fa-floppy-o:before {\n  content: \"\\F0C7\";\n}\n.fa-square:before {\n  content: \"\\F0C8\";\n}\n.fa-navicon:before,\n.fa-reorder:before,\n.fa-bars:before {\n  content: \"\\F0C9\";\n}\n.fa-list-ul:before {\n  content: \"\\F0CA\";\n}\n.fa-list-ol:before {\n  content: \"\\F0CB\";\n}\n.fa-strikethrough:before {\n  content: \"\\F0CC\";\n}\n.fa-underline:before {\n  content: \"\\F0CD\";\n}\n.fa-table:before {\n  content: \"\\F0CE\";\n}\n.fa-magic:before {\n  content: \"\\F0D0\";\n}\n.fa-truck:before {\n  content: \"\\F0D1\";\n}\n.fa-pinterest:before {\n  content: \"\\F0D2\";\n}\n.fa-pinterest-square:before {\n  content: \"\\F0D3\";\n}\n.fa-google-plus-square:before {\n  content: \"\\F0D4\";\n}\n.fa-google-plus:before {\n  content: \"\\F0D5\";\n}\n.fa-money:before {\n  content: \"\\F0D6\";\n}\n.fa-caret-down:before {\n  content: \"\\F0D7\";\n}\n.fa-caret-up:before {\n  content: \"\\F0D8\";\n}\n.fa-caret-left:before {\n  content: \"\\F0D9\";\n}\n.fa-caret-right:before {\n  content: \"\\F0DA\";\n}\n.fa-columns:before {\n  content: \"\\F0DB\";\n}\n.fa-unsorted:before,\n.fa-sort:before {\n  content: \"\\F0DC\";\n}\n.fa-sort-down:before,\n.fa-sort-desc:before {\n  content: \"\\F0DD\";\n}\n.fa-sort-up:before,\n.fa-sort-asc:before {\n  content: \"\\F0DE\";\n}\n.fa-envelope:before {\n  content: \"\\F0E0\";\n}\n.fa-linkedin:before {\n  content: \"\\F0E1\";\n}\n.fa-rotate-left:before,\n.fa-undo:before {\n  content: \"\\F0E2\";\n}\n.fa-legal:before,\n.fa-gavel:before {\n  content: \"\\F0E3\";\n}\n.fa-dashboard:before,\n.fa-tachometer:before {\n  content: \"\\F0E4\";\n}\n.fa-comment-o:before {\n  content: \"\\F0E5\";\n}\n.fa-comments-o:before {\n  content: \"\\F0E6\";\n}\n.fa-flash:before,\n.fa-bolt:before {\n  content: \"\\F0E7\";\n}\n.fa-sitemap:before {\n  content: \"\\F0E8\";\n}\n.fa-umbrella:before {\n  content: \"\\F0E9\";\n}\n.fa-paste:before,\n.fa-clipboard:before {\n  content: \"\\F0EA\";\n}\n.fa-lightbulb-o:before {\n  content: \"\\F0EB\";\n}\n.fa-exchange:before {\n  content: \"\\F0EC\";\n}\n.fa-cloud-download:before {\n  content: \"\\F0ED\";\n}\n.fa-cloud-upload:before {\n  content: \"\\F0EE\";\n}\n.fa-user-md:before {\n  content: \"\\F0F0\";\n}\n.fa-stethoscope:before {\n  content: \"\\F0F1\";\n}\n.fa-suitcase:before {\n  content: \"\\F0F2\";\n}\n.fa-bell-o:before {\n  content: \"\\F0A2\";\n}\n.fa-coffee:before {\n  content: \"\\F0F4\";\n}\n.fa-cutlery:before {\n  content: \"\\F0F5\";\n}\n.fa-file-text-o:before {\n  content: \"\\F0F6\";\n}\n.fa-building-o:before {\n  content: \"\\F0F7\";\n}\n.fa-hospital-o:before {\n  content: \"\\F0F8\";\n}\n.fa-ambulance:before {\n  content: \"\\F0F9\";\n}\n.fa-medkit:before {\n  content: \"\\F0FA\";\n}\n.fa-fighter-jet:before {\n  content: \"\\F0FB\";\n}\n.fa-beer:before {\n  content: \"\\F0FC\";\n}\n.fa-h-square:before {\n  content: \"\\F0FD\";\n}\n.fa-plus-square:before {\n  content: \"\\F0FE\";\n}\n.fa-angle-double-left:before {\n  content: \"\\F100\";\n}\n.fa-angle-double-right:before {\n  content: \"\\F101\";\n}\n.fa-angle-double-up:before {\n  content: \"\\F102\";\n}\n.fa-angle-double-down:before {\n  content: \"\\F103\";\n}\n.fa-angle-left:before {\n  content: \"\\F104\";\n}\n.fa-angle-right:before {\n  content: \"\\F105\";\n}\n.fa-angle-up:before {\n  content: \"\\F106\";\n}\n.fa-angle-down:before {\n  content: \"\\F107\";\n}\n.fa-desktop:before {\n  content: \"\\F108\";\n}\n.fa-laptop:before {\n  content: \"\\F109\";\n}\n.fa-tablet:before {\n  content: \"\\F10A\";\n}\n.fa-mobile-phone:before,\n.fa-mobile:before {\n  content: \"\\F10B\";\n}\n.fa-circle-o:before {\n  content: \"\\F10C\";\n}\n.fa-quote-left:before {\n  content: \"\\F10D\";\n}\n.fa-quote-right:before {\n  content: \"\\F10E\";\n}\n.fa-spinner:before {\n  content: \"\\F110\";\n}\n.fa-circle:before {\n  content: \"\\F111\";\n}\n.fa-mail-reply:before,\n.fa-reply:before {\n  content: \"\\F112\";\n}\n.fa-github-alt:before {\n  content: \"\\F113\";\n}\n.fa-folder-o:before {\n  content: \"\\F114\";\n}\n.fa-folder-open-o:before {\n  content: \"\\F115\";\n}\n.fa-smile-o:before {\n  content: \"\\F118\";\n}\n.fa-frown-o:before {\n  content: \"\\F119\";\n}\n.fa-meh-o:before {\n  content: \"\\F11A\";\n}\n.fa-gamepad:before {\n  content: \"\\F11B\";\n}\n.fa-keyboard-o:before {\n  content: \"\\F11C\";\n}\n.fa-flag-o:before {\n  content: \"\\F11D\";\n}\n.fa-flag-checkered:before {\n  content: \"\\F11E\";\n}\n.fa-terminal:before {\n  content: \"\\F120\";\n}\n.fa-code:before {\n  content: \"\\F121\";\n}\n.fa-mail-reply-all:before,\n.fa-reply-all:before {\n  content: \"\\F122\";\n}\n.fa-star-half-empty:before,\n.fa-star-half-full:before,\n.fa-star-half-o:before {\n  content: \"\\F123\";\n}\n.fa-location-arrow:before {\n  content: \"\\F124\";\n}\n.fa-crop:before {\n  content: \"\\F125\";\n}\n.fa-code-fork:before {\n  content: \"\\F126\";\n}\n.fa-unlink:before,\n.fa-chain-broken:before {\n  content: \"\\F127\";\n}\n.fa-question:before {\n  content: \"\\F128\";\n}\n.fa-info:before {\n  content: \"\\F129\";\n}\n.fa-exclamation:before {\n  content: \"\\F12A\";\n}\n.fa-superscript:before {\n  content: \"\\F12B\";\n}\n.fa-subscript:before {\n  content: \"\\F12C\";\n}\n.fa-eraser:before {\n  content: \"\\F12D\";\n}\n.fa-puzzle-piece:before {\n  content: \"\\F12E\";\n}\n.fa-microphone:before {\n  content: \"\\F130\";\n}\n.fa-microphone-slash:before {\n  content: \"\\F131\";\n}\n.fa-shield:before {\n  content: \"\\F132\";\n}\n.fa-calendar-o:before {\n  content: \"\\F133\";\n}\n.fa-fire-extinguisher:before {\n  content: \"\\F134\";\n}\n.fa-rocket:before {\n  content: \"\\F135\";\n}\n.fa-maxcdn:before {\n  content: \"\\F136\";\n}\n.fa-chevron-circle-left:before {\n  content: \"\\F137\";\n}\n.fa-chevron-circle-right:before {\n  content: \"\\F138\";\n}\n.fa-chevron-circle-up:before {\n  content: \"\\F139\";\n}\n.fa-chevron-circle-down:before {\n  content: \"\\F13A\";\n}\n.fa-html5:before {\n  content: \"\\F13B\";\n}\n.fa-css3:before {\n  content: \"\\F13C\";\n}\n.fa-anchor:before {\n  content: \"\\F13D\";\n}\n.fa-unlock-alt:before {\n  content: \"\\F13E\";\n}\n.fa-bullseye:before {\n  content: \"\\F140\";\n}\n.fa-ellipsis-h:before {\n  content: \"\\F141\";\n}\n.fa-ellipsis-v:before {\n  content: \"\\F142\";\n}\n.fa-rss-square:before {\n  content: \"\\F143\";\n}\n.fa-play-circle:before {\n  content: \"\\F144\";\n}\n.fa-ticket:before {\n  content: \"\\F145\";\n}\n.fa-minus-square:before {\n  content: \"\\F146\";\n}\n.fa-minus-square-o:before {\n  content: \"\\F147\";\n}\n.fa-level-up:before {\n  content: \"\\F148\";\n}\n.fa-level-down:before {\n  content: \"\\F149\";\n}\n.fa-check-square:before {\n  content: \"\\F14A\";\n}\n.fa-pencil-square:before {\n  content: \"\\F14B\";\n}\n.fa-external-link-square:before {\n  content: \"\\F14C\";\n}\n.fa-share-square:before {\n  content: \"\\F14D\";\n}\n.fa-compass:before {\n  content: \"\\F14E\";\n}\n.fa-toggle-down:before,\n.fa-caret-square-o-down:before {\n  content: \"\\F150\";\n}\n.fa-toggle-up:before,\n.fa-caret-square-o-up:before {\n  content: \"\\F151\";\n}\n.fa-toggle-right:before,\n.fa-caret-square-o-right:before {\n  content: \"\\F152\";\n}\n.fa-euro:before,\n.fa-eur:before {\n  content: \"\\F153\";\n}\n.fa-gbp:before {\n  content: \"\\F154\";\n}\n.fa-dollar:before,\n.fa-usd:before {\n  content: \"\\F155\";\n}\n.fa-rupee:before,\n.fa-inr:before {\n  content: \"\\F156\";\n}\n.fa-cny:before,\n.fa-rmb:before,\n.fa-yen:before,\n.fa-jpy:before {\n  content: \"\\F157\";\n}\n.fa-ruble:before,\n.fa-rouble:before,\n.fa-rub:before {\n  content: \"\\F158\";\n}\n.fa-won:before,\n.fa-krw:before {\n  content: \"\\F159\";\n}\n.fa-bitcoin:before,\n.fa-btc:before {\n  content: \"\\F15A\";\n}\n.fa-file:before {\n  content: \"\\F15B\";\n}\n.fa-file-text:before {\n  content: \"\\F15C\";\n}\n.fa-sort-alpha-asc:before {\n  content: \"\\F15D\";\n}\n.fa-sort-alpha-desc:before {\n  content: \"\\F15E\";\n}\n.fa-sort-amount-asc:before {\n  content: \"\\F160\";\n}\n.fa-sort-amount-desc:before {\n  content: \"\\F161\";\n}\n.fa-sort-numeric-asc:before {\n  content: \"\\F162\";\n}\n.fa-sort-numeric-desc:before {\n  content: \"\\F163\";\n}\n.fa-thumbs-up:before {\n  content: \"\\F164\";\n}\n.fa-thumbs-down:before {\n  content: \"\\F165\";\n}\n.fa-youtube-square:before {\n  content: \"\\F166\";\n}\n.fa-youtube:before {\n  content: \"\\F167\";\n}\n.fa-xing:before {\n  content: \"\\F168\";\n}\n.fa-xing-square:before {\n  content: \"\\F169\";\n}\n.fa-youtube-play:before {\n  content: \"\\F16A\";\n}\n.fa-dropbox:before {\n  content: \"\\F16B\";\n}\n.fa-stack-overflow:before {\n  content: \"\\F16C\";\n}\n.fa-instagram:before {\n  content: \"\\F16D\";\n}\n.fa-flickr:before {\n  content: \"\\F16E\";\n}\n.fa-adn:before {\n  content: \"\\F170\";\n}\n.fa-bitbucket:before {\n  content: \"\\F171\";\n}\n.fa-bitbucket-square:before {\n  content: \"\\F172\";\n}\n.fa-tumblr:before {\n  content: \"\\F173\";\n}\n.fa-tumblr-square:before {\n  content: \"\\F174\";\n}\n.fa-long-arrow-down:before {\n  content: \"\\F175\";\n}\n.fa-long-arrow-up:before {\n  content: \"\\F176\";\n}\n.fa-long-arrow-left:before {\n  content: \"\\F177\";\n}\n.fa-long-arrow-right:before {\n  content: \"\\F178\";\n}\n.fa-apple:before {\n  content: \"\\F179\";\n}\n.fa-windows:before {\n  content: \"\\F17A\";\n}\n.fa-android:before {\n  content: \"\\F17B\";\n}\n.fa-linux:before {\n  content: \"\\F17C\";\n}\n.fa-dribbble:before {\n  content: \"\\F17D\";\n}\n.fa-skype:before {\n  content: \"\\F17E\";\n}\n.fa-foursquare:before {\n  content: \"\\F180\";\n}\n.fa-trello:before {\n  content: \"\\F181\";\n}\n.fa-female:before {\n  content: \"\\F182\";\n}\n.fa-male:before {\n  content: \"\\F183\";\n}\n.fa-gittip:before,\n.fa-gratipay:before {\n  content: \"\\F184\";\n}\n.fa-sun-o:before {\n  content: \"\\F185\";\n}\n.fa-moon-o:before {\n  content: \"\\F186\";\n}\n.fa-archive:before {\n  content: \"\\F187\";\n}\n.fa-bug:before {\n  content: \"\\F188\";\n}\n.fa-vk:before {\n  content: \"\\F189\";\n}\n.fa-weibo:before {\n  content: \"\\F18A\";\n}\n.fa-renren:before {\n  content: \"\\F18B\";\n}\n.fa-pagelines:before {\n  content: \"\\F18C\";\n}\n.fa-stack-exchange:before {\n  content: \"\\F18D\";\n}\n.fa-arrow-circle-o-right:before {\n  content: \"\\F18E\";\n}\n.fa-arrow-circle-o-left:before {\n  content: \"\\F190\";\n}\n.fa-toggle-left:before,\n.fa-caret-square-o-left:before {\n  content: \"\\F191\";\n}\n.fa-dot-circle-o:before {\n  content: \"\\F192\";\n}\n.fa-wheelchair:before {\n  content: \"\\F193\";\n}\n.fa-vimeo-square:before {\n  content: \"\\F194\";\n}\n.fa-turkish-lira:before,\n.fa-try:before {\n  content: \"\\F195\";\n}\n.fa-plus-square-o:before {\n  content: \"\\F196\";\n}\n.fa-space-shuttle:before {\n  content: \"\\F197\";\n}\n.fa-slack:before {\n  content: \"\\F198\";\n}\n.fa-envelope-square:before {\n  content: \"\\F199\";\n}\n.fa-wordpress:before {\n  content: \"\\F19A\";\n}\n.fa-openid:before {\n  content: \"\\F19B\";\n}\n.fa-institution:before,\n.fa-bank:before,\n.fa-university:before {\n  content: \"\\F19C\";\n}\n.fa-mortar-board:before,\n.fa-graduation-cap:before {\n  content: \"\\F19D\";\n}\n.fa-yahoo:before {\n  content: \"\\F19E\";\n}\n.fa-google:before {\n  content: \"\\F1A0\";\n}\n.fa-reddit:before {\n  content: \"\\F1A1\";\n}\n.fa-reddit-square:before {\n  content: \"\\F1A2\";\n}\n.fa-stumbleupon-circle:before {\n  content: \"\\F1A3\";\n}\n.fa-stumbleupon:before {\n  content: \"\\F1A4\";\n}\n.fa-delicious:before {\n  content: \"\\F1A5\";\n}\n.fa-digg:before {\n  content: \"\\F1A6\";\n}\n.fa-pied-piper:before {\n  content: \"\\F1A7\";\n}\n.fa-pied-piper-alt:before {\n  content: \"\\F1A8\";\n}\n.fa-drupal:before {\n  content: \"\\F1A9\";\n}\n.fa-joomla:before {\n  content: \"\\F1AA\";\n}\n.fa-language:before {\n  content: \"\\F1AB\";\n}\n.fa-fax:before {\n  content: \"\\F1AC\";\n}\n.fa-building:before {\n  content: \"\\F1AD\";\n}\n.fa-child:before {\n  content: \"\\F1AE\";\n}\n.fa-paw:before {\n  content: \"\\F1B0\";\n}\n.fa-spoon:before {\n  content: \"\\F1B1\";\n}\n.fa-cube:before {\n  content: \"\\F1B2\";\n}\n.fa-cubes:before {\n  content: \"\\F1B3\";\n}\n.fa-behance:before {\n  content: \"\\F1B4\";\n}\n.fa-behance-square:before {\n  content: \"\\F1B5\";\n}\n.fa-steam:before {\n  content: \"\\F1B6\";\n}\n.fa-steam-square:before {\n  content: \"\\F1B7\";\n}\n.fa-recycle:before {\n  content: \"\\F1B8\";\n}\n.fa-automobile:before,\n.fa-car:before {\n  content: \"\\F1B9\";\n}\n.fa-cab:before,\n.fa-taxi:before {\n  content: \"\\F1BA\";\n}\n.fa-tree:before {\n  content: \"\\F1BB\";\n}\n.fa-spotify:before {\n  content: \"\\F1BC\";\n}\n.fa-deviantart:before {\n  content: \"\\F1BD\";\n}\n.fa-soundcloud:before {\n  content: \"\\F1BE\";\n}\n.fa-database:before {\n  content: \"\\F1C0\";\n}\n.fa-file-pdf-o:before {\n  content: \"\\F1C1\";\n}\n.fa-file-word-o:before {\n  content: \"\\F1C2\";\n}\n.fa-file-excel-o:before {\n  content: \"\\F1C3\";\n}\n.fa-file-powerpoint-o:before {\n  content: \"\\F1C4\";\n}\n.fa-file-photo-o:before,\n.fa-file-picture-o:before,\n.fa-file-image-o:before {\n  content: \"\\F1C5\";\n}\n.fa-file-zip-o:before,\n.fa-file-archive-o:before {\n  content: \"\\F1C6\";\n}\n.fa-file-sound-o:before,\n.fa-file-audio-o:before {\n  content: \"\\F1C7\";\n}\n.fa-file-movie-o:before,\n.fa-file-video-o:before {\n  content: \"\\F1C8\";\n}\n.fa-file-code-o:before {\n  content: \"\\F1C9\";\n}\n.fa-vine:before {\n  content: \"\\F1CA\";\n}\n.fa-codepen:before {\n  content: \"\\F1CB\";\n}\n.fa-jsfiddle:before {\n  content: \"\\F1CC\";\n}\n.fa-life-bouy:before,\n.fa-life-buoy:before,\n.fa-life-saver:before,\n.fa-support:before,\n.fa-life-ring:before {\n  content: \"\\F1CD\";\n}\n.fa-circle-o-notch:before {\n  content: \"\\F1CE\";\n}\n.fa-ra:before,\n.fa-rebel:before {\n  content: \"\\F1D0\";\n}\n.fa-ge:before,\n.fa-empire:before {\n  content: \"\\F1D1\";\n}\n.fa-git-square:before {\n  content: \"\\F1D2\";\n}\n.fa-git:before {\n  content: \"\\F1D3\";\n}\n.fa-y-combinator-square:before,\n.fa-yc-square:before,\n.fa-hacker-news:before {\n  content: \"\\F1D4\";\n}\n.fa-tencent-weibo:before {\n  content: \"\\F1D5\";\n}\n.fa-qq:before {\n  content: \"\\F1D6\";\n}\n.fa-wechat:before,\n.fa-weixin:before {\n  content: \"\\F1D7\";\n}\n.fa-send:before,\n.fa-paper-plane:before {\n  content: \"\\F1D8\";\n}\n.fa-send-o:before,\n.fa-paper-plane-o:before {\n  content: \"\\F1D9\";\n}\n.fa-history:before {\n  content: \"\\F1DA\";\n}\n.fa-circle-thin:before {\n  content: \"\\F1DB\";\n}\n.fa-header:before {\n  content: \"\\F1DC\";\n}\n.fa-paragraph:before {\n  content: \"\\F1DD\";\n}\n.fa-sliders:before {\n  content: \"\\F1DE\";\n}\n.fa-share-alt:before {\n  content: \"\\F1E0\";\n}\n.fa-share-alt-square:before {\n  content: \"\\F1E1\";\n}\n.fa-bomb:before {\n  content: \"\\F1E2\";\n}\n.fa-soccer-ball-o:before,\n.fa-futbol-o:before {\n  content: \"\\F1E3\";\n}\n.fa-tty:before {\n  content: \"\\F1E4\";\n}\n.fa-binoculars:before {\n  content: \"\\F1E5\";\n}\n.fa-plug:before {\n  content: \"\\F1E6\";\n}\n.fa-slideshare:before {\n  content: \"\\F1E7\";\n}\n.fa-twitch:before {\n  content: \"\\F1E8\";\n}\n.fa-yelp:before {\n  content: \"\\F1E9\";\n}\n.fa-newspaper-o:before {\n  content: \"\\F1EA\";\n}\n.fa-wifi:before {\n  content: \"\\F1EB\";\n}\n.fa-calculator:before {\n  content: \"\\F1EC\";\n}\n.fa-paypal:before {\n  content: \"\\F1ED\";\n}\n.fa-google-wallet:before {\n  content: \"\\F1EE\";\n}\n.fa-cc-visa:before {\n  content: \"\\F1F0\";\n}\n.fa-cc-mastercard:before {\n  content: \"\\F1F1\";\n}\n.fa-cc-discover:before {\n  content: \"\\F1F2\";\n}\n.fa-cc-amex:before {\n  content: \"\\F1F3\";\n}\n.fa-cc-paypal:before {\n  content: \"\\F1F4\";\n}\n.fa-cc-stripe:before {\n  content: \"\\F1F5\";\n}\n.fa-bell-slash:before {\n  content: \"\\F1F6\";\n}\n.fa-bell-slash-o:before {\n  content: \"\\F1F7\";\n}\n.fa-trash:before {\n  content: \"\\F1F8\";\n}\n.fa-copyright:before {\n  content: \"\\F1F9\";\n}\n.fa-at:before {\n  content: \"\\F1FA\";\n}\n.fa-eyedropper:before {\n  content: \"\\F1FB\";\n}\n.fa-paint-brush:before {\n  content: \"\\F1FC\";\n}\n.fa-birthday-cake:before {\n  content: \"\\F1FD\";\n}\n.fa-area-chart:before {\n  content: \"\\F1FE\";\n}\n.fa-pie-chart:before {\n  content: \"\\F200\";\n}\n.fa-line-chart:before {\n  content: \"\\F201\";\n}\n.fa-lastfm:before {\n  content: \"\\F202\";\n}\n.fa-lastfm-square:before {\n  content: \"\\F203\";\n}\n.fa-toggle-off:before {\n  content: \"\\F204\";\n}\n.fa-toggle-on:before {\n  content: \"\\F205\";\n}\n.fa-bicycle:before {\n  content: \"\\F206\";\n}\n.fa-bus:before {\n  content: \"\\F207\";\n}\n.fa-ioxhost:before {\n  content: \"\\F208\";\n}\n.fa-angellist:before {\n  content: \"\\F209\";\n}\n.fa-cc:before {\n  content: \"\\F20A\";\n}\n.fa-shekel:before,\n.fa-sheqel:before,\n.fa-ils:before {\n  content: \"\\F20B\";\n}\n.fa-meanpath:before {\n  content: \"\\F20C\";\n}\n.fa-buysellads:before {\n  content: \"\\F20D\";\n}\n.fa-connectdevelop:before {\n  content: \"\\F20E\";\n}\n.fa-dashcube:before {\n  content: \"\\F210\";\n}\n.fa-forumbee:before {\n  content: \"\\F211\";\n}\n.fa-leanpub:before {\n  content: \"\\F212\";\n}\n.fa-sellsy:before {\n  content: \"\\F213\";\n}\n.fa-shirtsinbulk:before {\n  content: \"\\F214\";\n}\n.fa-simplybuilt:before {\n  content: \"\\F215\";\n}\n.fa-skyatlas:before {\n  content: \"\\F216\";\n}\n.fa-cart-plus:before {\n  content: \"\\F217\";\n}\n.fa-cart-arrow-down:before {\n  content: \"\\F218\";\n}\n.fa-diamond:before {\n  content: \"\\F219\";\n}\n.fa-ship:before {\n  content: \"\\F21A\";\n}\n.fa-user-secret:before {\n  content: \"\\F21B\";\n}\n.fa-motorcycle:before {\n  content: \"\\F21C\";\n}\n.fa-street-view:before {\n  content: \"\\F21D\";\n}\n.fa-heartbeat:before {\n  content: \"\\F21E\";\n}\n.fa-venus:before {\n  content: \"\\F221\";\n}\n.fa-mars:before {\n  content: \"\\F222\";\n}\n.fa-mercury:before {\n  content: \"\\F223\";\n}\n.fa-intersex:before,\n.fa-transgender:before {\n  content: \"\\F224\";\n}\n.fa-transgender-alt:before {\n  content: \"\\F225\";\n}\n.fa-venus-double:before {\n  content: \"\\F226\";\n}\n.fa-mars-double:before {\n  content: \"\\F227\";\n}\n.fa-venus-mars:before {\n  content: \"\\F228\";\n}\n.fa-mars-stroke:before {\n  content: \"\\F229\";\n}\n.fa-mars-stroke-v:before {\n  content: \"\\F22A\";\n}\n.fa-mars-stroke-h:before {\n  content: \"\\F22B\";\n}\n.fa-neuter:before {\n  content: \"\\F22C\";\n}\n.fa-genderless:before {\n  content: \"\\F22D\";\n}\n.fa-facebook-official:before {\n  content: \"\\F230\";\n}\n.fa-pinterest-p:before {\n  content: \"\\F231\";\n}\n.fa-whatsapp:before {\n  content: \"\\F232\";\n}\n.fa-server:before {\n  content: \"\\F233\";\n}\n.fa-user-plus:before {\n  content: \"\\F234\";\n}\n.fa-user-times:before {\n  content: \"\\F235\";\n}\n.fa-hotel:before,\n.fa-bed:before {\n  content: \"\\F236\";\n}\n.fa-viacoin:before {\n  content: \"\\F237\";\n}\n.fa-train:before {\n  content: \"\\F238\";\n}\n.fa-subway:before {\n  content: \"\\F239\";\n}\n.fa-medium:before {\n  content: \"\\F23A\";\n}\n.fa-yc:before,\n.fa-y-combinator:before {\n  content: \"\\F23B\";\n}\n.fa-optin-monster:before {\n  content: \"\\F23C\";\n}\n.fa-opencart:before {\n  content: \"\\F23D\";\n}\n.fa-expeditedssl:before {\n  content: \"\\F23E\";\n}\n.fa-battery-4:before,\n.fa-battery-full:before {\n  content: \"\\F240\";\n}\n.fa-battery-3:before,\n.fa-battery-three-quarters:before {\n  content: \"\\F241\";\n}\n.fa-battery-2:before,\n.fa-battery-half:before {\n  content: \"\\F242\";\n}\n.fa-battery-1:before,\n.fa-battery-quarter:before {\n  content: \"\\F243\";\n}\n.fa-battery-0:before,\n.fa-battery-empty:before {\n  content: \"\\F244\";\n}\n.fa-mouse-pointer:before {\n  content: \"\\F245\";\n}\n.fa-i-cursor:before {\n  content: \"\\F246\";\n}\n.fa-object-group:before {\n  content: \"\\F247\";\n}\n.fa-object-ungroup:before {\n  content: \"\\F248\";\n}\n.fa-sticky-note:before {\n  content: \"\\F249\";\n}\n.fa-sticky-note-o:before {\n  content: \"\\F24A\";\n}\n.fa-cc-jcb:before {\n  content: \"\\F24B\";\n}\n.fa-cc-diners-club:before {\n  content: \"\\F24C\";\n}\n.fa-clone:before {\n  content: \"\\F24D\";\n}\n.fa-balance-scale:before {\n  content: \"\\F24E\";\n}\n.fa-hourglass-o:before {\n  content: \"\\F250\";\n}\n.fa-hourglass-1:before,\n.fa-hourglass-start:before {\n  content: \"\\F251\";\n}\n.fa-hourglass-2:before,\n.fa-hourglass-half:before {\n  content: \"\\F252\";\n}\n.fa-hourglass-3:before,\n.fa-hourglass-end:before {\n  content: \"\\F253\";\n}\n.fa-hourglass:before {\n  content: \"\\F254\";\n}\n.fa-hand-grab-o:before,\n.fa-hand-rock-o:before {\n  content: \"\\F255\";\n}\n.fa-hand-stop-o:before,\n.fa-hand-paper-o:before {\n  content: \"\\F256\";\n}\n.fa-hand-scissors-o:before {\n  content: \"\\F257\";\n}\n.fa-hand-lizard-o:before {\n  content: \"\\F258\";\n}\n.fa-hand-spock-o:before {\n  content: \"\\F259\";\n}\n.fa-hand-pointer-o:before {\n  content: \"\\F25A\";\n}\n.fa-hand-peace-o:before {\n  content: \"\\F25B\";\n}\n.fa-trademark:before {\n  content: \"\\F25C\";\n}\n.fa-registered:before {\n  content: \"\\F25D\";\n}\n.fa-creative-commons:before {\n  content: \"\\F25E\";\n}\n.fa-gg:before {\n  content: \"\\F260\";\n}\n.fa-gg-circle:before {\n  content: \"\\F261\";\n}\n.fa-tripadvisor:before {\n  content: \"\\F262\";\n}\n.fa-odnoklassniki:before {\n  content: \"\\F263\";\n}\n.fa-odnoklassniki-square:before {\n  content: \"\\F264\";\n}\n.fa-get-pocket:before {\n  content: \"\\F265\";\n}\n.fa-wikipedia-w:before {\n  content: \"\\F266\";\n}\n.fa-safari:before {\n  content: \"\\F267\";\n}\n.fa-chrome:before {\n  content: \"\\F268\";\n}\n.fa-firefox:before {\n  content: \"\\F269\";\n}\n.fa-opera:before {\n  content: \"\\F26A\";\n}\n.fa-internet-explorer:before {\n  content: \"\\F26B\";\n}\n.fa-tv:before,\n.fa-television:before {\n  content: \"\\F26C\";\n}\n.fa-contao:before {\n  content: \"\\F26D\";\n}\n.fa-500px:before {\n  content: \"\\F26E\";\n}\n.fa-amazon:before {\n  content: \"\\F270\";\n}\n.fa-calendar-plus-o:before {\n  content: \"\\F271\";\n}\n.fa-calendar-minus-o:before {\n  content: \"\\F272\";\n}\n.fa-calendar-times-o:before {\n  content: \"\\F273\";\n}\n.fa-calendar-check-o:before {\n  content: \"\\F274\";\n}\n.fa-industry:before {\n  content: \"\\F275\";\n}\n.fa-map-pin:before {\n  content: \"\\F276\";\n}\n.fa-map-signs:before {\n  content: \"\\F277\";\n}\n.fa-map-o:before {\n  content: \"\\F278\";\n}\n.fa-map:before {\n  content: \"\\F279\";\n}\n.fa-commenting:before {\n  content: \"\\F27A\";\n}\n.fa-commenting-o:before {\n  content: \"\\F27B\";\n}\n.fa-houzz:before {\n  content: \"\\F27C\";\n}\n.fa-vimeo:before {\n  content: \"\\F27D\";\n}\n.fa-black-tie:before {\n  content: \"\\F27E\";\n}\n.fa-fonticons:before {\n  content: \"\\F280\";\n}\n", ""]);
 	
 	// exports
 
 
 /***/ },
-/* 17 */
+/* 24 */
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports = __webpack_require__.p + "45c73723862c6fc5eb3d6961db2d71fb.eot"
 
 /***/ },
-/* 18 */
+/* 25 */
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports = __webpack_require__.p + "45c73723862c6fc5eb3d6961db2d71fb.eot"
 
 /***/ },
-/* 19 */
+/* 26 */
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports = __webpack_require__.p + "4b5a84aaf1c9485e060c503a0ff8cadb.woff2"
 
 /***/ },
-/* 20 */
+/* 27 */
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports = __webpack_require__.p + "dfb02f8f6d0cedc009ee5887cc68f1f3.woff"
 
 /***/ },
-/* 21 */
+/* 28 */
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports = __webpack_require__.p + "7c87870ab40d63cfb8870c1f183f9939.ttf"
 
 /***/ },
-/* 22 */
+/* 29 */
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports = __webpack_require__.p + "76a4f23c6be74fd309e0d0fd2c27a5de.svg"
 
 /***/ },
-/* 23 */
+/* 30 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(24);
+	var content = __webpack_require__(31);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
-	var update = __webpack_require__(14)(content, {});
+	var update = __webpack_require__(17)(content, {});
 	if(content.locals) module.exports = content.locals;
 	// Hot Module Replacement
 	if(false) {
@@ -32216,30 +33035,30 @@
 	}
 
 /***/ },
-/* 24 */
+/* 31 */
 /***/ function(module, exports, __webpack_require__) {
 
-	exports = module.exports = __webpack_require__(13)();
+	exports = module.exports = __webpack_require__(16)();
 	// imports
 	
 	
 	// module
-	exports.push([module.id, ".hide-visually {\n  display: none; }\n", ""]);
+	exports.push([module.id, ".hide-visually {\n  display: none; }\n\n.zoomControlsContainer {\n  position: absolute;\n  margin-left: 10px;\n  margin-top: 10px; }\n  .zoomControlsContainer .zoomButton {\n    float: left; }\n  .zoomControlsContainer .resetZoomButton {\n    float: right;\n    margin-left: 10px; }\n", ""]);
 	
 	// exports
 
 
 /***/ },
-/* 25 */
+/* 32 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(26);
+	var content = __webpack_require__(33);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
-	var update = __webpack_require__(14)(content, {});
+	var update = __webpack_require__(17)(content, {});
 	if(content.locals) module.exports = content.locals;
 	// Hot Module Replacement
 	if(false) {
@@ -32256,10 +33075,10 @@
 	}
 
 /***/ },
-/* 26 */
+/* 33 */
 /***/ function(module, exports, __webpack_require__) {
 
-	exports = module.exports = __webpack_require__(13)();
+	exports = module.exports = __webpack_require__(16)();
 	// imports
 	
 	
@@ -32270,11 +33089,11 @@
 
 
 /***/ },
-/* 27 */
+/* 34 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var map = {
-		"./src/javascripts/dynatable-component": 28
+		"./src/javascripts/filter-builder": 35
 	};
 	function webpackContext(req) {
 		return __webpack_require__(webpackContextResolve(req));
@@ -32287,23 +33106,384 @@
 	};
 	webpackContext.resolve = webpackContextResolve;
 	module.exports = webpackContext;
-	webpackContext.id = 27;
+	webpackContext.id = 34;
 
 
 /***/ },
-/* 28 */
+/* 35 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var dc = __webpack_require__(2),
+	    inflection = __webpack_require__(10);
+	
+	// styles
+	__webpack_require__(36);
+	
+	__webpack_require__(22);
+	__webpack_require__(30);
+	__webpack_require__(32);
+	
+	module.exports = function (parent, chartGroup) {
+	  
+	    var _chart = dc.baseMixin({});    
+	    var _filterSources = [];
+	    _chart._mandatoryAttributes([]);
+	
+	    _chart.filterSources = function(_) {
+	        // _ is of the following format:
+	        // [{chart: yourDcChartObject, icon: 'fontawesome-class', label: 'Your Label'}]
+	        if (!arguments.length) return _filterSources;
+	        _filterSources = _;
+	        return _chart;
+	    };
+	
+	    _chart._doRender = function () {
+	        var hasFilters = false;
+	        var filtered = _filterSources.filter(function(d){ return d.chart.filters().length > 0;});
+	        var notFiltered = _filterSources.filter(function(d){ return d.chart.filters().length === 0;});
+	        if (filtered.length > 0) hasFilters = true;
+	
+	        _chart.root().classed('filter-builder', true);
+	        _chart.root().html('');
+	        _chart.root().append('h2').html('<i class="fa fa-2x fa-filter"></i><span class="hide-visually">Filter</span>');
+	        var list = _chart.root().append('ul');
+	
+	        var addFilterButton = list.append('li').classed('add-filter', true);
+	        addFilterButton.append('i')
+	          .classed({'fa': true, 'fa-plus': true});
+	        filterMenu(addFilterButton, notFiltered);
+	
+	        if (hasFilters) {
+	          var filteredFieldsRoot = list.selectAll('li.filtered-field')
+	              .data(filtered)
+	            .enter().append('li').classed('filtered-field', true);
+	
+	          var fieldLabels = filteredFieldsRoot.selectAll('span.field-label')
+	              .data(function(d){return [d];})
+	            .enter().append('span').classed('field-label', true)
+	            .text(function(d){return d.label;});
+	
+	          var filteredFields = filteredFieldsRoot.selectAll('ul')
+	             .data(function(d){return [d];})
+	            .enter().append('ul')
+	            .classed('filter-value-list', true);
+	
+	          var filterValues = filteredFields.selectAll('li.filter-value')
+	              .data(function(d){return d.chart.filters().map(function(v){return {chart: d.chart, filterValue: v};});})
+	            .enter().append('li')
+	            .classed('filter-value', true)
+	            .text(function(d){return tryLabel(d);})
+	            .on('click', function(d){
+	              d.chart.filter(d.filterValue); // dc base .filter() function works for removal as well as addition of filters
+	              dc.redrawAll();
+	              d3.event.stopPropagation();
+	            });
+	
+	          var addValueButton = filteredFields.selectAll('li.add-value')
+	            .data(function(d){return [d];})
+	            .enter()
+	            .append('li')
+	            .classed({'add-value': true, 'filter-value': true})  
+	            .append('i')
+	            .classed({'fa': true, 'fa-plus': true})
+	            .on("click", function(){
+	              showValueOptions(this);
+	              d3.event.stopPropagation();
+	            });
+	            
+	          valuePicker(addValueButton);
+	
+	
+	          var clearFilterButton = filteredFieldsRoot.selectAll('span.close')
+	            .data(function(d){return [d.chart];})
+	            .enter()
+	            .append('span')  
+	            .classed({'close': true})
+	            .on('click', function(chart){
+	              chart.filterAll();
+	              dc.redrawAll();
+	              d3.event.stopPropagation();
+	            })
+	            .append('i')
+	            .classed({'fa': true, 'fa-times': true});
+	        }
+	
+	        return _chart;
+	    };
+	
+	    function tryLabel(filterItem){
+	      if (filterItem.chart.label && filterItem.chart.label() !== undefined){
+	        return filterItem.chart.label()({key: filterItem.filterValue}) || "N/A";
+	      } 
+	      return filterItem.filterValue || "N/A";
+	    }
+	
+	    function optionSort(a, b){
+	      var aLabel = tryLabel(a);
+	      var bLabel = tryLabel(b);
+	
+	      if (aLabel > bLabel) {
+	        return 1;
+	      }
+	      if (aLabel < bLabel){
+	        return -1;
+	      }
+	      return 0;
+	    }
+	
+	    _chart._doRedraw = function(){
+	        return _chart._doRender();
+	    };
+	
+	    // Filter Menu
+	    function filterMenu(parent, options){
+	      var _parentElement;
+	      if (parent.on === undefined) {
+	        _parentElement = d3.select(parent);
+	      } else {
+	        _parentElement = parent;
+	      } 
+	      
+	      var _dimensionListContainer = _parentElement.append('div')
+	        .classed({'picker-choices': true, 'dimension-list-container': true}).style('display', 'none');
+	
+	      var _dimListHeader = _dimensionListContainer.append('div')
+	        .classed('header', true)
+	        .on('click', function(){
+	          _dimensionListContainer.style('display', 'none');
+	          _dimensionList.selectAll('div.picker-choices').style('display', 'none');
+	          _dimensionList.selectAll('li.selected').classed('selected', false);
+	          d3.event.stopPropagation();
+	        });
+	
+	      _dimListHeader.append('div')
+	        .classed({'fa': true, 'fa-times': true, 'close-button': true});
+	
+	      _dimListHeader.append('div')
+	        .text('Add a Filter on')
+	        .classed({'header-label': true});
+	
+	      var _dimensionList = _dimensionListContainer.append('ul')
+	        .classed({'dimension-list': true});
+	
+	      var _dimensionOptions = _dimensionList.selectAll('li.dimension-option')
+	          .data(options)
+	        .enter().append('li')
+	        .attr('class', function(d){
+	          return (d.options && d.options.class);
+	        })
+	        .classed('dimension-option', true)
+	        .text(function(d){return d.label;})
+	        .on('click', function(d){
+	          showValueOptions(this, _parentElement);
+	          d3.event.stopPropagation();
+	        });
+	
+	      valuePicker(_dimensionOptions);
+	
+	
+	      _parentElement.on('click', function(){
+	        blurMenus();
+	        d3.select('.dimension-list-container').style("display", "block");
+	        try{
+	          d3.event.stopPropagation();
+	        } catch(e) {
+	          // swallow
+	        }
+	      });
+	
+	    }
+	
+	    function valuePicker(selection){
+	
+	      var _valueListContainer = selection.selectAll('div.value-list-container')
+	          .data(function(d){return [d];})
+	        .enter().append('div')
+	        .classed({'picker-choices': true,'value-list-container': true}).style("display", "none");
+	
+	      var _valueListHeader = _valueListContainer.selectAll('div.header')
+	          .data(function(d){return [d];})
+	        .enter().append('div')
+	        .classed('header', true)
+	        .on('click', function(){
+	          _valueListContainer.style('display', 'none');
+	          _valueList.selectAll('div.picker-choices').style('display', 'none');
+	          _valueList.selectAll('li.selected').classed('selected', false);
+	          d3.event.stopPropagation();
+	        });
+	
+	      _valueListHeader.append('div')
+	        .append('i')
+	        .classed({'fa': true, 'fa-times': true, 'close-button': true});
+	        
+	
+	      _valueListHeader.append('div')
+	        .text(function(d){return 'Choose a value for "' + d.label +'"';})
+	        .classed({'header-label': true});;
+	
+	      var _listFilterContainer = _valueListContainer
+	        .append('div')
+	        .classed('listFilterContainer', true);
+	
+	      _listFilterContainer
+	        .append('i')
+	        .classed('fa fa-2x fa-search', true);
+	
+	      _listFilterContainer
+	          .data(function(d){return [d];})
+	        .append('input')
+	        .attr('placeholder','Filter the list below...')
+	        .on("click", function(d) {
+	          d3.event.stopPropagation();
+	        })
+	        .on('input', function(d){
+	          that = this;
+	          dc.events.trigger(function(){
+	            selection.select('ul.'+dc.utils.nameToId(d.label)).selectAll('li.value-option')
+	              .classed('hidden', function(d){
+	                var re = new RegExp(that.value, 'i');
+	                return this.textContent.search(re) < 0; 
+	              });
+	          }, 200);
+	        });
+	
+	      var _valueList = _valueListContainer.selectAll('ul.value-list')
+	          .data(function(d){return [d];})
+	        .enter().append('ul')
+	        .attr('class', function(d){return dc.utils.nameToId(d.label);})
+	        .classed({'value-list': true});
+	    
+	      var _valueOptions = _valueList.selectAll('li.value-option')
+	          .data(function(d){
+	            return d.chart.group().top(Infinity)
+	              .map(function(i){ return {chart: d.chart, filterValue: i.key};})
+	              .filter(function(i){
+	                return i.chart.filters().indexOf(i.filterValue) < 0;
+	              })
+	              .sort(optionSort);
+	          })
+	        .enter().append('li')
+	        .text(function(d){return tryLabel(d);})
+	        .classed('value-option', true)
+	        .on('click', function(d){
+	          d.chart.filter(d.filterValue);
+	          dc.redrawAll();
+	          d3.event.stopPropagation();
+	        });
+	        
+	    }
+	
+	    function showValueOptions(element, parentElement){
+	      var _element;
+	      if (element.on === undefined) {
+	        _element = d3.select(element);
+	      } else {
+	        _element = element;
+	      } 
+	      if (parentElement) {
+	        parentElement.selectAll('ul.dimension-list .value-list-container').style('display', 'none');
+	        parentElement.selectAll('ul.dimension-list li').classed('selected', false);
+	      }  
+	      else {
+	        blurMenus();
+	      }
+	
+	      _element.select('.value-list-container').style('display','block');
+	      _element.classed('selected', true);
+	    }
+	
+	    function blurMenus() {
+	      d3.selectAll(".value-list-container")[0].forEach(function(valueOptionList) {
+	        d3.select(valueOptionList).style('display', "none");
+	      });
+	
+	      d3.select('.dimension-list-container').style("display", "none");
+	
+	    }
+	
+	    d3.select("html").on("click", function(){
+	      d3.selectAll('.picker-choices').style('display', 'none');
+	    });
+	
+	    return _chart.anchor(parent, chartGroup);
+	  }; 
+
+
+/***/ },
+/* 36 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// style-loader: Adds some css to the DOM by adding a <style> tag
+	
+	// load the styles
+	var content = __webpack_require__(37);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// add the styles to the DOM
+	var update = __webpack_require__(17)(content, {});
+	if(content.locals) module.exports = content.locals;
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		if(!content.locals) {
+			module.hot.accept("!!./../../node_modules/css-loader/index.js!./../../node_modules/sass-loader/index.js!./filter-builder.scss", function() {
+				var newContent = require("!!./../../node_modules/css-loader/index.js!./../../node_modules/sass-loader/index.js!./filter-builder.scss");
+				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+				update(newContent);
+			});
+		}
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
+	}
+
+/***/ },
+/* 37 */
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(16)();
+	// imports
+	
+	
+	// module
+	exports.push([module.id, ".row.row-filter {\n  /* optional foundation row layout */\n  background-color: rgba(120, 120, 120, 0.15);\n  padding: 0;\n  font-size: 12px;\n  min-height: 33px; }\n  .row.row-filter .filter-builder {\n    background-color: transparent; }\n\n.filter-builder {\n  background-color: rgba(120, 120, 120, 0.15);\n  padding: 0;\n  font-size: 12px;\n  min-height: 33px;\n  pointer-events: none;\n  width: 100%; }\n  .filter-builder h2 {\n    margin: 0;\n    font-size: 12px;\n    position: absolute;\n    z-index: 0;\n    top: 3px; }\n  .filter-builder i.fa {\n    color: #666; }\n  .filter-builder ul {\n    padding: 0;\n    margin: 0;\n    list-style-type: none; }\n  .filter-builder li {\n    display: inline;\n    float: left; }\n  .filter-builder li.filtered-field {\n    background-color: #fff;\n    color: #666;\n    border: 1px solid #ccc;\n    margin: 3px 0 3px 1em;\n    padding: 0;\n    float: left;\n    border-radius: 5px;\n    font-size: 12px;\n    line-height: 1.5;\n    text-indent: 0;\n    overflow: hidden; }\n    .filter-builder li.filtered-field:first-child {\n      margin-left: 24px; }\n    .filter-builder li.filtered-field.no-tag {\n      background-color: transparent;\n      border-width: 0;\n      text-indent: 20px;\n      font-size: 12px; }\n      .filter-builder li.filtered-field.no-tag:hover {\n        color: #666;\n        background-color: transparent; }\n    .filter-builder li.filtered-field span {\n      display: table-cell;\n      height: 100%;\n      vertical-align: top;\n      padding: 3px 2px 3px 4px; }\n      .filter-builder li.filtered-field span.field-label {\n        cursor: default;\n        font-weight: bold;\n        padding-left: 4px;\n        white-space: nowrap; }\n      .filter-builder li.filtered-field span.close {\n        cursor: pointer;\n        padding-right: 3px;\n        pointer-events: auto; }\n        .filter-builder li.filtered-field span.close:hover .fa-times {\n          color: #C2113A; }\n        .filter-builder li.filtered-field span.close .fa-times {\n          font-size: 14px; }\n    .filter-builder li.filtered-field ul.filter-value-list {\n      display: table-cell; }\n      .filter-builder li.filtered-field ul.filter-value-list > li {\n        margin: 0px;\n        padding: 3px 5px;\n        pointer-events: auto; }\n        .filter-builder li.filtered-field ul.filter-value-list > li.filter-value {\n          font-weight: normal;\n          font-size: 12px;\n          border: 1px solid #d3d3d3;\n          margin: 2px 0 2px 3px;\n          padding: 0 4px;\n          border-radius: 4px;\n          cursor: pointer;\n          transition: all 140ms ease; }\n          .filter-builder li.filtered-field ul.filter-value-list > li.filter-value:hover {\n            text-decoration: line-through;\n            border-color: #eaeaea;\n            color: #aaa; }\n        .filter-builder li.filtered-field ul.filter-value-list > li.add-value {\n          padding: 0 4px;\n          margin-left: 2px;\n          border-color: #fff;\n          cursor: pointer;\n          line-height: 18px; }\n          .filter-builder li.filtered-field ul.filter-value-list > li.add-value .fa-plus {\n            border: 1px solid #dfdfdf;\n            padding: 1px 3px 1px 3px;\n            border-radius: 3px;\n            display: inline; }\n          .filter-builder li.filtered-field ul.filter-value-list > li.add-value:hover {\n            border-color: #fff; }\n            .filter-builder li.filtered-field ul.filter-value-list > li.add-value:hover .fa-plus {\n              color: #007e40;\n              border-color: #dadada;\n              box-shadow: 0 0 7px rgba(0, 0, 0, 0.17) inset; }\n  .filter-builder li.filtered-field .picker-choices,\n  .filter-builder li.add-filter .picker-choices {\n    border: 1px solid #ddd;\n    border-bottom-color: #ccc;\n    position: absolute;\n    z-index: 99;\n    background-color: rgba(255, 255, 255, 0.95);\n    max-height: 26em;\n    width: 36%;\n    left: 0;\n    top: 32px;\n    box-shadow: 2px 3px 2px rgba(0, 0, 0, 0.1), 0px 0px 7px rgba(0, 0, 0, 0.08) inset; }\n    .filter-builder li.filtered-field .picker-choices .value-list-container,\n    .filter-builder li.add-filter .picker-choices .value-list-container {\n      left: -180%;\n      top: 27px;\n      min-width: 174%;\n      max-height: 24em !important;\n      overflow-x: hidden;\n      overflow-y: hidden;\n      transition: all 380ms ease; }\n    .filter-builder li.filtered-field .picker-choices .value-list,\n    .filter-builder li.add-filter .picker-choices .value-list {\n      left: -180%;\n      top: 27px;\n      min-width: 100%;\n      max-height: 14em !important;\n      overflow: auto;\n      overflow-x: hidden;\n      transition: all 380ms ease; }\n    .filter-builder li.filtered-field .picker-choices div.header,\n    .filter-builder li.add-filter .picker-choices div.header {\n      position: relative;\n      font-family: 'Abel', Helvetica, Arial, sans-serif;\n      font-size: 12px;\n      padding: 0.1rem 0.3rem 0.1rem 0.9375rem;\n      border-bottom: 1px solid #ddd;\n      height: 1.4rem;\n      line-height: 1.4rem;\n      color: #999;\n      background-color: #fff;\n      pointer-events: auto;\n      cursor: pointer; }\n      .filter-builder li.filtered-field .picker-choices div.header .close-button,\n      .filter-builder li.add-filter .picker-choices div.header .close-button {\n        width: 15px;\n        float: right;\n        cursor: pointer;\n        text-align: right;\n        padding: 4px 0px 0 0;\n        font-size: 14px; }\n      .filter-builder li.filtered-field .picker-choices div.header:hover .fa-times,\n      .filter-builder li.add-filter .picker-choices div.header:hover .fa-times {\n        color: #C2113A; }\n    .filter-builder li.filtered-field .picker-choices li,\n    .filter-builder li.add-filter .picker-choices li {\n      display: block;\n      cursor: pointer;\n      border: none;\n      float: none;\n      padding: 0.4rem 0.9375rem;\n      font-size: 12px;\n      line-height: 1.1rem;\n      pointer-events: auto; }\n      .filter-builder li.filtered-field .picker-choices li:hover,\n      .filter-builder li.add-filter .picker-choices li:hover {\n        background-color: #EEE; }\n      .filter-builder li.filtered-field .picker-choices li.selected,\n      .filter-builder li.add-filter .picker-choices li.selected {\n        background-color: #ddd; }\n        .filter-builder li.filtered-field .picker-choices li.selected .value-list-container,\n        .filter-builder li.add-filter .picker-choices li.selected .value-list-container {\n          left: 100%;\n          transition: all 180ms ease;\n          overflow: hidden; }\n  .filter-builder li.add-filter + li.filtered-field {\n    margin-left: 0; }\n  .filter-builder .listFilterContainer {\n    background-color: #eee;\n    border-bottom: 1px solid #dbdbdb;\n    padding: .7%;\n    box-shadow: 0 0 5px rgba(120, 120, 120, 0.2);\n    position: relative; }\n    .filter-builder .listFilterContainer i.fa {\n      font-size: 1.2em;\n      position: absolute;\n      margin-top: 6px;\n      margin-left: 6px; }\n    .filter-builder .listFilterContainer input {\n      width: 100%;\n      padding: 5px 5px 5px 21px;\n      font-family: \"Helvetica Neue\", \"Helvetica\", Helvetica, Arial, sans-serif;\n      font-size: 12px;\n      background-color: #fff;\n      border-radius: 3px;\n      border: 1px solid #bbb; }\n  .filter-builder .add-value .listFilterContainer {\n    padding: .5%; }\n    .filter-builder .add-value .listFilterContainer i.fa {\n      margin-top: 5px;\n      margin-left: 5px; }\n    .filter-builder .add-value .listFilterContainer input {\n      padding-top: 4px;\n      padding-left: 20px; }\n  .filter-builder ::-webkit-input-placeholder {\n    font-family: 'Abel', Helvetica, Arial, sans-serif; }\n  .filter-builder :-moz-placeholder {\n    /* Firefox 18- */\n    font-family: 'Abel', Helvetica, Arial, sans-serif; }\n  .filter-builder ::-moz-placeholder {\n    /* Firefox 19+ */\n    font-family: 'Abel', Helvetica, Arial, sans-serif; }\n  .filter-builder :-ms-input-placeholder {\n    font-family: 'Abel', Helvetica, Arial, sans-serif; }\n  .filter-builder li.add-filter i.fa-plus {\n    display: block;\n    padding: 8px 3px 5px 16px;\n    position: relative;\n    left: -1px;\n    z-index: 1;\n    cursor: pointer;\n    top: 4px;\n    pointer-events: auto; }\n  .filter-builder li.add-filter:hover i.fa-plus {\n    color: #007e40; }\n  .filter-builder li.filtered-field .picker-choices {\n    overflow-y: hidden;\n    overflow-x: hidden;\n    width: 98%; }\n    .filter-builder li.filtered-field .picker-choices li {\n      color: #666; }\n  .filter-builder .dimension-list-container, .filter-builder .value-list-container {\n    display: none; }\n  .filter-builder .value-list-container li.hidden.value-option {\n    display: none; }\n", ""]);
+	
+	// exports
+
+
+/***/ },
+/* 38 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var map = {
+		"./src/javascripts/dynatable-component": 39
+	};
+	function webpackContext(req) {
+		return __webpack_require__(webpackContextResolve(req));
+	};
+	function webpackContextResolve(req) {
+		return map[req] || (function() { throw new Error("Cannot find module '" + req + "'.") }());
+	};
+	webpackContext.keys = function webpackContextKeys() {
+		return Object.keys(map);
+	};
+	webpackContext.resolve = webpackContextResolve;
+	module.exports = webpackContext;
+	webpackContext.id = 38;
+
+
+/***/ },
+/* 39 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var $  = __webpack_require__(7);
 	window.jQuery = $;
 	var dc = __webpack_require__(2),
-	    dynatable = __webpack_require__(29);
+	    dynatable = __webpack_require__(40);
 	
 	// styles
+	__webpack_require__(41);
+	__webpack_require__(22);
 	__webpack_require__(30);
-	__webpack_require__(15);
-	__webpack_require__(23);
-	__webpack_require__(25);
+	__webpack_require__(32);
 	
 	module.exports = function(parent, chartGroup){
 	
@@ -32406,7 +33586,7 @@
 	}
 
 /***/ },
-/* 29 */
+/* 40 */
 /***/ function(module, exports) {
 
 	/*
@@ -34146,16 +35326,16 @@
 
 
 /***/ },
-/* 30 */
+/* 41 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(31);
+	var content = __webpack_require__(42);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
-	var update = __webpack_require__(14)(content, {});
+	var update = __webpack_require__(17)(content, {});
 	if(content.locals) module.exports = content.locals;
 	// Hot Module Replacement
 	if(false) {
@@ -34172,10 +35352,10 @@
 	}
 
 /***/ },
-/* 31 */
+/* 42 */
 /***/ function(module, exports, __webpack_require__) {
 
-	exports = module.exports = __webpack_require__(13)();
+	exports = module.exports = __webpack_require__(16)();
 	// imports
 	
 	
@@ -34186,11 +35366,11 @@
 
 
 /***/ },
-/* 32 */
+/* 43 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var map = {
-		"./src/javascripts/audio-dash": 33
+		"./src/javascripts/audio-dash": 44
 	};
 	function webpackContext(req) {
 		return __webpack_require__(webpackContextResolve(req));
@@ -34203,11 +35383,11 @@
 	};
 	webpackContext.resolve = webpackContextResolve;
 	module.exports = webpackContext;
-	webpackContext.id = 32;
+	webpackContext.id = 43;
 
 
 /***/ },
-/* 33 */
+/* 44 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var dc = __webpack_require__(2);
@@ -34382,11 +35562,11 @@
 	};
 
 /***/ },
-/* 34 */
+/* 45 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var map = {
-		"./src/javascripts/tool-tipsify": 35
+		"./src/javascripts/kpi-gauge": 46
 	};
 	function webpackContext(req) {
 		return __webpack_require__(webpackContextResolve(req));
@@ -34399,498 +35579,97 @@
 	};
 	webpackContext.resolve = webpackContextResolve;
 	module.exports = webpackContext;
-	webpackContext.id = 34;
+	webpackContext.id = 45;
 
 
 /***/ },
-/* 35 */
+/* 46 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var dc = __webpack_require__(2),
-	    inflection = __webpack_require__(10),
-	    dtip = __webpack_require__(36)(d3);
+	var dc = __webpack_require__(2);
 	
-	__webpack_require__(37);
+	__webpack_require__(47);
 	
-	var toolTipsify = function(chart, options){
+	var KPIGauge = function(parent, dimension, group, options) {
 	
-	  // default & override setup for formatter
+	  var _chart = {kpiBar: {}, kpiNumber: {}};
+	  var gaugeClassName = 'kpi-gauge';
+	  var numberClassName = 'kpi-number';
 	  var formatter = d3.format(",");
-	  if (options && options.formatter) {
-	    formatter = options.formatter;
+	  var title = "Total";
+	  var barWidth = function () {return d3.select(parent).property('offsetWidth')};
+	  var barHeight = 9;
+	  
+	  if(options) {
+	    if(options.formatter) {
+	      formatter = options.formatter;
+	    }
+	
+	    if(options.title) {
+	      title = options.title;
+	    }
+	
+	    if(options.width) {
+	      width = options.width;
+	    }
+	
+	    if(options.height) {
+	      height = options.height;
+	    }
+	
 	  }
 	
-	  // default setup for content & position 
-	  var content = function(d) {
-	    return "<label>" + chart.label()(d) + "</label><br/>" + formatter(d.value);
+		var root = d3.select(parent);
+	  root.classed('kpi-component-container', true);
+		
+		root.append('div').classed(gaugeClassName, true);
+		root.append('div').classed(numberClassName, true);
+	  root.append('h3').html(title);
+	
+		_chart.kpiNumber = dc.numberDisplay(parent + ' .' + numberClassName)
+	      .group(group)
+	      .valueAccessor(function(d) { return d;})
+	      .formatNumber(formatter);
+	
+	  _chart.kpiBar = dc.barGauge(parent + ' .' + gaugeClassName)
+	    .width(barWidth())
+	    .height(barHeight)
+	    .orientation('horizontal')
+	    .margins({top:0,right:0,bottom:0,left:0})
+	    .usePercentageLength(true)
+	    .dimension(dimension)
+	    .group(group)
+	    .totalCapacity(group.value());
+	
+	  resize = function() {
+	    _chart.kpiBar.width(barWidth()).render();
 	  };
-	  var position = 'mouse';
-	  
 	
-	  // override content and position via options
-	  if (options && options.content) {
-	    content = options.content;
-	  }
-	  if (options && options.position) {
-	    position = options.position;
-	  }
-	  
-	  var d3TipClass = 'd3-tip';
-	  if (position === 'mouse') {
-	    d3TipClass = 'd3-tip-mouse';
-	  }
+	  window.addEventListener('resize', resize, true);
 	
-	  chart.renderlet(function(){
-	    var ttId = '#' + chart.root().attr('id') + '-tip';
-	
-	    var tt = d3.tip()
-	      .attr('class', d3TipClass)
-	      .attr('id', ttId)
-	      .positionAnchor(position)
-	      .html(content);
-	
-	    var tippables = tippableSelector(chart); 
-	
-	    // HACK...
-	    if (!d3.select(ttId).empty()) d3.select(ttId).remove(); 
-	
-	    tippables.call(tt);
-	    tippables.on('mouseover', tt.show)
-	             .on('mouseout', tt.hide)
-	             .on('mousemove', tt.updatePosition)
-	             .on('click', tt.hide);
-	  });
-	
+	  return _chart;
 	};
 	
-	function tippableSelector(chart) {
-	
-	  var selectors = ['g.row', 'g.pie-slice', 'g.country', 'g.bubble', 'rect.bar'];
-	
-	  for(var i=0; i<selectors.length;i++) {
-	    var tippables = chart.selectAll(selectors[i]);
-	    if (tippables[0].length > 0) {
-	      return tippables;
-	    }
-	  }
-	
-	}
-	
-	module.exports = toolTipsify;
+	module.exports = KPIGauge;
 
 /***/ },
-/* 36 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;// d3.tip
-	// Copyright (c) 2013 Justin Palmer
-	//
-	// Tooltips for d3.js SVG visualizations
-	
-	(function (root, factory) {
-	  if (true) {
-	    // AMD. Register as an anonymous module with d3 as a dependency.
-	    !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(3)], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory), __WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ? (__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__))
-	  } else if (typeof module === 'object' && module.exports) {
-	    // CommonJS
-	    module.exports = function(d3) {
-	      d3.tip = factory(d3)
-	      return d3.tip
-	    }
-	  } else {
-	    // Browser global.
-	    factory(root.d3)
-	  }
-	}(this, function (d3) {
-	
-	  // Public - contructs a new tooltip
-	  //
-	  // Returns a tip
-	  d3.tip = function() {
-	    var direction = d3_tip_direction,
-	        offset    = d3_tip_offset,
-	        html      = d3_tip_html,
-	        node      = initNode(),
-	        svg       = null,
-	        point     = null,
-	        target    = null,
-	        positionAnchor = d3_tip_positionAnchor;
-	
-	    function tip(vis) {
-	      svg = getSVGNode(vis)
-	      point = svg.createSVGPoint()
-	      document.body.appendChild(node)
-	    }
-	
-	    // Public - show the tooltip on the screen
-	    //
-	    // Returns a tip
-	    tip.show = function() {
-	      var args = Array.prototype.slice.call(arguments)
-	      if(args[args.length - 1] instanceof SVGElement) target = args.pop()
-	
-	      var content = html.apply(this, args),
-	          poffset = offset.apply(this, args),
-	          dir     = direction.apply(this, args),
-	          nodel   = d3.select(node),
-	          i       = directions.length,
-	          coords,
-	          scrollTop  = document.documentElement.scrollTop || document.body.scrollTop,
-	          scrollLeft = document.documentElement.scrollLeft || document.body.scrollLeft
-	
-	      nodel.html(content)
-	        .style({ opacity: 1, 'pointer-events': 'all', 'z-index': 100 })
-	
-	      while(i--) nodel.classed(directions[i], false)
-	      coords = direction_callbacks.get(dir).apply(this)
-	      var rightEdge =  coords.left + poffset[1] + scrollLeft + nodel.property('offsetWidth');
-	      var bottomEdge = coords.top +  poffset[0] + scrollTop + nodel.property('offsetHeight');
-	      var overFlowRight = tipOverFlowRight(rightEdge);
-	      var overFlowBottom = tipOverFlowBottom(bottomEdge);
-	      var leftEdge = coords.left + poffset[1] + scrollLeft;
-	      var overFlowLeft = tipOverFlowLeft(leftEdge);
-	      var topEdge = coords.top + poffset[0] + scrollTop;
-	
-	      if(overFlowRight) leftEdge -= overFlowRight;
-	      if(overFlowLeft) leftEdge += overFlowLeft;
-	      if(overFlowBottom) topEdge -= overFlowBottom;
-	
-	      if(positionAnchor() === 'shape') {
-	        nodel.classed(dir, true).style({
-	          top: topEdge + 'px',
-	          left: leftEdge + 'px'
-	        });
-	      }
-	      else if(positionAnchor() === 'mouse') {
-	        nodel.classed(dir, true);
-	        tip.updatePosition(poffset);
-	      }
-	      
-	      return tip
-	    }
-	
-	    // Public - hide the tooltip
-	    //
-	    // Returns a tip
-	    tip.hide = function() {
-	      var nodel = d3.select(node)
-	      nodel.style({ opacity: 0, 'pointer-events': 'none', 'z-index': -1 })
-	      return tip
-	    }
-	
-	    //Public - update position of tooltip based on mouse
-	    //
-	    // Returns a tip
-	    tip.updatePosition = function(v) {
-	      var nodel = d3.select(node);
-	      var mouseX = d3.mouse(d3.select("html").node())[0] + 10;
-	      var mouseY = d3.mouse(d3.select("html").node())[1] + 20;
-	      var rightEdge = mouseX + nodel.property('offsetWidth');
-	      var bottomEdge = mouseY + nodel.property('offsetHeight');
-	      var overFlowRight = tipOverFlowRight(rightEdge);
-	      var overFlowLeft = tipOverFlowLeft(mouseX);
-	      var overFlowBottom = tipOverFlowBottom(bottomEdge);
-	
-	      if(v.length) {
-	        mouseX += v[0];
-	        mouseY += v[1];
-	      }
-	      if(overFlowRight) mouseX -= overFlowRight;
-	      if(overFlowLeft) mouseX += overFlowLeft;
-	      if(overFlowBottom) mouseY -= overFlowBottom;
-	
-	      nodel.style({
-	        top: mouseY + 'px',
-	        left: mouseX + 'px'
-	      });
-	      return tip;
-	    };
-	
-	    function tipOverFlowRight(rightEdge) {
-	      var windowWidth = window.outerWidth;
-	      if(rightEdge > windowWidth)
-	        return rightEdge - windowWidth;
-	      else
-	        return false;
-	    }
-	
-	    function tipOverFlowLeft(leftEdge) {
-	      var windowWidth = window.outerWidth;
-	      if(leftEdge < 0)
-	        return -(leftEdge);
-	      else
-	        return false;
-	    }
-	
-	    function tipOverFlowBottom(bottomEdge) {
-	      var scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
-	      var windowHeight = window.innerHeight + scrollTop;
-	      if(bottomEdge > windowHeight)
-	        return bottomEdge - windowHeight;
-	      else
-	        return false;
-	    }
-	    // Public: Proxy attr calls to the d3 tip container.  Sets or gets attribute value.
-	    //
-	    // n - name of the attribute
-	    // v - value of the attribute
-	    //
-	    // Returns tip or attribute value
-	    tip.attr = function(n, v) {
-	      if (arguments.length < 2 && typeof n === 'string') {
-	        return d3.select(node).attr(n)
-	      } else {
-	        var args =  Array.prototype.slice.call(arguments)
-	        d3.selection.prototype.attr.apply(d3.select(node), args)
-	      }
-	
-	      return tip
-	    }
-	
-	    // Public: Proxy style calls to the d3 tip container.  Sets or gets a style value.
-	    //
-	    // n - name of the property
-	    // v - value of the property
-	    //
-	    // Returns tip or style property value
-	    tip.style = function(n, v) {
-	      if (arguments.length < 2 && typeof n === 'string') {
-	        return d3.select(node).style(n)
-	      } else {
-	        var args =  Array.prototype.slice.call(arguments)
-	        d3.selection.prototype.style.apply(d3.select(node), args)
-	      }
-	
-	      return tip
-	    }
-	
-	    // Public: Set or get the direction of the tooltip
-	    //
-	    // v - One of n(north), s(south), e(east), or w(west), nw(northwest),
-	    //     sw(southwest), ne(northeast) or se(southeast)
-	    //
-	    // Returns tip or direction
-	    tip.direction = function(v) {
-	      if (!arguments.length) return direction
-	      direction = v == null ? v : d3.functor(v)
-	
-	      return tip
-	    }
-	
-	    // Public: Set or get the position anchor of the tool tip.
-	    //
-	    // v - either 'ordinal' - the default position that uses ordinal positioning
-	    // or 'mouse' - to position the tool tip wherever the mouse goes on the selected node
-	    //
-	    // Returns tip or position
-	    tip.positionAnchor = function(v) {
-	      if (!arguments.length) return positionAnchor;
-	      positionAnchor = v == null ? v : d3.functor(v);
-	
-	      return tip;
-	    };
-	
-	    // Public: Sets or gets the offset of the tip
-	    //
-	    // v - Array of [x, y] offset
-	    //
-	    // Returns offset or
-	    tip.offset = function(v) {
-	      if (!arguments.length) return offset
-	      offset = v == null ? v : d3.functor(v)
-	
-	      return tip
-	    }
-	
-	    // Public: sets or gets the html value of the tooltip
-	    //
-	    // v - String value of the tip
-	    //
-	    // Returns html value or tip
-	    tip.html = function(v) {
-	      if (!arguments.length) return html
-	      html = v == null ? v : d3.functor(v)
-	
-	      return tip
-	    }
-	
-	    function d3_tip_direction() { return 'n' }
-	    function d3_tip_offset() { return [0, 0] }
-	    function d3_tip_html() { return ' ' }
-	    function d3_tip_positionAnchor() { return 'shape';}
-	
-	    var direction_callbacks = d3.map({
-	      n:  direction_n,
-	      s:  direction_s,
-	      e:  direction_e,
-	      w:  direction_w,
-	      nw: direction_nw,
-	      ne: direction_ne,
-	      sw: direction_sw,
-	      se: direction_se
-	    }),
-	
-	    directions = direction_callbacks.keys()
-	
-	    function direction_n() {
-	      var bbox = getScreenBBox()
-	      return {
-	        top:  bbox.n.y - node.offsetHeight,
-	        left: bbox.n.x - node.offsetWidth / 2
-	      }
-	    }
-	
-	    function direction_s() {
-	      var bbox = getScreenBBox()
-	      return {
-	        top:  bbox.s.y,
-	        left: bbox.s.x - node.offsetWidth / 2
-	      }
-	    }
-	
-	    function direction_e() {
-	      var bbox = getScreenBBox()
-	      return {
-	        top:  bbox.e.y - node.offsetHeight / 2,
-	        left: bbox.e.x
-	      }
-	    }
-	
-	    function direction_w() {
-	      var bbox = getScreenBBox()
-	      return {
-	        top:  bbox.w.y - node.offsetHeight / 2,
-	        left: bbox.w.x - node.offsetWidth
-	      }
-	    }
-	
-	    function direction_nw() {
-	      var bbox = getScreenBBox()
-	      return {
-	        top:  bbox.nw.y - node.offsetHeight,
-	        left: bbox.nw.x - node.offsetWidth
-	      }
-	    }
-	
-	    function direction_ne() {
-	      var bbox = getScreenBBox()
-	      return {
-	        top:  bbox.ne.y - node.offsetHeight,
-	        left: bbox.ne.x
-	      }
-	    }
-	
-	    function direction_sw() {
-	      var bbox = getScreenBBox()
-	      return {
-	        top:  bbox.sw.y,
-	        left: bbox.sw.x - node.offsetWidth
-	      }
-	    }
-	
-	    function direction_se() {
-	      var bbox = getScreenBBox()
-	      return {
-	        top:  bbox.se.y,
-	        left: bbox.e.x
-	      }
-	    }
-	
-	    function initNode() {
-	      var node = d3.select(document.createElement('div'))
-	      node.style({
-	        position: 'absolute',
-	        top: 0,
-	        opacity: 0,
-	        'pointer-events': 'none',
-	        'box-sizing': 'border-box'
-	      })
-	
-	      return node.node()
-	    }
-	
-	    function getSVGNode(el) {
-	      el = el.node()
-	      if(el.tagName.toLowerCase() === 'svg')
-	        return el
-	
-	      return el.ownerSVGElement
-	    }
-	
-	    // Private - gets the screen coordinates of a shape
-	    //
-	    // Given a shape on the screen, will return an SVGPoint for the directions
-	    // n(north), s(south), e(east), w(west), ne(northeast), se(southeast), nw(northwest),
-	    // sw(southwest).
-	    //
-	    //    +-+-+
-	    //    |   |
-	    //    +   +
-	    //    |   |
-	    //    +-+-+
-	    //
-	    // Returns an Object {n, s, e, w, nw, sw, ne, se}
-	    function getScreenBBox() {
-	      var targetel   = target || d3.event.target;
-	
-	      while ('undefined' === typeof targetel.getScreenCTM && 'undefined' === targetel.parentNode) {
-	          targetel = targetel.parentNode;
-	      }
-	
-	      var bbox       = {},
-	          matrix     = targetel.getScreenCTM(),
-	          tbbox      = targetel.getBBox(),
-	          width      = tbbox.width,
-	          height     = tbbox.height,
-	          x          = tbbox.x,
-	          y          = tbbox.y
-	
-	      point.x = x
-	      point.y = y
-	      bbox.nw = point.matrixTransform(matrix)
-	      point.x += width
-	      bbox.ne = point.matrixTransform(matrix)
-	      point.y += height
-	      bbox.se = point.matrixTransform(matrix)
-	      point.x -= width
-	      bbox.sw = point.matrixTransform(matrix)
-	      point.y -= height / 2
-	      bbox.w  = point.matrixTransform(matrix)
-	      point.x += width
-	      bbox.e = point.matrixTransform(matrix)
-	      point.x -= width / 2
-	      point.y -= height / 2
-	      bbox.n = point.matrixTransform(matrix)
-	      point.y += height
-	      bbox.s = point.matrixTransform(matrix)
-	
-	      return bbox
-	    }
-	
-	    return tip
-	  };
-	  return d3.tip
-	}));
-
-
-/***/ },
-/* 37 */
+/* 47 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(38);
+	var content = __webpack_require__(48);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
-	var update = __webpack_require__(14)(content, {});
+	var update = __webpack_require__(17)(content, {});
 	if(content.locals) module.exports = content.locals;
 	// Hot Module Replacement
 	if(false) {
 		// When the styles change, update the <style> tags
 		if(!content.locals) {
-			module.hot.accept("!!./../../node_modules/css-loader/index.js!./../../node_modules/sass-loader/index.js!./tool-tipsify.scss", function() {
-				var newContent = require("!!./../../node_modules/css-loader/index.js!./../../node_modules/sass-loader/index.js!./tool-tipsify.scss");
+			module.hot.accept("!!./../../node_modules/css-loader/index.js!./../../node_modules/sass-loader/index.js!./kpi-gauge.scss", function() {
+				var newContent = require("!!./../../node_modules/css-loader/index.js!./../../node_modules/sass-loader/index.js!./kpi-gauge.scss");
 				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
 				update(newContent);
 			});
@@ -34900,35 +35679,35 @@
 	}
 
 /***/ },
-/* 38 */
+/* 48 */
 /***/ function(module, exports, __webpack_require__) {
 
-	exports = module.exports = __webpack_require__(13)();
+	exports = module.exports = __webpack_require__(16)();
 	// imports
 	
 	
 	// module
-	exports.push([module.id, ".d3-tip-mouse {\n  font-size: 13px;\n  line-height: 16px;\n  padding: 8px;\n  background: rgba(0, 0, 0, 0.8);\n  color: #fff;\n  border-radius: 2px;\n  pointer-events: none;\n  z-index: 100;\n  outline: none; }\n  .d3-tip-mouse label {\n    font-family: 'Abel', Helvetica, Arial, sans-serif;\n    font-weight: 400; }\n\n.d3-tip {\n  font-size: 13px;\n  line-height: 16px;\n  padding: 8px;\n  background: rgba(0, 0, 0, 0.8);\n  color: #fff;\n  border-radius: 2px;\n  pointer-events: none;\n  z-index: 100;\n  outline: none;\n  /* Creates a small triangle extender for the tooltip */\n  /* Northward tooltips */\n  /* Eastward tooltips */\n  /* Southward tooltips */\n  /* Westward tooltips */ }\n  .d3-tip label {\n    font-family: 'Abel', Helvetica, Arial, sans-serif;\n    font-weight: 400; }\n  .d3-tip:after {\n    box-sizing: border-box;\n    display: inline;\n    font-size: 10px;\n    width: 100%;\n    line-height: 1;\n    color: rgba(0, 0, 0, 0.8);\n    position: absolute;\n    pointer-events: none;\n    z-index: 100; }\n  .d3-tip.n:after {\n    content: \"\\25BC\";\n    top: auto;\n    bottom: -7px;\n    left: 0;\n    text-align: center; }\n  .d3-tip.ne:after {\n    content: \"\\25BC\";\n    top: auto;\n    bottom: -7px;\n    left: 0;\n    text-align: left;\n    padding-left: 8px; }\n  .d3-tip.nw:after {\n    content: \"\\25BC\";\n    top: auto;\n    bottom: -7px;\n    left: 0;\n    text-align: right;\n    padding-right: 8px; }\n  .d3-tip.e:after {\n    content: \"\\25C0\";\n    margin: -4px 0 0 0;\n    top: 50%;\n    left: -7px; }\n  .d3-tip.s:after {\n    content: \"\\25B2\";\n    margin: 0 0 1px 0;\n    top: -8px;\n    left: 0;\n    text-align: center; }\n  .d3-tip.w:after {\n    content: \"\\25B6\";\n    margin: -4px 0 0 -2px;\n    top: 50%;\n    left: 100%; }\n", ""]);
+	exports.push([module.id, ".kpi-component-container {\n  background-color: #336799;\n  position: relative;\n  height: 100px;\n  margin-right: 20px;\n  margin-top: 20px; }\n  .kpi-component-container h3 {\n    position: relative;\n    margin-top: 23px;\n    font-size: 18px;\n    font-family: 'Abel', Helvetica, Arial, sans-serif;\n    color: #fff; }\n  .kpi-component-container\n.dc-bar-gauge-background {\n    fill: #4787c4; }\n  .kpi-component-container\n.dc-bar-gauge-foreground {\n    fill: #aed1eb; }\n  .kpi-component-container .kpi-gauge.dc-bar-gauge {\n    position: absolute;\n    top: 0px; }\n  .kpi-component-container .kpi-number.dc-chart {\n    position: relative;\n    font-size: 38px;\n    font-family: 'Abel', Helvetica, Arial, sans-serif;\n    color: #fff;\n    top: 20px;\n    margin-left: 10px; }\n", ""]);
 	
 	// exports
 
 
 /***/ },
-/* 39 */
+/* 49 */
 /***/ function(module, exports) {
 
 	function loadDateFixture() {
 	    var fixture = JSON.parse("[" +
-	        "{\"id\":\"1\",\"value\":\"44\",\"nvalue\":\"-4\",\"countrycode\":\"US\",\"state\":\"California\",\"status\":\"T\",\"id\":1,\"region\":\"South\",\"date\":\"2012-05-25T16:10:09Z\"}, " +
-	        "{\"id\":\"2\",\"value\":\"22\",\"nvalue\":\"-2\",\"countrycode\":\"US\",\"state\":\"Colorado\",\"status\":\"F\",\"id\":2,\"region\":\"West\",\"date\":\"2012-06-10T16:10:19Z\"}, " +
-	        "{\"id\":\"3\",\"value\":\"33\",\"nvalue\":\"1\",\"countrycode\":\"US\",\"state\":\"Delaware\",\"status\":\"T\",\"id\":3,\"region\":\"West\",\"date\":\"2012-08-10T16:20:29Z\"}, " +
-	        "{\"id\":\"4\",\"value\":\"44\",\"nvalue\":\"-3\",\"countrycode\":\"US\",\"state\":\"California\",\"status\":\"F\",\"id\":4,\"region\":\"South\",\"date\":\"2012-07-01T16:10:39Z\"}, " +
-	        "{\"id\":\"5\",\"value\":\"55\",\"nvalue\":\"-5\",\"countrycode\":\"CA\",\"state\":\"Ontario\",\"status\":\"T\",\"id\":5,\"region\":\"Central\",\"date\":\"2012-06-10T16:10:49Z\"}, " +
-	        "{\"id\":\"6\",\"value\":\"66\",\"nvalue\":\"-4\",\"countrycode\":\"US\",\"state\":\"California\",\"status\":\"F\",\"id\":6,\"region\":\"West\",\"date\":\"2012-06-08T16:10:59Z\"}, " +
-	        "{\"id\":\"7\",\"value\":\"22\",\"nvalue\":\"10\",\"countrycode\":\"CA\",\"state\":\"Ontario\",\"status\":\"T\",\"id\":7,\"region\":\"East\",\"date\":\"2012-07-10T16:10:09Z\"}, " +
-	        "{\"id\":\"8\",\"value\":\"33\",\"nvalue\":\"1\",\"countrycode\":\"US\",\"state\":\"Mississippi\",\"status\":\"F\",\"id\":8,\"region\":\"Central\",\"date\":\"2012-07-10T16:10:19Z\"}, " +
-	        "{\"id\":\"9\",\"value\":\"44\",\"nvalue\":\"2\",\"countrycode\":\"US\",\"state\":\"Mississippi\",\"status\":\"T\",\"id\":9,\"region\":\"Central\",\"date\":\"2012-08-10T16:30:29Z\"}, " +
-	        "{\"id\":\"10\",\"value\":\"55\",\"nvalue\":\"-3\",\"countrycode\":\"US\",\"state\":\"Oklahoma\",\"status\":\"F\",\"id\":10,\"region\":\"\",\"date\":\"2012-06-10T16:10:39Z\"}" +
+	        "{\"id\":\"1\",\"value\":\"44\",\"nvalue\":\"-4\",\"countrycode\":\"US\",\"state\":\"California\",\"status\":\"T\",\"id\":1,\"region\":\"South\",\"date\":\"2012-05-25T16:10:09Z\",\"year\":\"2011\"}, " +
+	        "{\"id\":\"2\",\"value\":\"22\",\"nvalue\":\"-2\",\"countrycode\":\"US\",\"state\":\"Colorado\",\"status\":\"F\",\"id\":2,\"region\":\"West\",\"date\":\"2012-06-10T16:10:19Z\",\"year\":\"2010\"}, " +
+	        "{\"id\":\"3\",\"value\":\"33\",\"nvalue\":\"1\",\"countrycode\":\"US\",\"state\":\"Delaware\",\"status\":\"T\",\"id\":3,\"region\":\"West\",\"date\":\"2012-08-10T16:20:29Z\",\"year\":\"2009\"}, " +
+	        "{\"id\":\"4\",\"value\":\"44\",\"nvalue\":\"-3\",\"countrycode\":\"US\",\"state\":\"California\",\"status\":\"F\",\"id\":4,\"region\":\"South\",\"date\":\"2012-07-01T16:10:39Z\",\"year\":\"2008\"}, " +
+	        "{\"id\":\"5\",\"value\":\"55\",\"nvalue\":\"-5\",\"countrycode\":\"CA\",\"state\":\"Ontario\",\"status\":\"T\",\"id\":5,\"region\":\"Central\",\"date\":\"2012-06-10T16:10:49Z\",\"year\":\"2007\"}, " +
+	        "{\"id\":\"6\",\"value\":\"66\",\"nvalue\":\"-4\",\"countrycode\":\"US\",\"state\":\"California\",\"status\":\"F\",\"id\":6,\"region\":\"West\",\"date\":\"2012-06-08T16:10:59Z\",\"year\":\"2008\"}, " +
+	        "{\"id\":\"7\",\"value\":\"22\",\"nvalue\":\"10\",\"countrycode\":\"CA\",\"state\":\"Ontario\",\"status\":\"T\",\"id\":7,\"region\":\"East\",\"date\":\"2012-07-10T16:10:09Z\",\"year\":\"2009\"}, " +
+	        "{\"id\":\"8\",\"value\":\"33\",\"nvalue\":\"1\",\"countrycode\":\"US\",\"state\":\"Mississippi\",\"status\":\"F\",\"id\":8,\"region\":\"Central\",\"date\":\"2012-07-10T16:10:19Z\",\"year\":\"2010\"}, " +
+	        "{\"id\":\"9\",\"value\":\"44\",\"nvalue\":\"2\",\"countrycode\":\"US\",\"state\":\"Mississippi\",\"status\":\"T\",\"id\":9,\"region\":\"Central\",\"date\":\"2012-08-10T16:30:29Z\",\"year\":\"2011\"}, " +
+	        "{\"id\":\"10\",\"value\":\"55\",\"nvalue\":\"-3\",\"countrycode\":\"US\",\"state\":\"Oklahoma\",\"status\":\"F\",\"id\":10,\"region\":\"\",\"date\":\"2012-06-10T16:10:39Z\",\"year\":\"2010\"}" +
 	        "]");
 	
 	    fixture.forEach(dateCleaner);
@@ -35013,16 +35792,16 @@
 	};
 
 /***/ },
-/* 40 */
+/* 50 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(41);
+	var content = __webpack_require__(51);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
-	var update = __webpack_require__(14)(content, {});
+	var update = __webpack_require__(17)(content, {});
 	if(content.locals) module.exports = content.locals;
 	// Hot Module Replacement
 	if(false) {
@@ -35039,10 +35818,10 @@
 	}
 
 /***/ },
-/* 41 */
+/* 51 */
 /***/ function(module, exports, __webpack_require__) {
 
-	exports = module.exports = __webpack_require__(13)();
+	exports = module.exports = __webpack_require__(16)();
 	// imports
 	
 	

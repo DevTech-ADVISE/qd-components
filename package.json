@@ -20,7 +20,7 @@
   },
   "homepage": "https://github.com/QuickDash/qd-components",
   "dependencies": {
-    "d3": "~3.4.11",
+    "d3": "~3.5.4",
     "d3-tip": "git://github.com/BI/d3-tip",
     "dc": "git://github.com/BI/dc.js",
     "dynatable": "git://github.com/BI/jquery-dynatable",
