@@ -3,9 +3,11 @@ var dc = require('dc'),
 var $ = jQuery;
 
 var jsPath = './src/javascripts/';
+var cssPath = './src/stylesheets/';
 var quickDefaults = require(jsPath + 'quick-defaults');
 var toolTipsify = require(jsPath + 'tool-tipsify');
 var sizeBoxify = require(jsPath + 'size-boxify');
+require('dc/dc.css');
 
 // custom charts & components
 var dcCustom = {

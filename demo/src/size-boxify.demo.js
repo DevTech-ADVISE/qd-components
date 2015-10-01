@@ -4,7 +4,6 @@ var dataFilePath = './data/bubble_map_table.csv';
 var countriesGeoJsonFilePath = './data/countries.geo.json';
 var formatters = require('qd-formatters')(d3);
 
-require('dc/dc.css');
 require('./stylesheets/size-boxify.demo.scss');
 
 //add kpi chart

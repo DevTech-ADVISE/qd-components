@@ -1,11 +1,6 @@
 var dc = require('../../index.js');
 var fixtures = require('../../spec/helpers/fixtures.js');
 
-require('dc/dc.css');
-//include styles
-//better data set for paging
-//don't require the group, its not using it
-
 var id, dynatable, data;
 var assistanceCategoryId, assistanceCategoryDimension, assistanceCategoryGroup, assistanceCategoryChart;
 var regionId, regionDimension, regionGroup, regionChart;

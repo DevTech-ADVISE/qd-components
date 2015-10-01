@@ -3,7 +3,6 @@ var fixtures = require('../../spec/helpers/fixtures.js');
 var dataFilePath = './data/bubble_map_table.csv';
 var countriesGeoJsonFilePath = './data/countries.geo.json';
 
-require('dc/dc.css');
 require('./stylesheets/tool-tipsify.demo.scss');
 
 var data;
