@@ -18,3 +18,8 @@
 		margin-left: 10px;
 	}
 }
+
+//remove the floating dc gives to most charts
+div.dc-chart.kpi-number {
+	float: none;
+}

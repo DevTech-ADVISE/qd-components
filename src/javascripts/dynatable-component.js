@@ -5,9 +5,6 @@ var dc = require('dc'),
 
 // styles
 require('../../src/stylesheets/dynatable.scss');
-require('font-awesome/css/font-awesome.css');
-require('../../src/stylesheets/common.scss');
-require('normalize.css/normalize.css');
 
 module.exports = function(parent, chartGroup){
 

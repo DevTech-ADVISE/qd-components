@@ -7,6 +7,9 @@ var cssPath = './src/stylesheets/';
 var quickDefaults = require(jsPath + 'quick-defaults');
 var toolTipsify = require(jsPath + 'tool-tipsify');
 var sizeBoxify = require(jsPath + 'size-boxify');
+require(cssPath + 'common.scss');
+require('font-awesome/css/font-awesome.css');
+require('normalize.css/normalize.css');
 require('dc/dc.css');
 
 // custom charts & components
