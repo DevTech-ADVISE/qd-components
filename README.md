@@ -18,6 +18,43 @@ Require in your code
 var dc = require('qd-components');
 ```
 
+IMPORTANT LOADERS
+You must use webpack in your parent application, and include the following loaders in your webpack.config.js file. Also remember you must npm install each of these loaders before you can use them. 
+```
+module: {
+    loaders: [
+      {
+        test: /\.scss$/,
+        loader: 'style!css!sass'
+      },
+      { 
+        test: /\.css$/, 
+        loader: "style-loader!css-loader" 
+      },
+      {
+        test: /\.woff(\?v=\d+\.\d+\.\d+)?$/,
+        loader: "url?limit=10000&mimetype=application/font-woff"
+      },
+      {
+        test: /\.woff2(\?v=\d+\.\d+\.\d+)?$/,
+        loader: "url?limit=10000&mimetype=application/font-woff"
+      }, 
+      {
+        test: /\.ttf(\?v=\d+\.\d+\.\d+)?$/,
+        loader: "url?limit=10000&mimetype=application/octet-stream"
+      }, 
+      {
+        test: /\.eot(\?v=\d+\.\d+\.\d+)?$/,
+        loader: "file"
+      }, 
+      {
+        test: /\.svg(\?v=\d+\.\d+\.\d+)?$/,
+        loader: "url?limit=10000&mimetype=image/svg+xml"
+      }
+    ]
+  }
+```
+
 # API Reference
 
 ## dc.filterBuilder(parent)
