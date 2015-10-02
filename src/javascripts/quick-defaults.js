@@ -17,7 +17,29 @@ var quickDefaults = function(dc) {
   original.pieChart = dc.pieChart;
   dc.pieChart = function(parent, opts) {
     var _chart = original.pieChart(parent);
+    var _options = {};
+    _chart.options = function(_) {
+      if(!arguments.length) return _options;
+      _options = _;
+      return _chart;
+    };
 
+    var renderletFunc = function() {
+      if(opts && opts.renderletFunc) {
+        opts.renderletFunc();
+      }
+
+      if(_options && _options.centerTitle) {
+        var labelRoot = d3.select(parent + ' svg g');
+        if(labelRoot.select('text.center-label').empty()) {
+          labelRoot.append('svg:text')
+            .attr('class', 'center-label')
+            .text(_options.centerTitle);
+        }
+      }
+    };
+
+    _chart.renderlet(renderletFunc);
     _chart.renderLabel(false);
 
     return _chart;
