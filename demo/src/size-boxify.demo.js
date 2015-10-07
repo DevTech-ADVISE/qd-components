@@ -63,13 +63,12 @@ d3.csv(dataFilePath, function(d) {
         var geoJsonKeyField = 'id';
         var _layerName = 'country';
 
-        countryChart = dc.geoChoroplethChart('#' + countryId)
+        countryChart = dc.geoChoroplethChart('#' + countryId, {formatter: formatters.currencyFormat})
           .dimension(countryDimension)
           .group(countryGroup)
           .overlayGeoJson(geoJson.features, _layerName, function(d) {
             return d[geoJsonKeyField];
-          })
-          .formatter(formatters.currencyFormat);
+          });
 
         dc.renderAll();
   });

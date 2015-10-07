@@ -1,9 +1,11 @@
 var inflection = require('inflection'),
     dtip = require('d3-tip')(d3);
+var formatters = require('qd-formatters')(d3);
+var dc = require('./quick-defaults')();
 
 require('../stylesheets/tool-tipsify.scss');
 
-var addToolTipsifyToDc = function(dc){
+var addToolTipsifyToDc = function(){
   var original = {};
   
   original.rowChart = dc.rowChart;
@@ -35,17 +37,21 @@ var addToolTipsifyToDc = function(dc){
 
   original.geoChoroplethChart = dc.geoChoroplethChart;
   dc.geoChoroplethChart = function(parent, opts) {
-    var _chart = original.geoChoroplethChart(parent);
-
+    var _chart = original.geoChoroplethChart(parent, opts);
+    var formatter = formatters.bigNumberFormat;
     _chart = toolTipsifyMixin(_chart, 'g.country');
+
+    if(opts && opts.formatter) {
+      formatter = opts.formatter;
+    }
 
     var geoChoroContent = function(d) {
       var dataItem = _chart.data().filter(function(i){return i.key === d.id})[0];
       if (dataItem === undefined) return "<label>" + d.properties.name + "</label><br/>No Data";
-      return "<label>" + _chart.label()(dataItem) + "</label><br/>" + _chart.formatter()(_chart.valueAccessor()(dataItem));
+      return "<label>" + _chart.label()(dataItem) + "</label><br/>" + formatter(_chart.valueAccessor()(dataItem));
     }
 
-    _chart.toolTipsify({content: geoChoroContent});
+    _chart.toolTipsify({content: geoChoroContent, formatter: formatter});
 
     return _chart;
   };
