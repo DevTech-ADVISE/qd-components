@@ -35,7 +35,7 @@ d3.csv(dataFilePath, function(d) {
   yearGroup = yearDimension.group();//.reduceSum(function(d) { return d.value;});
 
   countryDimension = data.dimension(function(d) { return d.country_code;});
-  countryGroup = countryDimension.group();
+  countryGroup = countryDimension.group().reduceSum(function(d) { return d.constant_amount;});
 
   fundingGroupSum = data.groupAll().reduceSum(function(d) { return d.constant_amount;});
 
@@ -68,7 +68,8 @@ d3.csv(dataFilePath, function(d) {
           .group(countryGroup)
           .overlayGeoJson(geoJson.features, _layerName, function(d) {
             return d[geoJsonKeyField];
-          });
+          })
+          .formatter(formatters.currencyFormat);
 
         dc.renderAll();
   });

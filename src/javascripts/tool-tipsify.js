@@ -42,7 +42,7 @@ var addToolTipsifyToDc = function(dc){
     var geoChoroContent = function(d) {
       var dataItem = _chart.data().filter(function(i){return i.key === d.id})[0];
       if (dataItem === undefined) return "<label>" + d.properties.name + "</label><br/>No Data";
-      return "<label>" + _chart.label()(dataItem) + "</label><br/>" + _chart.valueAccessor()(dataItem);
+      return "<label>" + _chart.label()(dataItem) + "</label><br/>" + _chart.formatter()(_chart.valueAccessor()(dataItem));
     }
 
     _chart.toolTipsify({content: geoChoroContent});
