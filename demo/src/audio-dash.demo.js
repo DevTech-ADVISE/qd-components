@@ -1,7 +1,6 @@
 var dc = require('../../index.js');
 var fixtures = require('../../spec/helpers/fixtures.js');
 
-require('dc/dc.css');
 
 var id, audioDash, data;
 var stateId, stateDimension, stateGroup, stateChart;

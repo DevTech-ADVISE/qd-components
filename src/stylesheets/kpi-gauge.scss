@@ -1,0 +1,40 @@
+.kpi-component-container {
+	background-color: #336799;
+    position: relative;
+    height: 100px;
+    margin-right: 20px;
+    margin-top: 20px;
+    h3 {
+        position: relative;
+        margin-left: 10px;
+        margin-top: 23px;
+        font-size: 18px;
+        font-family: 'Abel', Helvetica, Arial, sans-serif;
+        color: #fff;
+    }
+	.dc-bar-gauge-background
+    {
+        fill: #4787c4;
+    }
+
+    .dc-bar-gauge-foreground
+    {
+        fill: #aed1eb;
+
+    }
+
+    .kpi-gauge.dc-bar-gauge {
+        position: absolute;
+        top: 0px;
+    }
+
+    .kpi-number.dc-chart {
+        position: relative;
+        font-size: 38px;
+        font-family: 'Abel', Helvetica, Arial, sans-serif;
+        color: #fff;
+        top: 20px;
+        margin-left: 10px;
+    }
+
+}

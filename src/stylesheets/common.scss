@@ -18,3 +18,29 @@
 		margin-left: 10px;
 	}
 }
+
+//remove the floating dc gives to most charts
+div.dc-chart.kpi-number {
+	float: none;
+}
+
+.center-label{
+	text-anchor: middle;
+    alignment-baseline: middle;
+    fill: #222;
+    font-size: 12px;
+}
+
+g.country path {
+	stroke-width: 1;
+	stroke: #fff;
+	cursor: pointer;
+
+	&:hover {fill: #C2113A;}
+}
+
+g.country.selected path, g.country.deselected path {
+	stroke-width: 1;
+	stroke: #fff;
+	&:hover {fill: #C2113A;}
+}

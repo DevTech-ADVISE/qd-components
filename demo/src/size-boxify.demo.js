@@ -2,15 +2,17 @@ dc = require('../../index.js');
 var fixtures = require('../../spec/helpers/fixtures.js');
 var dataFilePath = './data/bubble_map_table.csv';
 var countriesGeoJsonFilePath = './data/countries.geo.json';
+var formatters = require('qd-formatters')(d3);
 
-require('dc/dc.css');
 require('./stylesheets/size-boxify.demo.scss');
 
+//add kpi chart
 var data;
 var assistanceCategoryId, assistanceCategoryDimension, assistanceCategoryGroup, assistanceCategoryChart;
 var regionId, regionDimension, regionGroup, regionChart;
-var yearId, yearDimension, yearGroup;//yearChart;
+var yearId, yearDimension, yearGroup, yearChart;
 var countryId, countryDimension, countryGroup, countryChart;
+var fundingId, fundingDimension, fundingGroupSum, fundingChart;
 
 d3.csv(dataFilePath, function(d) {
 
@@ -21,6 +23,7 @@ d3.csv(dataFilePath, function(d) {
   regionId = 'region-chart';
   yearId = 'year-chart';
   countryId = 'country-chart';
+  fundingId = 'funding-chart';
 
   assistanceCategoryDimension = data.dimension(function(d) { return d.assistance_category_name; });
   assistanceCategoryGroup = assistanceCategoryDimension.group();
@@ -32,9 +35,11 @@ d3.csv(dataFilePath, function(d) {
   yearGroup = yearDimension.group();//.reduceSum(function(d) { return d.value;});
 
   countryDimension = data.dimension(function(d) { return d.country_code;});
-  countryGroup = countryDimension.group();
+  countryGroup = countryDimension.group().reduceSum(function(d) { return d.constant_amount;});
 
-  regionChart = dc.pieChart('#' + regionId);
+  fundingGroupSum = data.groupAll().reduceSum(function(d) { return d.constant_amount;});
+
+  regionChart = dc.pieChart('#' + regionId).options({centerTitle: 'Regions'});
   regionChart.dimension(regionDimension).group(regionGroup)
     .title(function(d) {return d.region})
     .transitionDuration(0);
@@ -52,6 +57,8 @@ d3.csv(dataFilePath, function(d) {
     .xUnits(dc.units.ordinal)
     .transitionDuration(0);
 
+  fundingChart = dc.kpiGauge('#' + fundingId, countryDimension, fundingGroupSum, {title: "Total Activities", formatter: formatters.bigCurrencyFormat});
+
   d3.json(countriesGeoJsonFilePath, function(geoJson) {
         var geoJsonKeyField = 'id';
         var _layerName = 'country';
@@ -61,14 +68,13 @@ d3.csv(dataFilePath, function(d) {
           .group(countryGroup)
           .overlayGeoJson(geoJson.features, _layerName, function(d) {
             return d[geoJsonKeyField];
-          });
+          })
+          .formatter(formatters.currencyFormat);
 
         dc.renderAll();
   });
 
   //*********sizeboxify your charts here**************
 
-
-  
 
 });

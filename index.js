@@ -3,15 +3,21 @@ var dc = require('dc'),
 var $ = jQuery;
 
 var jsPath = './src/javascripts/';
+var cssPath = './src/stylesheets/';
 var quickDefaults = require(jsPath + 'quick-defaults');
 var toolTipsify = require(jsPath + 'tool-tipsify');
 var sizeBoxify = require(jsPath + 'size-boxify');
+require(cssPath + 'common.scss');
+require('font-awesome/css/font-awesome.css');
+require('normalize.css/normalize.css');
+require('dc/dc.css');
 
 // custom charts & components
 var dcCustom = {
   filterBuilder: require(jsPath + 'filter-builder'),
   dynatableComponent: require(jsPath + 'dynatable-component'),
-  audioDash: require(jsPath + 'audio-dash')
+  audioDash: require(jsPath + 'audio-dash'),
+  kpiGauge: require(jsPath + 'kpi-gauge')
 };
 
 jQuery.extend(dc, dcCustom);

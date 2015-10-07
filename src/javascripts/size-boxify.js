@@ -3,10 +3,6 @@ var dc = require('dc');
 // styles
 require('../../src/stylesheets/size-boxify.scss');
 
-require('font-awesome/css/font-awesome.css');
-require('../../src/stylesheets/common.scss');
-require('normalize.css/normalize.css');
-
 var sizeBoxify = function(dc) {
   var original = {};
 
@@ -49,13 +45,17 @@ var sizeBoxify = function(dc) {
     _chart.resize = function() {
       _chart.height(_chart.getDynamicHeight()).width(_chart.getDynamicWidth())
         .innerRadius(_chart.getInnerRadius()).radius(_chart.getDynamicRadius())
+        .cx(_chart.getDynamicRadius())
+        .legend(dc.legend().x((_chart.getDynamicRadius() * 2) + 10).y(12).itemHeight(12).gap(2))
         .render();
     };
 
     window.addEventListener('resize', _chart.resize, true);
 
     _chart.width(_chart.getDynamicWidth()).height(_chart.getDynamicHeight())
-      .innerRadius(_chart.getInnerRadius()).radius(_chart.getDynamicRadius());
+      .innerRadius(_chart.getInnerRadius()).radius(_chart.getDynamicRadius())
+      .cx(_chart.getDynamicRadius())
+      .legend(dc.legend().x((_chart.getDynamicRadius() * 2) + 10).y(12).itemHeight(12).gap(2));
     return _chart;
   };
 

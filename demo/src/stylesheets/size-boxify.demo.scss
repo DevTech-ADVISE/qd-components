@@ -1,6 +1,4 @@
-div.dc-chart {
-	float: none;
-}
+
 
 #simple-charts {
 	width: 49%;
@@ -9,8 +7,10 @@ div.dc-chart {
 }
 
 #country-geo-panel {
+	position: relative;
+	overflow: auto;
 	width: 49%;
-	height: 90%;
+	height: 98%;
 	float: right;
 	background: #EAEAEA;
 	margin-top: 5px;
@@ -19,13 +19,20 @@ div.dc-chart {
 	h3 {
 		margin-top: 10px;
 		margin-left: 10px;
+		margin-bottom: 0px;
+		position: relative;
+	}
+
+	#country-chart {
+		position: absolute;
+
 	}
 }
 
 #region-panel {
 	position: relative;
 	float: left;
-	width: 48%;
+	width: 100%;
 	height: 50%;
 	background: #EAEAEA;
 
@@ -33,29 +40,33 @@ div.dc-chart {
 		margin-left: 20px;
 	}
 
-	#region-chart-column {
-		width: 80%;
+	#region-chart{
 		height: 80%;
 		position: absolute;
 		bottom: 0px;
 	}
+
+	#funding-chart {
+		width: 30%;
+		float: right;
+	}
 }
 
-#state-panel {
+#assistance-category-panel {
 	position: relative; 
-	float: right;
+	float: left;
 	width: 48%;
-	height: 50%;
+	height: 47%;
 	background: #EAEAEA;
-
+	margin-top: 5px;
 	h3 {
 		margin-left: 15px;
 		margin-top: 10px;
 	}
 
-	#state-chart-column {
-		width: 80%;
-		height: 85%;
+	#assistance-category-chart {
+		
+		height: 80%;
 		position: absolute;
 		bottom: 0px;
 	}
@@ -64,16 +75,16 @@ div.dc-chart {
 #year-panel {
 	position: relative;
 	float: right;
-	width: 100%;
-	height: 45%;
+	width: 48%;
+	height: 47%;
 	background: #EAEAEA;
 	margin-top: 5px;
 	h3 {
 		margin-left: 20px;
 	}
 
-	#year-chart-column {
-		width: 90%;
+	#year-chart {
+		
 		height: 80%;
 		position: absolute;
 		bottom: 0px;
@@ -84,7 +95,7 @@ div.dc-chart {
 	}
 }
 
-#year-panel, #region-panel, #state-panel, #country-geo-panel {
+#year-panel, #region-panel, #assistance-category-panel, #country-geo-panel {
 	border: 1px solid #B7B7B7;
 }
 

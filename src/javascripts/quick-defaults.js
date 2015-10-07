@@ -1,5 +1,6 @@
 var inflection = require('inflection'),
   dtip = require('d3-tip')(d3);
+var formatters = require('qd-formatters');
 
 var quickDefaults = function(dc) {
   
@@ -14,10 +15,53 @@ var quickDefaults = function(dc) {
     return _chart;
   };
 
+  original.pieChart = dc.pieChart;
+  dc.pieChart = function(parent, opts) {
+    var _chart = original.pieChart(parent);
+    var _options = {};
+    _chart.options = function(_) {
+      if(!arguments.length) return _options;
+      _options = _;
+      return _chart;
+    };
+
+    var renderletFunc = function() {
+      if(opts && opts.renderletFunc) {
+        opts.renderletFunc();
+      }
+
+      if(_options && _options.centerTitle) {
+        var labelRoot = d3.select(parent + ' svg g');
+        if(labelRoot.select('text.center-label').empty()) {
+          labelRoot.append('svg:text')
+            .attr('class', 'center-label')
+            .text(_options.centerTitle);
+        }
+      }
+    };
+
+    _chart.renderlet(renderletFunc);
+    _chart.renderLabel(false);
+
+    return _chart;
+  };
 
   original.geoChoroplethChart = dc.geoChoroplethChart;
   dc.geoChoroplethChart = function(parent, opts) {
     var _chart = original.geoChoroplethChart(parent);
+    var _formatter = formatters.bigNumberFormat;
+
+    _chart.formatter = function(_) {
+      if(!arguments.length) return _formatter;
+      _formatter = _;
+      return _formatter;
+    }
+
+    //Add zoom markup
+    _chart.root().append("div").classed("zoomControlsContainer", true);
+    _chart.root().select(".zoomControlsContainer").append("div").classed("zoomButton", true);
+    _chart.root().select(".zoomControlsContainer").append("div").classed("resetZoomButton", true);
+
     //Defaults for colors and data
     var _colorRange = ["#a9c8f4", "#7fa1d2", "#5479b0", "#2a518e", "#002A6C"];
     var _zeroColor = '#ccc';

@@ -4,10 +4,6 @@ var dc = require('dc'),
 // styles
 require('../../src/stylesheets/filter-builder.scss');
 
-require('font-awesome/css/font-awesome.css');
-require('../../src/stylesheets/common.scss');
-require('normalize.css/normalize.css');
-
 module.exports = function (parent, chartGroup) {
   
     var _chart = dc.baseMixin({});    
