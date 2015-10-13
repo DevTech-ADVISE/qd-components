@@ -57,7 +57,7 @@ d3.csv(dataFilePath, function(d) {
     .xUnits(dc.units.ordinal)
     .transitionDuration(0);
 
-  fundingChart = dc.kpiGauge('#' + fundingId, countryDimension, fundingGroupSum, {title: "Total Activities", formatter: formatters.bigCurrencyFormat});
+  fundingChart = dc.kpiGauge('#' + fundingId, countryDimension, fundingGroupSum, {title: "Total Funding", formatter: formatters.bigCurrencyFormat});
 
   d3.json(countriesGeoJsonFilePath, function(geoJson) {
         var geoJsonKeyField = 'id';
