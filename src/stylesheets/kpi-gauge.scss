@@ -30,6 +30,12 @@
         top: 0px;
     }
 
+    .kpi-gauge svg{
+        position: absolute;
+        top: 0px;
+        left: 0px;
+    }
+
     .kpi-number.dc-chart {
         position: relative;
         font-size: 38px;
