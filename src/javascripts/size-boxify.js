@@ -1,9 +1,9 @@
-var dc = require('dc');
+var dc = require('./tool-tipsify')();
 
 // styles
 require('../../src/stylesheets/size-boxify.scss');
 
-var sizeBoxify = function(dc) {
+var sizeBoxify = function() {
   var original = {};
 
   original.rowChart = dc.rowChart;
@@ -80,7 +80,7 @@ var sizeBoxify = function(dc) {
 
   original.geoChoroplethChart = dc.geoChoroplethChart;
   dc.geoChoroplethChart = function(parent, opts) {
-    var _chart = original.geoChoroplethChart(parent);
+    var _chart = original.geoChoroplethChart(parent, opts);
     var projectionWidth = 960;
 
     _chart = sizeBoxifyMixin(_chart);

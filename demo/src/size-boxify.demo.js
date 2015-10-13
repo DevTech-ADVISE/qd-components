@@ -57,19 +57,18 @@ d3.csv(dataFilePath, function(d) {
     .xUnits(dc.units.ordinal)
     .transitionDuration(0);
 
-  fundingChart = dc.kpiGauge('#' + fundingId, countryDimension, fundingGroupSum, {title: "Total Activities", formatter: formatters.bigCurrencyFormat});
+  fundingChart = dc.kpiGauge('#' + fundingId, countryDimension, fundingGroupSum, {title: "Total Funding", formatter: formatters.bigCurrencyFormat});
 
   d3.json(countriesGeoJsonFilePath, function(geoJson) {
         var geoJsonKeyField = 'id';
         var _layerName = 'country';
 
-        countryChart = dc.geoChoroplethChart('#' + countryId)
+        countryChart = dc.geoChoroplethChart('#' + countryId, {formatter: formatters.currencyFormat})
           .dimension(countryDimension)
           .group(countryGroup)
           .overlayGeoJson(geoJson.features, _layerName, function(d) {
             return d[geoJsonKeyField];
-          })
-          .formatter(formatters.currencyFormat);
+          });
 
         dc.renderAll();
   });

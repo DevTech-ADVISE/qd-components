@@ -22,9 +22,8 @@ var dcCustom = {
 
 jQuery.extend(dc, dcCustom);
 
-// modify DC to have nice defaults, be tipsified and sizeboxified
-var dcWithDefaults = quickDefaults(dc);
-var dcWithTips = toolTipsify(dcWithDefaults);
-dc = sizeBoxify(dcWithDefaults);
+// modify DC to have nice defaults. 
+// Sizeboxify is the entry point which then inherits functions from tooltipsify and quickdefaults
+dc = sizeBoxify(dc);
 
 module.exports = dc;

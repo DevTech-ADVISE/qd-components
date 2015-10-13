@@ -1,8 +1,8 @@
 var inflection = require('inflection'),
   dtip = require('d3-tip')(d3);
-var formatters = require('qd-formatters');
+var dc = require('dc');
 
-var quickDefaults = function(dc) {
+var quickDefaults = function() {
   
   var original = {};
 
@@ -49,13 +49,6 @@ var quickDefaults = function(dc) {
   original.geoChoroplethChart = dc.geoChoroplethChart;
   dc.geoChoroplethChart = function(parent, opts) {
     var _chart = original.geoChoroplethChart(parent);
-    var _formatter = formatters.bigNumberFormat;
-
-    _chart.formatter = function(_) {
-      if(!arguments.length) return _formatter;
-      _formatter = _;
-      return _formatter;
-    }
 
     //Add zoom markup
     _chart.root().append("div").classed("zoomControlsContainer", true);
