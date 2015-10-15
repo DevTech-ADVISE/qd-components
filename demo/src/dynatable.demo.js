@@ -35,7 +35,8 @@ regionChart.dimension(regionDimension).group(regionGroup)
 
 dynatable = dc.dynatableComponent('#' + id)
 			  .dimension(listingDimension)
-			  .group(listingGroup);
+			  .group(listingGroup)
+			  .cellContent(function(d) {return "<span class='custom-cell-content'>" + d + "</span>";});
 dynatable.columns([{label: "Region", csvColumnName: "region_name"},
 				   {label: "Assitance Category", csvColumnName: "assistance_category_name"},
 				   {label: "Sector", csvColumnName: "dac_sector_name"},
