@@ -13,6 +13,8 @@ module.exports = function(parent, chartGroup){
   var _dataTable;
   var _settings;
   var _initialRecordSize = "Infinity";
+  var _cellWriter = defaultCellWriter;
+  var _cellContent = function(d) {return d;};
 
   /**
       #### .columns({label: String, csvColumnName: String})
@@ -36,6 +38,7 @@ module.exports = function(parent, chartGroup){
   };
 
   _chart.shortLoad = function(_) {
+    if(!arguments.length) return _initialRecordSize;
     if(_) {
       if(typeof _ === 'number') {
         _initialRecordSize = _;
@@ -44,12 +47,26 @@ module.exports = function(parent, chartGroup){
         _initialRecordSize = 10;
       }
     }
+    return _chart;
+  };
+
+  _chart.cellWriter = function(_) {
+    if(!arguments.length) return _cellWriter;
+    _cellWriter = _;
+    return _chart;
+  };
+
+  _chart.cellContent = function(_) {
+    if(!arguments.length) return _cellContent;
+    _cellContent = _;
+    return _chart;
   };
 
   _chart._doRender = function() {
     // Insert Table HTML into parent node
     if (!_dataTable){
       _chart.root().html("");
+      _chart.root().classed('dynatableComponent', true);
       var table = _chart.root().append('table');
       table.attr("class", "dc-datatable");
       //id for the table is needed to allow for mutliple dynatables on one page
@@ -78,6 +95,9 @@ module.exports = function(parent, chartGroup){
               records: _chart.dimension().top(_initialRecordSize),//.top(10),
               perPageDefault: 10,
               perPageOptions: [10, 50, 100, 200, 500]
+          },
+          writers: {
+            _cellWriter: _cellWriter
           }
       };
 
@@ -101,6 +121,29 @@ module.exports = function(parent, chartGroup){
         _dataTable.paginationPage.set(1);
         _dataTable.process();
     });
+  };
+
+  function defaultCellWriter(column, record) {
+    var html = column.attributeWriter(record),
+        td = '<td';
+
+    if (column.hidden || column.textAlign) {
+      td += ' style="';
+
+      // keep cells for hidden column headers hidden
+      if (column.hidden) {
+        td += 'display: none;';
+      }
+
+      // keep cells aligned as their column headers are aligned
+      if (column.textAlign) {
+        td += 'text-align: ' + column.textAlign + ';';
+      }
+
+      td += '"';
+    }
+
+    return td + '>' + _cellContent(html) + '</td>';
   };
 
   return _chart.anchor(parent, chartGroup);
