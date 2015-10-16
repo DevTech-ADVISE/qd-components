@@ -14,7 +14,7 @@ module.exports = function(parent, chartGroup){
   var _settings;
   var _initialRecordSize = "Infinity";
   var _cellWriter = defaultCellWriter;
-  var _cellContent = function(d) {return d;};
+  var _cellContent = function(cellValue, column, record) {return cellValue;};
 
   /**
       #### .columns({label: String, csvColumnName: String})
@@ -124,7 +124,7 @@ module.exports = function(parent, chartGroup){
   };
 
   function defaultCellWriter(column, record) {
-    var html = column.attributeWriter(record),
+    var cellValue = column.attributeWriter(record),
         td = '<td';
 
     if (column.hidden || column.textAlign) {
@@ -143,7 +143,7 @@ module.exports = function(parent, chartGroup){
       td += '"';
     }
 
-    return td + '>' + _cellContent(html) + '</td>';
+    return td + '>' + _cellContent(cellValue, column, record) + '</td>';
   };
 
   return _chart.anchor(parent, chartGroup);
