@@ -6,6 +6,25 @@ var assistanceCategoryId, assistanceCategoryDimension, assistanceCategoryGroup, 
 var regionId, regionDimension, regionGroup, regionChart;
 var listingDimension, listingGroup;
 
+window.clickCell = function(record) {
+	alert("You clicked data for the country " + record.country_name);
+};
+
+var customCellFunc = function(cellValue, column, record) {
+
+	//stringify the javascript object so it can be used in the link's onclick
+	//note that the onclick uses single quotes so that the object that is stringified can use its standard double quotes
+	var stringified = JSON.stringify(record);
+	stringified = stringified.replace("'", "\\'");
+
+	if(column.label === "Region"){
+		var html = "<a class='custom-cell-content' onclick='clickCell(" + stringified + ")'>" + cellValue + "</a>";
+		return html;
+	}
+	else
+		return "<span>" + cellValue + "</span>";
+};
+
 data = crossfilter(fixtures.loadForeignAidFixture());
 
 id = 'dynatable';
@@ -36,7 +55,7 @@ regionChart.dimension(regionDimension).group(regionGroup)
 dynatable = dc.dynatableComponent('#' + id)
 			  .dimension(listingDimension)
 			  .group(listingGroup)
-			  .cellContent(function(d) {return "<span class='custom-cell-content'>" + d + "</span>";});
+			  .cellContent(customCellFunc);
 dynatable.columns([{label: "Region", csvColumnName: "region_name"},
 				   {label: "Assitance Category", csvColumnName: "assistance_category_name"},
 				   {label: "Sector", csvColumnName: "dac_sector_name"},
