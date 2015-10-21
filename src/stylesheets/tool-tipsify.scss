@@ -9,7 +9,15 @@
     z-index:100;
     outline: none;
 
-    label {font-family: 'Abel', Helvetica, Arial, sans-serif;font-weight: 400;}
+    label {
+        font-family: 'Abel', Helvetica, Arial, sans-serif;
+        font-weight: 400;
+        //include the following styles so zurb topbar doesn't override any label styles
+        font-size: 13px;
+        line-height: 16px;
+        color: #fff;
+        display: inline;
+    }
 }
 
 .d3-tip {
