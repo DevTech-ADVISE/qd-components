@@ -47,8 +47,19 @@ var addToolTipsifyToDc = function(){
 
     var geoChoroContent = function(d) {
       var dataItem = _chart.data().filter(function(i){return i.key === d.id})[0];
-      if (dataItem === undefined) return "<label>" + d.properties.name + "</label><br/>No Data";
-      return "<label>" + _chart.label()(dataItem) + "</label><br/>" + formatter(_chart.valueAccessor()(dataItem));
+      var countryName = '';
+      if(d.properties.name) {
+        countryName = d.properties.name;
+      }
+      else if(dataItem) {
+        countryName = _chart.label()(dataItem);
+      }
+      else {
+        countryName = 'Country Not found';
+      }
+      if (dataItem === undefined) return "<label>" + countryName + "</label><br/>No Data";
+      
+      return "<label>" + countryName + "</label><br/>" + formatter(_chart.valueAccessor()(dataItem));
     }
 
     _chart.toolTipsify({content: geoChoroContent, formatter: formatter});
