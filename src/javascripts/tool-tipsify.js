@@ -55,7 +55,7 @@ var addToolTipsifyToDc = function(){
         countryName = _chart.label()(dataItem);
       }
       else {
-        countryName = 'Country Not found';
+        countryName = 'N/A';
       }
       if (dataItem === undefined) return "<label>" + countryName + "</label><br/>No Data";
       
