@@ -28,7 +28,7 @@ var sizeBoxify = function() {
   original.pieChart = dc.pieChart;
   dc.pieChart = function(parent, opts) {
     var _chart = original.pieChart(parent);
-
+    var _innerRadiusRatio = (opts && opts.innerRadiusRatio && typeof opts.innerRadiusRatio === "number") ? opts.innerRadiusRatio : 13/20;
     _chart = sizeBoxifyMixin(_chart);
 
     _chart.getDynamicRadius = function() {
@@ -39,7 +39,8 @@ var sizeBoxify = function() {
     };
 
     _chart.getInnerRadius = function() {
-      return _chart.getDynamicRadius() * (3/5);
+
+      return _chart.getDynamicRadius() * _innerRadiusRatio;
     };
 
     _chart.resize = function() {
