@@ -87,6 +87,23 @@ var quickDefaults = function() {
     return _chart;
   };
 
+  original.geoBubbleOverlayChart = dc.geoBubbleOverlayChart;
+  dc.geoBubbleOverlayChart = function(parent, opts) {
+    var _chart = original.geoBubbleOverlayChart(parent);
+
+    _chart
+      .projection(d3.geo.mercator())
+      .bubbleLabel(function(d) { return _chart.keyAccessor()(d)})
+      .renderTitle(false)
+      .radiusValueAccessor(function(d){
+        var r = Math.sqrt(d.value/1000000);
+        if (r < 0) return 0;
+        return Math.abs(r);
+      });
+
+    return _chart;
+  };
+
   return dc;
 };
 

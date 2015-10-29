@@ -56,6 +56,25 @@ var addToolTipsifyToDc = function(){
     return _chart;
   };
 
+  original.geoBubbleOverlayChart = dc.geoBubbleOverlayChart;
+  dc.geoBubbleOverlayChart = function(parent, opts) {
+    var _chart = original.geoBubbleOverlayChart(parent, opts);
+    var formatter = formatters.bigNumberFormat;
+    _chart = toolTipsifyMixin(_chart, 'circle.bubble');
+
+    if(opts && opts.formatter) {
+      formatter = opts.formatter;
+    }
+
+    var geoBubbleContent = function(d) {
+      return "<label>" + _chart.label()(d) + "</label><br/>" + formatter(d.value);
+    }
+
+    _chart.toolTipsify({content: geoBubbleContent, formatter: formatter, position: 's'});
+
+    return _chart;
+  };
+
   return dc;
 };
 

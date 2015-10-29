@@ -107,6 +107,35 @@ var sizeBoxify = function() {
     return _chart;
   };
 
+  original.geoBubbleOverlayChart = dc.geoBubbleOverlayChart;
+  dc.geoBubbleOverlayChart = function(parent, opts) {
+    var _chart = original.geoBubbleOverlayChart(parent, opts);
+    var projectionWidth = 960;
+
+    _chart = sizeBoxifyMixin(_chart);
+
+    _chart.getProjectionScale = function() {
+      return (_chart.getDynamicWidth()/projectionWidth) * 153;
+    };
+
+    _chart.getProjection = function() {
+      return d3.geo.mercator().scale(_chart.getProjectionScale()).translate([_chart.getDynamicWidth()/2, _chart.getDynamicHeight()/2]);
+    };
+
+    _chart.resize = function() {
+      _chart.width(_chart.getDynamicWidth())
+        .height(_chart.getDynamicHeight())
+        .projection(_chart.getProjection())
+        .render();
+    };
+
+    window.addEventListener('resize', _chart.resize, true);
+
+    _chart.width(_chart.getDynamicWidth()).height(_chart.getDynamicHeight())
+      .projection(_chart.getProjection());
+    return _chart;
+  };
+
   return dc;
 };
 

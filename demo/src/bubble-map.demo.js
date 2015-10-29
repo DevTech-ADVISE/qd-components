@@ -4,26 +4,26 @@ var dataFilePath = './data/bubble_map_table.csv';
 var countriesGeoJsonFilePath = './data/countries.geo.json';
 var formatters = require('qd-formatters')(d3);
 
-require('./stylesheets/size-boxify.demo.scss');
+require('./stylesheets/bubble-map.demo.scss');
 
 //add kpi chart
 var data;
+var filterBuilderId, filterBuilder;
 var assistanceCategoryId, assistanceCategoryDimension, assistanceCategoryGroup, assistanceCategoryChart;
 var regionId, regionDimension, regionGroup, regionChart;
-// var yearId, yearDimension, yearGroup, yearChart;
+var yearId, yearDimension, yearGroup, yearChart;
 var countryId, countryDimension, countryGroup, countryChart;
-var fundingId, fundingDimension, fundingGroupSum, fundingChart;
 
 d3.csv(dataFilePath, function(d) {
 
   //add more charts, and show the tool tip positions, add any more documentation
   data = crossfilter(d);
 
+  filterBuilderId = 'filter-builder';
   assistanceCategoryId = 'assistance-category-chart';
   regionId = 'region-chart';
   yearId = 'year-chart';
   countryId = 'country-chart';
-  fundingId = 'funding-chart';
 
   assistanceCategoryDimension = data.dimension(function(d) { return d.assistance_category_name; });
   assistanceCategoryGroup = assistanceCategoryDimension.group();
@@ -37,16 +37,14 @@ d3.csv(dataFilePath, function(d) {
   countryDimension = data.dimension(function(d) { return d.country_code;});
   countryGroup = countryDimension.group().reduceSum(function(d) { return d.constant_amount;});
 
-  fundingGroupSum = data.groupAll().reduceSum(function(d) { return d.constant_amount;});
-
   regionChart = dc.pieChart('#' + regionId).options({centerTitle: 'Regions'});
   regionChart.dimension(regionDimension).group(regionGroup)
     .title(function(d) {return d.region})
     .transitionDuration(0);
 
-  assistanceCategoryChart = dc.rowChart('#' + assistanceCategoryId);
+  assistanceCategoryChart = dc.pieChart('#' + assistanceCategoryId).options({centerTitle: 'Assistance Category'});
   assistanceCategoryChart.dimension(assistanceCategoryDimension).group(assistanceCategoryGroup)
-    .gap(10)
+    .title(function(d) {return d.assistance_category_name})
     .transitionDuration(0);
 
   var yearList = yearGroup.top(Infinity).map(function(d){return d.key;}).sort();
@@ -58,23 +56,27 @@ d3.csv(dataFilePath, function(d) {
     .xUnits(dc.units.ordinal)
     .transitionDuration(0);
 
-  fundingChart = dc.kpiGauge('#' + fundingId, countryDimension, fundingGroupSum, {title: "Total Funding", formatter: formatters.bigCurrencyFormat});
+  filterBuilder = dc.filterBuilder('#' + filterBuilderId);
 
+
+  //NOTE: the json will take about 500 milliseconds to load
   d3.json(countriesGeoJsonFilePath, function(geoJson) {
         var geoJsonKeyField = 'id';
         var _layerName = 'country';
 
-        countryChart = dc.geoChoroplethChart('#' + countryId, {formatter: formatters.currencyFormat})
+        countryChart = dc.geoBubbleOverlayChart('#' + countryId)// {formatter: formatters.currencyFormat})
           .dimension(countryDimension)
           .group(countryGroup)
-          .overlayGeoJson(geoJson.features, _layerName, function(d) {
+          .setGeoJson(geoJson.features, _layerName, function(d) {
             return d[geoJsonKeyField];
           });
 
+        filterBuilder.filterSources([{chart: regionChart, label: "Region"},
+                               {chart: assistanceCategoryChart, label: "Assistance Category"},
+                               {chart: countryChart, label: "Country"}]);
+
         dc.renderAll();
   });
-
-  //*********sizeboxify your charts here**************
 
 
 });
