@@ -12,7 +12,7 @@ var filterBuilderId, filterBuilder;
 var assistanceCategoryId, assistanceCategoryDimension, assistanceCategoryGroup, assistanceCategoryChart;
 var regionId, regionDimension, regionGroup, regionChart;
 var yearId, yearDimension, yearGroup, yearChart;
-var countryId, countryDimension, countryGroup, countryChart;
+// var countryId, countryDimension, countryGroup, countryChart;
 
 d3.csv(dataFilePath, function(d) {
 
@@ -70,6 +70,9 @@ d3.csv(dataFilePath, function(d) {
           .setGeoJson(geoJson.features, _layerName, function(d) {
             return d[geoJsonKeyField];
           });
+        countryChart
+          .labelLookupKey('country_name')
+          .lookupTable('country_code', ['country_name'], countryDimension.top(Infinity));
 
         filterBuilder.filterSources([{chart: regionChart, label: "Region"},
                                {chart: assistanceCategoryChart, label: "Assistance Category"},

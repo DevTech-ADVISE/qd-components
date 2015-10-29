@@ -1,20 +1,109 @@
+
+.pie-section-class {
+	width: 30%;
+	
+}
+
 .country-panel {
 	width: 100%;
-	height: 85%;
+	height: 80%;
 	position: absolute;
+	border-bottom: 1px solid #ddd;
+    overflow: hidden;
 }
 
 .pie-chart-panel {
+	@extend .pie-section-class;
 	position: absolute;
-	width: 30%;
-	height: 20%;
+	left: 25px;
+	height: 22%;
 	top: 30%;
  	min-height: 100px;
+ 	
+ 	:last-child {
+ 		margin-top: 10px;
+ 	}
+}
+
+
+//add div on top of pie charts section that will override any pointer-events that are conflicting with
+//pointer events of elements behind the pie charts
+#pie-background-clickable {
+	@extend .pie-section-class;
+	position: relative;
+	height: 100%;
+	pointer-events: none; 
 }
 
 .year-panel {
 	width: 100%;
-	height: 25%;
+	height: 20%;
 	position: absolute;
 	bottom: 0px;
+}
+
+.dc-chart circle.bubble {
+    fill: #336799;
+}
+
+.dc-chart g {
+    circle.bubble:hover {
+        fill-opacity: 1;
+        stroke: #C2113A;
+        stroke-width: 1;
+    }
+
+    text.chart-label {
+        font-size:12px;
+        fill:#222;
+
+        &.chart-label-center {text-anchor:middle;text-align:center;}
+    }
+
+    &.selected {
+        text {
+            fill: #fff;
+            stroke: #fff;
+        }
+        circle {
+            fill-opacity: 1;
+            stroke: #C2113A;
+            stroke-width: 1;
+        }
+    }
+    &.deselected {
+        circle {
+            fill-opacity: 0.2;
+        }
+        text {
+            display: block;
+            opacity: 0.1;
+        }
+    }
+    &.node text {
+        fill: #002A6C;
+        pointer-events: none;
+    }
+    &.node:hover {text-color: #C2113A;}
+
+    &.row {
+        text {fill: black;}
+        rect:hover {
+            fill-opacity: 1.0;
+            fill: #3182bd;
+        }
+    }
+}
+
+.dc-chart .country path {
+    stroke-width: 1;
+    stroke: #fff;
+
+    &:hover {
+        fill: #ccc;
+        cursor: auto;
+    }
+}
+g.country path {
+  cursor: pointer;    
 }

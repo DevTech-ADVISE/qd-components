@@ -67,10 +67,13 @@ var addToolTipsifyToDc = function(){
     }
 
     var geoBubbleContent = function(d) {
-      return "<label>" + _chart.label()(d) + "</label><br/>" + formatter(d.value);
+      var label = (_chart.lookupTable && _chart.lookupTable !== {}) 
+        ? _chart.lookupTable()[d.key][_chart.labelLookupKey()] 
+        : _chart.label()(d);
+      return "<label>" + label + "</label><br/>" + formatter(d.value);
     }
 
-    _chart.toolTipsify({content: geoBubbleContent, formatter: formatter, position: 's'});
+    _chart.toolTipsify({content: geoBubbleContent, formatter: formatter, position: 's', offset: [10, 0]});
 
     return _chart;
   };
