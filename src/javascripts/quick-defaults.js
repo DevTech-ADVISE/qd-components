@@ -90,7 +90,7 @@ var quickDefaults = function() {
   original.geoBubbleOverlayChart = dc.geoBubbleOverlayChart;
   dc.geoBubbleOverlayChart = function(parent, opts) {
     var _chart = original.geoBubbleOverlayChart(parent);
-    var _lookupTable = {}, _labelLookupKey = 'id';
+    var _lookupTable = {}, _labelLookupKey = 'id', _radiusValueModifier = 1/10000000;
 
     _chart.lookupTable = function(keyColumn, valueColumns, data) {
       if(!arguments.length) return _lookupTable;
@@ -111,13 +111,20 @@ var quickDefaults = function() {
       if(!arguments.length) return _labelLookupKey;
       _labelLookupKey = _;
       return _chart;
-    }
+    };
+
+    _chart.radiusValueModifier = function(_) {
+      if(!arguments.length) return _radiusValueModifier;
+      _radiusValueModifier = _;
+      return _chart;
+    };
+
     _chart
       .projection(d3.geo.mercator())
       .bubbleLabel(function(d) { return _chart.keyAccessor()(d)})
       .renderTitle(false)
       .radiusValueAccessor(function(d){
-        var r = Math.sqrt(d.value/10000000);
+        var r = Math.sqrt(d.value/_radiusValueModifier);
         if (r < 0) return 0;
         return Math.abs(r);
       });
