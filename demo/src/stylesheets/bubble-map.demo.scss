@@ -4,6 +4,25 @@
 	
 }
 
+#total-funding-chart.kpi-component-container {
+	background: transparent;
+    height: 120px;
+    width: 15%;
+    float: left;
+
+    .kpi-gauge {
+    	display: none;
+    }
+
+    .kpi-number {
+    	color: black;
+    }
+
+    h3 {
+		color: black !important;
+	}
+}
+
 .country-panel {
 	width: 100%;
 	height: 80%;

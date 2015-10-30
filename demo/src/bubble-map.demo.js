@@ -9,10 +9,11 @@ require('./stylesheets/bubble-map.demo.scss');
 //add kpi chart
 var data;
 var filterBuilderId, filterBuilder;
+var totalFundingId, totalFundingSum, totalFundingChart;
 var assistanceCategoryId, assistanceCategoryDimension, assistanceCategoryGroup, assistanceCategoryChart;
 var regionId, regionDimension, regionGroup, regionChart;
 var yearId, yearDimension, yearGroup, yearChart;
-// var countryId, countryDimension, countryGroup, countryChart;
+var countryId, countryDimension, countryGroup, countryChart;
 
 d3.csv(dataFilePath, function(d) {
 
@@ -20,10 +21,13 @@ d3.csv(dataFilePath, function(d) {
   data = crossfilter(d);
 
   filterBuilderId = 'filter-builder';
+  totalFundingId = 'total-funding-chart';
   assistanceCategoryId = 'assistance-category-chart';
   regionId = 'region-chart';
   yearId = 'year-chart';
   countryId = 'country-chart';
+
+  totalFundingSum = data.groupAll().reduceSum(function(d) { return d.constant_amount;});
 
   assistanceCategoryDimension = data.dimension(function(d) { return d.assistance_category_name; });
   assistanceCategoryGroup = assistanceCategoryDimension.group();
@@ -36,6 +40,8 @@ d3.csv(dataFilePath, function(d) {
 
   countryDimension = data.dimension(function(d) { return d.country_code;});
   countryGroup = countryDimension.group().reduceSum(function(d) { return d.constant_amount;});
+
+  totalFundingChart = dc.kpiGauge('#' + totalFundingId, countryDimension, totalFundingSum, {title: "Total Obligations", formatter: formatters.bigCurrencyFormat});
 
   regionChart = dc.pieChart('#' + regionId).options({centerTitle: 'Regions'});
   regionChart.dimension(regionDimension).group(regionGroup)

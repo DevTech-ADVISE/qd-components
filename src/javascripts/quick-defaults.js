@@ -90,7 +90,7 @@ var quickDefaults = function() {
   original.geoBubbleOverlayChart = dc.geoBubbleOverlayChart;
   dc.geoBubbleOverlayChart = function(parent, opts) {
     var _chart = original.geoBubbleOverlayChart(parent);
-    var _lookupTable = {}, _labelLookupKey = 'id', _radiusValueModifier = 1/10000000;
+    var _lookupTable = {}, _labelLookupKey = 'id', _radiusValueModifier = 10000000;
 
     _chart.lookupTable = function(keyColumn, valueColumns, data) {
       if(!arguments.length) return _lookupTable;
