@@ -83,6 +83,13 @@ var filterBuilder = dc.filterBuilder('#filter-builder-id')
                   {chart: bazChart, label: "Baz"}]);
 ```
 
+## dc.pieChart(parent, options) 
+
+QdComponents adds a few feature to the standard dc PieChart.
+
+### .centerTitle(String)
+Add a title to the center of the pie chart. 
+
 ## dc.dynatableComponent(parent)
 
 DynatableComponent turns a simple table into a dimensional table that responds to your DC charts. This means any time your DC charts get filtered, the data in the Dynatable also gets filtered. 
@@ -166,25 +173,9 @@ var audioDash = dc.audioDash('#audio-dash-id')
 
 ```
 
-## dc.sizeBoxify(chart)
+## [dcChart].sizeBoxify(sizeBoxifyConfig)
 
-Provides easy addition of dynamic resize capability to any DC chart component instance.
-
-```
-// Example Usage
-
-var dc = require('qd-components');
-
-var myFooChart;
-
-// Minimal setup example. Will resize myFooChart based on dimensions of myFooChart.parent()
-dc.sizeBoxify(myFooChart);
-
-// Custom example
-dc.sizeBoxify(myFooChart, function(){
-	// custom resize code here
-});
-```
+QdComponents will sizeboxify all charts by default, no need to call sizeBoxify on your charts. As of now there are no custom options for sizeBoxifyConfig. 
 
 ## [dcChart].toolTipsify(toolTipConfig)
 Makes it easy to add high quality tooltips to any of your DC charts. 
