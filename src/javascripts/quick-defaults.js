@@ -18,10 +18,10 @@ var quickDefaults = function() {
   original.pieChart = dc.pieChart;
   dc.pieChart = function(parent, opts) {
     var _chart = original.pieChart(parent);
-    var _options = {};
-    _chart.options = function(_) {
-      if(!arguments.length) return _options;
-      _options = _;
+    var _centerTitle = '';
+    _chart.centerTitle = function(_) {
+      if(!arguments.length) return _centerTitle;
+      _centerTitle = _;
       return _chart;
     };
 
@@ -30,12 +30,12 @@ var quickDefaults = function() {
         opts.renderletFunc();
       }
 
-      if(_options && _options.centerTitle) {
+      if(_centerTitle !== '') {
         var labelRoot = d3.select(parent + ' svg g');
         if(labelRoot.select('text.center-label').empty()) {
           labelRoot.append('svg:text')
             .attr('class', 'center-label')
-            .text(_options.centerTitle);
+            .text(_centerTitle);
         }
       }
     };
