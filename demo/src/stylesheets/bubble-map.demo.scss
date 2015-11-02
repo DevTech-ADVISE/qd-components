@@ -4,6 +4,25 @@
 	
 }
 
+#player-controls {
+	position: absolute;
+    font-size: 30px;
+    right: 50px;
+    top: 50px;
+    z-index: 98;
+    text-align: center;
+    color: #336799;
+
+    .active {color: #666;}
+    i {
+        cursor:pointer;
+        margin-right: 8px;
+        padding: 4px 3px;
+
+        &:hover {color: #C2113A;}
+    }
+}
+
 #total-funding-chart.kpi-component-container {
 	background: transparent;
     height: 120px;

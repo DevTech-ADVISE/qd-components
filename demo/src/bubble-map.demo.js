@@ -12,8 +12,11 @@ var filterBuilderId, filterBuilder;
 var totalFundingId, totalFundingSum, totalFundingChart;
 var assistanceCategoryId, assistanceCategoryDimension, assistanceCategoryGroup, assistanceCategoryChart;
 var regionId, regionDimension, regionGroup, regionChart;
-var yearId, yearDimension, yearGroup, yearChart;
+var yearId, yearDimension, yearGroup, yearChart, yearList;
 var countryId, countryDimension, countryGroup, countryChart;
+
+//year player 
+var yearPlayerState;
 
 d3.csv(dataFilePath, function(d) {
 
@@ -53,7 +56,7 @@ d3.csv(dataFilePath, function(d) {
     .title(function(d) {return d.assistance_category_name})
     .transitionDuration(0);
 
-  var yearList = yearGroup.top(Infinity).map(function(d){return d.key;}).sort();
+  yearList = yearGroup.top(Infinity).map(function(d){return d.key;}).sort();
   yearChart = dc.barChart('#' + yearId)
     .dimension(yearDimension).group(yearGroup)
     .gap(10)
@@ -84,8 +87,75 @@ d3.csv(dataFilePath, function(d) {
                                {chart: assistanceCategoryChart, label: "Assistance Category"},
                                {chart: countryChart, label: "Country"}]);
 
+
+        var intervalTime = 850;
+        // if(navigator.appVersion.indexOf("MSIE 10.")!=-1) intervalTime = 1250;
+        // if(navigator.appVersion.indexOf("MSIE 9.")!=-1) intervalTime = 1500;
+        // if(mobilecheck == true) intervalTime = 2000;
+
+        window.setInterval(function() {if(yearPlayerState==='playing') advanceYearSelection();}, intervalTime);
+
+
         dc.renderAll();
   });
 
 
 });
+
+
+advanceYearSelection = function() {
+        var currentYearPosition = yearList.indexOf(yearChart.filters()[0]);
+        var nextYearPosition;
+        if (currentYearPosition >= yearList.length-1){
+          nextYearPosition = 0;
+        }else{
+          nextYearPosition = currentYearPosition + 1
+        }
+        var nextYear = yearList[nextYearPosition];
+        dc.events.trigger(function(){
+          yearChart.filterAll();
+          yearChart.filter(nextYear);
+          yearChart.redrawGroup();
+        });
+    }
+
+previousYearSelection = function() {
+    var currentYearPosition = yearList.indexOf(yearChart.filters()[0]);
+    var nextYearPosition;
+    if (currentYearPosition <= 0){
+      nextYearPosition = yearList.length-1;
+    } else{
+      nextYearPosition = currentYearPosition - 1
+    }
+    var nextYear = yearList[nextYearPosition];
+    dc.events.trigger(function(){
+      yearChart.filterAll();
+      yearChart.filter(nextYear);
+      yearChart.redrawGroup();
+    });
+}
+
+pauseYearPlayer = function() {
+    yearPlayerState = 'paused';
+    d3.select('#player-controls .pause').classed('active', true);
+    d3.select('#player-controls .play').classed('active', false);
+
+}
+playYearPlayer = function() {
+    yearPlayerState = 'playing';
+    d3.select('#player-controls .pause').classed('active', false);
+    d3.select('#player-controls .play').classed('active', true);
+}
+
+yearPlayerState = 'paused'; // one of: ['paused', 'playing']
+
+var resizeTimer;
+d3.select(window).on('resize', function() {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(resize, 166);
+});
+d3.select('#player-controls .pause').on('click', pauseYearPlayer);
+d3.select('#player-controls .play').on('click', playYearPlayer);
+d3.select('#player-controls .next').on('click', advanceYearSelection);
+d3.select('#player-controls .prev').on('click', previousYearSelection);
+
