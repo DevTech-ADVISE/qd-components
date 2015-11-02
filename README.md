@@ -85,23 +85,44 @@ var filterBuilder = dc.filterBuilder('#filter-builder-id')
 
 ## dc.pieChart(parent, options) 
 Pie chart component now has custom options passed to it. 
+
 | Param           | Type   | Description                                               |
 |-----------------|--------|-----------------------------------------------------------|
 | options         | object | Takes an object that looks like {innerRadiusRatio: number}. The innerRadiusRatio is the size of the inner radius compared to what the outer radius will be. The outer radius is always going to be 100% of the parent container. |
 
 ### .centerTitle(title)
 Add a title to the center of the pie chart. 
+
 | Param           | Type   | Description                                               |
 |-----------------|--------|-----------------------------------------------------------|
 | title           | string | A label that will be placed in the center of the pie chart|
 
+```
+//Example Usage
+var dc = require('qd-components');
+...
+var worldRegions = dc.pieChart('#' + parentId, {innerRadiusRatio: 3/5})
+	.dimension(regionDimension)
+	.group(regionGroup)
+	.title(function(d){return d.region;})
+	.centerTitle('Regions');
+```
+
 ## dc.kpiGauge(parent, dimension, group, options)
 KpiGauge is a combination chart. It uses the DC number display in conjunction with our custom DC bar gauge. 
+
 | Param           | Type      | Description                                               |
 |-----------------|-----------|-----------------------------------------------------------|
 | dimension       | object    | Use any dummy dimension for this parameter. All that matters is the data from the dimension object as there is no dimensional data to be displayed, only measure.|
 | group           | object    | The group object will be used for the value displayed in the number display, and for the total capacity value of the bar gauge. |
 | options         | object    | {title: "Display Title", formatter: d3.format(",")} The title text will be displayed under the number display. The formatter will be used to format the number display value. Recommended to import the qd-formatters library for this |
+
+```
+//Example Usage
+var dc = require('qd-components');
+...
+var countryFundingKpi = dc.kpiGauge('#' + parentId, countryDimension, totalFundingSumGroup, {title: "Total Funding", formatter: formatters.bigCurrencyFormat});
+```
 
 ## dc.geoBubbleOverlayChart(parent, options)
 QdComponents adds some default styles to DC's geoBubbleOverlayChart, and also a way to add label lookup data for custom tooltip labels.
@@ -109,6 +130,7 @@ QdComponents adds some default styles to DC's geoBubbleOverlayChart, and also a 
 ## .lookupTable(dataKey, dataValueKeys, data)
 Create a lookup table that the chart can use to grab data values based on a data key. This is useful for creating custom tooltips that use the lookup table to create custom labels based on lookup id's. 
 Set the labelLookupKey when using the lookupTable function.
+
 | Param           | Type             | Description                                               |
 |-----------------|------------------|-----------------------------------------------------------|
 | dataKey         | string           | This data key will be used to create keys in the lookup table based on the value found in the chart data for this key.      |
@@ -117,9 +139,23 @@ Set the labelLookupKey when using the lookupTable function.
 
 ### .labelLookupKey(columnName)
 Set the labelLookupKey when using the lookupTable function
+
 | Param           | Type   | Description                                               |
 |-----------------|--------|-----------------------------------------------------------|
 | columnName      | string | A label that will be placed in the center of the pie chart|
+
+```
+//Example Usage
+var dc = require('qd-components');
+...
+var countryChart = dc.geoBubbleOverlayChart('#' + parentId)
+	.dimension(countryDimension)
+	.group(countryGroup)
+	.setGeoJson(geoJson, layerName, dataAccessorFunc);
+countryChart.lookupTable(keyColumn, dataValueKeys, countryDimension.top(Infinity))
+	.labelLookupKey(labelKeyColumn);
+
+```
 
 ## dc.dynatableComponent(parent)
 
