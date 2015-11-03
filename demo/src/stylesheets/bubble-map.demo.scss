@@ -4,7 +4,7 @@
 	
 }
 
-#player-controls {
+#year-player-control{
 	position: absolute;
     font-size: 30px;
     right: 50px;
@@ -21,6 +21,10 @@
 
         &:hover {color: #C2113A;}
     }
+}
+
+.axis-label {
+    font-size: .625em;
 }
 
 #total-funding-chart.kpi-component-container {
@@ -42,7 +46,8 @@
 	}
 }
 
-.country-panel {
+#country-panel {
+    z-index: -1;
 	width: 100%;
 	height: 80%;
 	position: absolute;

@@ -71,6 +71,7 @@ var sizeBoxify = function() {
         .height(_chart.getDynamicHeight())
         .rescale();
       _chart.render();
+      _chart.redraw(); //must also redraw so filters are preserved
     };
 
     window.addEventListener('resize', _chart.resize, true);

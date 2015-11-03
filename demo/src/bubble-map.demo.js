@@ -12,7 +12,7 @@ var filterBuilderId, filterBuilder;
 var totalFundingId, totalFundingSum, totalFundingChart;
 var assistanceCategoryId, assistanceCategoryDimension, assistanceCategoryGroup, assistanceCategoryChart;
 var regionId, regionDimension, regionGroup, regionChart;
-var yearId, yearDimension, yearGroup, yearChart, yearList;
+// var yearId, yearDimension, yearGroup, yearChart, yearList;
 var countryId, countryDimension, countryGroup, countryChart;
 
 //year player 
@@ -27,6 +27,7 @@ d3.csv(dataFilePath, function(d) {
   totalFundingId = 'total-funding-chart';
   assistanceCategoryId = 'assistance-category-chart';
   regionId = 'region-chart';
+  yearPlayerId = 'year-player-control';
   yearId = 'year-chart';
   countryId = 'country-chart';
 
@@ -38,7 +39,7 @@ d3.csv(dataFilePath, function(d) {
   regionDimension = data.dimension(function(d) { return d.region_name; });
   regionGroup = regionDimension.group();
 
-  yearDimension = data.dimension(function(d) { return d.fiscal_year; });
+  yearDimension = data.dimension(function(d) { return Number(d.fiscal_year); });
   yearGroup = yearDimension.group().reduceSum(function(d) { return d.constant_amount;});
 
   countryDimension = data.dimension(function(d) { return d.country_code;});
@@ -56,14 +57,7 @@ d3.csv(dataFilePath, function(d) {
     .title(function(d) {return d.assistance_category_name})
     .transitionDuration(0);
 
-  yearList = yearGroup.top(Infinity).map(function(d){return d.key;}).sort();
-  yearChart = dc.barChart('#' + yearId)
-    .dimension(yearDimension).group(yearGroup)
-    .gap(10)
-    .elasticY(true)
-    .x(d3.scale.ordinal().domain(yearList))
-    .xUnits(dc.units.ordinal)
-    .transitionDuration(0);
+  yearChart = dc.timelineComponent('#' + yearPlayerId, '#' + yearId, yearDimension, yearGroup, 'Fiscal Year', 'Constant Dollars'); 
 
   filterBuilder = dc.filterBuilder('#' + filterBuilderId);
 
@@ -86,76 +80,13 @@ d3.csv(dataFilePath, function(d) {
         filterBuilder.filterSources([{chart: regionChart, label: "Region"},
                                {chart: assistanceCategoryChart, label: "Assistance Category"},
                                {chart: countryChart, label: "Country"}]);
-
-
-        var intervalTime = 850;
-        // if(navigator.appVersion.indexOf("MSIE 10.")!=-1) intervalTime = 1250;
-        // if(navigator.appVersion.indexOf("MSIE 9.")!=-1) intervalTime = 1500;
-        // if(mobilecheck == true) intervalTime = 2000;
-
-        window.setInterval(function() {if(yearPlayerState==='playing') advanceYearSelection();}, intervalTime);
-
-
+        
         dc.renderAll();
+
+        yearChart.timeline.redraw();
   });
 
 
 });
 
-
-advanceYearSelection = function() {
-        var currentYearPosition = yearList.indexOf(yearChart.filters()[0]);
-        var nextYearPosition;
-        if (currentYearPosition >= yearList.length-1){
-          nextYearPosition = 0;
-        }else{
-          nextYearPosition = currentYearPosition + 1
-        }
-        var nextYear = yearList[nextYearPosition];
-        dc.events.trigger(function(){
-          yearChart.filterAll();
-          yearChart.filter(nextYear);
-          yearChart.redrawGroup();
-        });
-    }
-
-previousYearSelection = function() {
-    var currentYearPosition = yearList.indexOf(yearChart.filters()[0]);
-    var nextYearPosition;
-    if (currentYearPosition <= 0){
-      nextYearPosition = yearList.length-1;
-    } else{
-      nextYearPosition = currentYearPosition - 1
-    }
-    var nextYear = yearList[nextYearPosition];
-    dc.events.trigger(function(){
-      yearChart.filterAll();
-      yearChart.filter(nextYear);
-      yearChart.redrawGroup();
-    });
-}
-
-pauseYearPlayer = function() {
-    yearPlayerState = 'paused';
-    d3.select('#player-controls .pause').classed('active', true);
-    d3.select('#player-controls .play').classed('active', false);
-
-}
-playYearPlayer = function() {
-    yearPlayerState = 'playing';
-    d3.select('#player-controls .pause').classed('active', false);
-    d3.select('#player-controls .play').classed('active', true);
-}
-
-yearPlayerState = 'paused'; // one of: ['paused', 'playing']
-
-var resizeTimer;
-d3.select(window).on('resize', function() {
-    clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(resize, 166);
-});
-d3.select('#player-controls .pause').on('click', pauseYearPlayer);
-d3.select('#player-controls .play').on('click', playYearPlayer);
-d3.select('#player-controls .next').on('click', advanceYearSelection);
-d3.select('#player-controls .prev').on('click', previousYearSelection);
 

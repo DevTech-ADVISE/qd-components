@@ -6,6 +6,57 @@ var quickDefaults = function() {
   
   var original = {};
 
+  original.barChart = dc.barChart;
+  dc.barChart = function(parent, opts) {
+    var _chart = original.barChart(parent);
+    var _xLabel = '', _yLabel = '';
+
+    _chart.xLabel = function(_) {
+      if(!arguments.length) return _xLabel;
+      _xLabel = _;
+      return _chart;
+    };
+
+    _chart.yLabel = function(_) {
+      if(!arguments.length) return _yLabel;
+      _yLabel = _;
+      return _chart;
+    };
+
+    function addLabelAxisX(displayText) {
+      _chart.svg()
+        .append("text")
+        .attr("class", "axis-label x-axis-label")
+        .attr("text-anchor", "middle")
+        .attr("x", _chart.width() / 2)
+        .attr("y", _chart.height())
+        .text(displayText);
+    }
+
+    function addLabelAxisY(displayText) {
+      _chart.svg()
+        .append("text")
+        .attr("class", "axis-label y-axis-label")
+        .attr("text-anchor", "end")
+        .attr("transform", "rotate(-90)")
+        .attr("y", 2)
+        .attr("x",-4)
+        .attr("dy", ".625em")
+        .text(displayText);
+    }
+
+    _chart.on('postRender', function() {
+      if(_xLabel !== '') {
+        addLabelAxisX(_xLabel);
+      }
+      if(_yLabel !== '') {
+        addLabelAxisY(_yLabel);
+      }
+    });
+
+    return _chart;
+  };
+
   original.rowChart = dc.rowChart;
   dc.rowChart = function(parent, opts) {
     var _chart = original.rowChart(parent);
