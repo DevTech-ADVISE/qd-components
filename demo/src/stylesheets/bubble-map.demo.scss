@@ -1,3 +1,22 @@
+.font-Abel {
+    font-family: 'Abel', Helvetica, Arial, sans-serif;
+    font-weight: 400;
+}
+
+.pie-chart-panel {
+    pointer-events:none;
+
+    .dc-legend-item,
+    .dc-chart .pie-slice {
+        pointer-events:auto;
+    }
+}
+.filter-builder {
+    h2 {margin-left: 5px;}
+    li.add-filter i.fa-plus {left: 4px;}
+}
+
+
 
 .pie-section-class {
 	width: 30%;
@@ -7,8 +26,8 @@
 #year-player-control{
 	position: absolute;
     font-size: 30px;
-    right: 5%;
-    top: 15%;
+    right: 20px;
+    top: 98px;
     z-index: 98;
     text-align: center;
     color: #336799;
@@ -24,11 +43,12 @@
 }
 
 #year-display {
-    font-size: 50px;
+    @extend .font-Abel;
+    font-size: 54px;
     float: right;
-    right: 5%;
+    right: 20px;
     position: absolute;
-    top: 5%;
+    top: 43px;
 }
 
 .axis-label {
@@ -37,20 +57,28 @@
 
 #total-funding-chart.kpi-component-container {
 	background: transparent;
-    height: 120px;
     width: 15%;
     float: left;
+    margin-top: 10px;
 
     .kpi-gauge {
     	display: none;
     }
 
     .kpi-number {
-    	color: black;
+        color: black;
+        font-size: 54px;
+        top: 0;
+        height: 62px;
     }
 
     h3 {
-		color: black !important;
+        @extend .font-Abel;
+        font-size: 19px;
+        color: black !important;
+        margin-top: 0;
+        text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
+        text-transform: none;
 	}
 }
 
@@ -85,12 +113,12 @@
 	height: 100%;
 	pointer-events: none; 
 }
-
 .year-panel {
-	width: 100%;
-	height: 20%;
-	position: absolute;
-	bottom: 0px;
+    width: 98%;
+    height: 19%;
+    position: absolute;
+    bottom: 0px;
+    left: 1%;
 }
 
 .dc-chart circle.bubble {
