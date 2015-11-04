@@ -3,11 +3,13 @@ var sizeBoxify = require('./size-boxify.js');
 var dc = sizeBoxify(dcOrig);
 var formatters = require('qd-formatters')(d3);
 
-var timelineComponent = function(playerControlId, timelineId, yearDisplayId, dimension, group, xLabel, yLabel, options) {
+var timelineComponent = function(playerParentId, timelineId, dimension, group, xLabel, yLabel, options) {
 	var _chart = {playerControl: {}, timeline: {}, yearDisplay: {}};
+  var playerControlClass = 'player-control', selectionDisplayClass = 'selection-display';
   var _domainListFunc = function(g) {
    return g.top(Infinity).map(function(d){return d.key;}).sort();};
   var _domainList = _domainListFunc(group);
+  var _initialFilterValue = (options && options.initialFilterValue) ? options.initialFilterValue : _domainList[_domainList.length-2];
   var _yearPlayerState;
   var _tickMarks_xFunc = function(domainList) { 
     var width = window.outerWidth;
@@ -97,10 +99,33 @@ var timelineComponent = function(playerControlId, timelineId, yearDisplayId, dim
   _chart.timeline.margins().left = 50;
   _chart.timeline.xAxis().tickValues(_tickMarks_xFunc()).tickFormat(_tickFormat_xFunc);
   _chart.timeline.yAxis().tickValues(_tickMarks_yFunc()).tickFormat(_tickFormat_yFunc);
-  _chart.timeline.filter(_domainList[_domainList.length-2]);
+  _chart.timeline.filter(_initialFilterValue);
 
-  //***********Player Control section************
-  _chart.playerControl = d3.select(playerControlId);
+
+  //********Selection display *************
+  d3.select(playerParentId).append('select').classed(selectionDisplayClass, true);
+  var timelineSelect = d3.select(playerParentId + ' .' + selectionDisplayClass);
+  _domainList.forEach(function(d) {
+    var option = timelineSelect.append('option');
+    option.attr('value', d).text(d);
+    if(d == _initialFilterValue)
+      option.attr('selected', true);
+  });
+  timelineSelect.on('change', function() {
+    var selectedValue = this.value;
+    dc.events.trigger(function() {
+      _chart.timeline.filterAll();
+      _chart.timeline.filter(selectedValue);
+      _chart.timeline.redrawGroup();
+    })
+  });
+  _chart.timeline.renderlet(function() {
+    timelineSelect[0][0].value = _chart.timeline.filters()[0];
+  });
+
+  //***********Player Control ************
+  d3.select(playerParentId).append('div').classed(playerControlClass, true);
+  _chart.playerControl = d3.select(playerParentId + ' .' + playerControlClass);
   _chart.playerControl.attr('aria-hidden', true);
   _chart.playerControl.append('h2').classed('hide-visually', true).text('Timeline Controls');
   _chart.playerControl.append('i').classed('fa fa-step-backward prev', true);
@@ -142,14 +167,14 @@ var timelineComponent = function(playerControlId, timelineId, yearDisplayId, dim
 
   var pauseYearPlayer = function() {
       _yearPlayerState = 'paused';
-      d3.select(playerControlId + ' .pause').classed('active', true);
-      d3.select(playerControlId + ' .play').classed('active', false);
+      d3.select(playerParentId + ' .' + playerControlClass + ' .pause').classed('active', true);
+      d3.select(playerParentId + ' .' + playerControlClass + ' .play').classed('active', false);
 
   }
   var playYearPlayer = function() {
       _yearPlayerState = 'playing';
-      d3.select(playerControlId + ' .pause').classed('active', false);
-      d3.select(playerControlId + ' .play').classed('active', true);
+      d3.select(playerParentId + ' .' + playerControlClass + ' .pause').classed('active', false);
+      d3.select(playerParentId + ' .' + playerControlClass + ' .play').classed('active', true);
   }
 
   _yearPlayerState = 'paused'; // one of: ['paused', 'playing']
@@ -168,10 +193,10 @@ var timelineComponent = function(playerControlId, timelineId, yearDisplayId, dim
       clearTimeout(resizeTimer);
       resizeTimer = setTimeout(resize, 166);
   });
-  d3.select(playerControlId + ' .pause').on('click', pauseYearPlayer);
-  d3.select(playerControlId + ' .play').on('click', playYearPlayer);
-  d3.select(playerControlId + ' .next').on('click', advanceYearSelection);
-  d3.select(playerControlId + ' .prev').on('click', previousYearSelection);
+  d3.select(playerParentId + ' .' + playerControlClass + ' .pause').on('click', pauseYearPlayer);
+  d3.select(playerParentId + ' .' + playerControlClass + ' .play').on('click', playYearPlayer);
+  d3.select(playerParentId + ' .' + playerControlClass + ' .next').on('click', advanceYearSelection);
+  d3.select(playerParentId + ' .' + playerControlClass + ' .prev').on('click', previousYearSelection);
 
   var intervalTime = 850;
   // if(navigator.appVersion.indexOf("MSIE 10.")!=-1) intervalTime = 1250;
@@ -179,14 +204,6 @@ var timelineComponent = function(playerControlId, timelineId, yearDisplayId, dim
   // if(mobilecheck == true) intervalTime = 2000;
 
   window.setInterval(function() {if(_yearPlayerState==='playing') advanceYearSelection();}, intervalTime);
-
-  //********Year number display *************
-  _chart.yearDisplay = dc.numberDisplay(yearDisplayId)
-    .formatNumber(d3.format('d'))
-   .transitionDuration(0)
-   .valueAccessor(function(d){return _chart.timeline.filters()[0];})
-   .group(group);
-
 
   return _chart;
 };

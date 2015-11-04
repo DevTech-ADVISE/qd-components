@@ -40,7 +40,6 @@
 
         &:hover {color: #C2113A;}
     }
-}
 
 #year-display {
     @extend .font-Abel;
@@ -49,7 +48,19 @@
     right: 20px;
     position: absolute;
     top: 43px;
+
+    .selection-display {
+        width: 130px;
+        height: 60px;
+        font-size: 50px;
+        color: black;
+        background: transparent;
+        -webkit-appearance: none;
+        border: 0px;
+    }
 }
+
+
 
 .axis-label {
     font-size: .625em;

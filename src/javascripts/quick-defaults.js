@@ -141,7 +141,7 @@ var quickDefaults = function() {
   original.geoBubbleOverlayChart = dc.geoBubbleOverlayChart;
   dc.geoBubbleOverlayChart = function(parent, opts) {
     var _chart = original.geoBubbleOverlayChart(parent);
-    var _lookupTable = {}, _labelLookupKey = 'id', _radiusValueModifier = 10000000;
+    var _lookupTable = {}, _labelLookupKey = 'id', _radiusValueModifier = 1;
 
     _chart.lookupTable = function(keyColumn, valueColumns, data) {
       if(!arguments.length) return _lookupTable;
@@ -175,7 +175,7 @@ var quickDefaults = function() {
       .bubbleLabel(function(d) { return _chart.keyAccessor()(d)})
       .renderTitle(false)
       .radiusValueAccessor(function(d){
-        var r = Math.sqrt(d.value/_radiusValueModifier);
+        var r = Math.sqrt(d.value/_radiusValueModifier); //separate radius values more with sqrt curve
         if (r < 0) return 0;
         return Math.abs(r);
       });
