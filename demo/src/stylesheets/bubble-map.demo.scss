@@ -21,15 +21,19 @@
 
         &:hover {color: #C2113A;}
     }
+
+    .selection-display {
+        width: 130px;
+        height: 60px;
+        font-size: 50px;
+        color: black;
+        background: transparent;
+        -webkit-appearance: none;
+        border: 0px;
+    }
 }
 
-#year-display {
-    font-size: 50px;
-    float: right;
-    right: 5%;
-    position: absolute;
-    top: 5%;
-}
+
 
 .axis-label {
     font-size: .625em;
