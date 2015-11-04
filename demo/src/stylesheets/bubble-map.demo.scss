@@ -18,12 +18,9 @@
 
 
 
-.pie-section-class {
-	width: 30%;
-	
-}
+.pie-section-class {width: 30%;}
 
-#year-player-control{
+#year-player-control {
 	position: absolute;
     font-size: 30px;
     right: 20px;
@@ -40,7 +37,7 @@
 
         &:hover {color: #C2113A;}
     }
-
+}
 #year-display {
     @extend .font-Abel;
     font-size: 54px;
