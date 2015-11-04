@@ -71,6 +71,7 @@ d3.csv(dataFilePath, function(d) {
         countryChart = dc.geoBubbleOverlayChart('#' + countryId)// {formatter: formatters.currencyFormat})
           .dimension(countryDimension)
           .group(countryGroup)
+          .radiusValueModifier(1000000)
           .setGeoJson(geoJson.features, _layerName, function(d) {
             return d[geoJsonKeyField];
           });
