@@ -28,7 +28,8 @@ d3.csv(dataFilePath, function(d) {
   assistanceCategoryId = 'assistance-category-chart';
   regionId = 'region-chart';
   yearPlayerId = 'year-player-control';
-  yearId = 'year-chart';
+  timelineId = 'year-chart';
+  yearDisplayId = 'year-display';
   countryId = 'country-chart';
 
   totalFundingSum = data.groupAll().reduceSum(function(d) { return d.constant_amount;});
@@ -57,7 +58,7 @@ d3.csv(dataFilePath, function(d) {
     .title(function(d) {return d.assistance_category_name})
     .transitionDuration(0);
 
-  yearChart = dc.timelineComponent('#' + yearPlayerId, '#' + yearId, yearDimension, yearGroup, 'Fiscal Year', 'Constant Dollars'); 
+  yearChart = dc.timelineComponent('#' + yearPlayerId, '#' + timelineId, '#' + yearDisplayId, yearDimension, yearGroup, 'Fiscal Year', 'Constant Dollars'); 
 
   filterBuilder = dc.filterBuilder('#' + filterBuilderId);
 
