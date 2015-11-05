@@ -87,7 +87,7 @@ var quickDefaults = function() {
           if(!Array.isArray(_options.centerTitle)) {
             labelRoot.append('svg:text')
               .attr('class', 'center-label')
-              .text(text);
+              .text(_options.centerTitle);
           }
           else {
             _options.centerTitle.forEach(function(text, index) {

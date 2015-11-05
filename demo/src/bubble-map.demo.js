@@ -13,7 +13,7 @@ var totalFundingId, totalFundingSum, totalFundingChart;
 var assistanceCategoryId, assistanceCategoryDimension, assistanceCategoryGroup, assistanceCategoryChart;
 var fundingAgencyId, fundingAgencyDimension, fundingAgencyGroup, fundingAgencyChart;
 var timelineId, yearPlayerControlId, yearDimension, yearGroup, yearChart, yearList;
-var countryId, countryDimension, countryGroup, countryChart;
+// var countryId, countryDimension, countryGroup, countryChart;
 
 //year player 
 var yearPlayerState;
@@ -44,6 +44,7 @@ d3.csv(dataFilePath, function(d) {
 
   countryDimension = data.dimension(function(d) { return d.country_code;});
   countryGroup = countryDimension.group().reduceSum(function(d) { return d.constant_amount;});
+  countryDimensionList = countryDimension.top(Infinity); //Important: list of countries for lookup table is made before any filters are applied
 
   totalFundingChart = dc.kpiGauge('#' + totalFundingId, countryDimension, totalFundingSum, {title: "Total Obligations", formatter: formatters.bigCurrencyFormat});
 
@@ -77,7 +78,7 @@ d3.csv(dataFilePath, function(d) {
           });
         countryChart
           .labelLookupKey('country_name')
-          .lookupTable('country_code', ['country_name'], countryDimension.top(Infinity));
+          .lookupTable('country_code', ['country_name'], countryDimensionList);
 
         filterBuilder.filterSources([{chart: fundingAgencyChart, label: "FundingAgency"},
                                {chart: assistanceCategoryChart, label: "Assistance Category"},
