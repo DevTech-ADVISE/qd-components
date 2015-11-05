@@ -47,13 +47,13 @@ d3.csv(dataFilePath, function(d) {
 
   totalFundingChart = dc.kpiGauge('#' + totalFundingId, countryDimension, totalFundingSum, {title: "Total Obligations", formatter: formatters.bigCurrencyFormat});
 
-  fundingAgencyChart = dc.pieChart('#' + fundingAgencyId).options({centerTitle: 'Funding Agency'});
+  fundingAgencyChart = dc.pieChart('#' + fundingAgencyId).options({centerTitle: ['Funding', 'Agency']});
   fundingAgencyChart.dimension(fundingAgencyDimension).group(fundingAgencyGroup)
     .title(function(d) {return d.funding_agency_name})
     .slicesCap(6)
     .transitionDuration(0);
 
-  assistanceCategoryChart = dc.pieChart('#' + assistanceCategoryId, {centerLegend: true}).options({centerTitle: 'Assistance Category'});
+  assistanceCategoryChart = dc.pieChart('#' + assistanceCategoryId, {centerLegend: true}).options({centerTitle: ['Assistance', 'Category']});
   assistanceCategoryChart.dimension(assistanceCategoryDimension).group(assistanceCategoryGroup)
     .title(function(d) {return d.assistance_category_name})
     .transitionDuration(0);

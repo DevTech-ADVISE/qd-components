@@ -84,9 +84,19 @@ var quickDefaults = function() {
       if(_options && _options.centerTitle) {
         var labelRoot = d3.select(parent + ' svg g');
         if(labelRoot.select('text.center-label').empty()) {
-          labelRoot.append('svg:text')
-            .attr('class', 'center-label')
-            .text(_options.centerTitle);
+          if(!Array.isArray(_options.centerTitle)) {
+            labelRoot.append('svg:text')
+              .attr('class', 'center-label')
+              .text(text);
+          }
+          else {
+            _options.centerTitle.forEach(function(text, index) {
+              labelRoot.append('svg:text')
+                .attr('class', 'center-label')
+                .attr('dy', index + 'em')
+                .text(text);
+            });
+          }
         }
       }
     };
