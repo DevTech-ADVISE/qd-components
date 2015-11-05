@@ -29,6 +29,7 @@ var sizeBoxify = function() {
   dc.pieChart = function(parent, opts) {
     var _chart = original.pieChart(parent);
     var _innerRadiusRatio = (opts && opts.innerRadiusRatio && typeof opts.innerRadiusRatio === "number") ? opts.innerRadiusRatio : 13/20;
+    var _centerLegend = (opts && opts.centerLegend && opts.centerLegend === true) ? true : false;
     _chart = sizeBoxifyMixin(_chart);
 
     _chart.getDynamicRadius = function() {
@@ -39,24 +40,32 @@ var sizeBoxify = function() {
     };
 
     _chart.getInnerRadius = function() {
-
       return _chart.getDynamicRadius() * _innerRadiusRatio;
     };
 
     _chart.resize = function() {
       _chart.height(_chart.getDynamicHeight()).width(_chart.getDynamicWidth())
         .innerRadius(_chart.getInnerRadius()).radius(_chart.getDynamicRadius())
-        .cx(_chart.getDynamicRadius())
-        .legend(dc.legend().x((_chart.getDynamicRadius() * 2) + 10).y(12).itemHeight(12).gap(2))
-        .render();
+        .cx(_chart.getDynamicRadius());
+      if(_centerLegend === true) {
+        _chart.legend(dc.legend().x((_chart.getDynamicRadius() * 2) + 10).y(_chart.getDynamicRadius() - 6).itemHeight(12).gap(2));
+      }
+      else {
+        _chart.legend(dc.legend().x((_chart.getDynamicRadius() * 2) + 10).y(12).itemHeight(12).gap(2));
+      }
+      _chart.render();
     };
-
     window.addEventListener('resize', _chart.resize, true);
 
     _chart.width(_chart.getDynamicWidth()).height(_chart.getDynamicHeight())
       .innerRadius(_chart.getInnerRadius()).radius(_chart.getDynamicRadius())
-      .cx(_chart.getDynamicRadius())
-      .legend(dc.legend().x((_chart.getDynamicRadius() * 2) + 10).y(12).itemHeight(12).gap(2));
+      .cx(_chart.getDynamicRadius());
+    if(_centerLegend === true) {
+      _chart.legend(dc.legend().x((_chart.getDynamicRadius() * 2) + 10).y(_chart.getDynamicRadius() - 6).itemHeight(12).gap(2));
+    }
+    else {
+      _chart.legend(dc.legend().x((_chart.getDynamicRadius() * 2) + 10).y(12).itemHeight(12).gap(2));
+    }
     return _chart;
   };
 

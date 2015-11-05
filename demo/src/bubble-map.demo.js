@@ -53,10 +53,9 @@ d3.csv(dataFilePath, function(d) {
     .slicesCap(6)
     .transitionDuration(0);
 
-  assistanceCategoryChart = dc.pieChart('#' + assistanceCategoryId).options({centerTitle: 'Assistance Category'});
+  assistanceCategoryChart = dc.pieChart('#' + assistanceCategoryId, {centerLegend: true}).options({centerTitle: 'Assistance Category'});
   assistanceCategoryChart.dimension(assistanceCategoryDimension).group(assistanceCategoryGroup)
     .title(function(d) {return d.assistance_category_name})
-    .legend(dc.legend().x((assistanceCategoryChart.getDynamicRadius() * 2) + 10).y(assistanceCategoryChart.getDynamicRadius() - 6).itemHeight(12).gap(2))
     .transitionDuration(0);
 
   yearChart = dc.timelineComponent('#' + yearPlayerControlId, '#' + timelineId, yearDimension, yearGroup, 'Fiscal Year', 'Constant Dollars'); 
