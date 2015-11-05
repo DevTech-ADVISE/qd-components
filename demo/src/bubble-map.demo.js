@@ -11,7 +11,7 @@ var data;
 var filterBuilderId, filterBuilder;
 var totalFundingId, totalFundingSum, totalFundingChart;
 var assistanceCategoryId, assistanceCategoryDimension, assistanceCategoryGroup, assistanceCategoryChart;
-var regionId, regionDimension, regionGroup, regionChart;
+var fundingAgencyId, fundingAgencyDimension, fundingAgencyGroup, fundingAgencyChart;
 var timelineId, yearPlayerControlId, yearDimension, yearGroup, yearChart, yearList;
 var countryId, countryDimension, countryGroup, countryChart;
 
@@ -26,7 +26,7 @@ d3.csv(dataFilePath, function(d) {
   filterBuilderId = 'filter-builder';
   totalFundingId = 'total-funding-chart';
   assistanceCategoryId = 'assistance-category-chart';
-  regionId = 'region-chart';
+  fundingAgencyId = 'funding-agency-chart';
   yearPlayerControlId = 'year-player-control';
   timelineId = 'year-chart';
   countryId = 'country-chart';
@@ -36,8 +36,8 @@ d3.csv(dataFilePath, function(d) {
   assistanceCategoryDimension = data.dimension(function(d) { return d.assistance_category_name; });
   assistanceCategoryGroup = assistanceCategoryDimension.group();
 
-  regionDimension = data.dimension(function(d) { return d.region_name; });
-  regionGroup = regionDimension.group();
+  fundingAgencyDimension = data.dimension(function(d) { return d.funding_agency_name; });
+  fundingAgencyGroup = fundingAgencyDimension.group();
 
   yearDimension = data.dimension(function(d) { return Number(d.fiscal_year); });
   yearGroup = yearDimension.group().reduceSum(function(d) { return d.constant_amount;});
@@ -47,14 +47,16 @@ d3.csv(dataFilePath, function(d) {
 
   totalFundingChart = dc.kpiGauge('#' + totalFundingId, countryDimension, totalFundingSum, {title: "Total Obligations", formatter: formatters.bigCurrencyFormat});
 
-  regionChart = dc.pieChart('#' + regionId).options({centerTitle: 'Regions'});
-  regionChart.dimension(regionDimension).group(regionGroup)
-    .title(function(d) {return d.region})
+  fundingAgencyChart = dc.pieChart('#' + fundingAgencyId).options({centerTitle: 'Funding Agency'});
+  fundingAgencyChart.dimension(fundingAgencyDimension).group(fundingAgencyGroup)
+    .title(function(d) {return d.funding_agency_name})
+    .slicesCap(6)
     .transitionDuration(0);
 
   assistanceCategoryChart = dc.pieChart('#' + assistanceCategoryId).options({centerTitle: 'Assistance Category'});
   assistanceCategoryChart.dimension(assistanceCategoryDimension).group(assistanceCategoryGroup)
     .title(function(d) {return d.assistance_category_name})
+    .legend(dc.legend().x((assistanceCategoryChart.getDynamicRadius() * 2) + 10).y(assistanceCategoryChart.getDynamicRadius() - 6).itemHeight(12).gap(2))
     .transitionDuration(0);
 
   yearChart = dc.timelineComponent('#' + yearPlayerControlId, '#' + timelineId, yearDimension, yearGroup, 'Fiscal Year', 'Constant Dollars'); 
@@ -78,7 +80,7 @@ d3.csv(dataFilePath, function(d) {
           .labelLookupKey('country_name')
           .lookupTable('country_code', ['country_name'], countryDimension.top(Infinity));
 
-        filterBuilder.filterSources([{chart: regionChart, label: "Region"},
+        filterBuilder.filterSources([{chart: fundingAgencyChart, label: "FundingAgency"},
                                {chart: assistanceCategoryChart, label: "Assistance Category"},
                                {chart: countryChart, label: "Country"}]);
         
