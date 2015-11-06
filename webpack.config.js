@@ -12,7 +12,8 @@ module.exports = {
     'audio-dash': './audio-dash.demo.js',
     'tool-tipsify': './tool-tipsify.demo.js',
     'size-boxify': './size-boxify.demo.js',
-    'bubble-map': './bubble-map.demo.js'
+    'bubble-map': './bubble-map.demo.js',
+    'bubble-map-starter': './bubble-map-starter.js'
   },
   output: {
     path: path.join(demoPath, 'build'),

@@ -3,6 +3,49 @@
     font-weight: 400;
 }
 
+//Starter template styles, Remove these!
+body {
+    margin: 0px;
+}
+
+#filter-builder .placeholder {
+    height: 33px;
+}
+
+#total-funding-chart .placeholder {
+    height: 88px;
+}
+
+#year-player-control .placeholder {
+    height: 73px;
+    font-size: 17px;
+}
+
+#country-panel .placeholder {
+    font-size: 50px;
+    text-align: center;
+}
+
+.pie-chart-panel .placeholder {
+    height: 250px;
+}
+
+.year-panel .placeholder {
+    background: rgba(238, 238, 238, 0.68);
+}
+
+.placeholder {
+    color: #BBBBBB;
+    background: #eee;
+    border: 1px dotted #bbb;
+    height: 100%;
+    padding-left: 5px;
+    padding-top: 5px;
+}
+
+//End of starter template styles
+
+//bubblemap page styles
 .pie-chart-panel {
     pointer-events:none;
 
@@ -197,3 +240,4 @@
 g.country path {
   cursor: pointer;    
 }
+//bubblemap page styles
