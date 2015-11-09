@@ -1,0 +1,243 @@
+.font-Abel {
+    font-family: 'Abel', Helvetica, Arial, sans-serif;
+    font-weight: 400;
+}
+
+//Starter template styles, Remove these!
+body {
+    margin: 0px;
+}
+
+#filter-builder .placeholder {
+    height: 33px;
+}
+
+#total-funding-chart .placeholder {
+    height: 88px;
+}
+
+#year-player-control .placeholder {
+    height: 73px;
+    font-size: 17px;
+}
+
+#country-panel .placeholder {
+    font-size: 50px;
+    text-align: center;
+}
+
+.pie-chart-panel .placeholder {
+    height: 250px;
+}
+
+.year-panel .placeholder {
+    background: rgba(238, 238, 238, 0.68);
+}
+
+.placeholder {
+    color: #BBBBBB;
+    background: #eee;
+    border: 1px dotted #bbb;
+    height: 100%;
+    padding-left: 5px;
+    padding-top: 5px;
+}
+
+//End of starter template styles
+
+//bubblemap page styles
+.pie-chart-panel {
+    pointer-events:none;
+
+    .dc-legend-item,
+    .dc-chart .pie-slice {
+        pointer-events:auto;
+    }
+}
+.filter-builder {
+    h2 {margin-left: 5px;}
+    li.add-filter i.fa-plus {left: 4px;}
+}
+
+
+
+.pie-section-class {width: 30%;}
+
+#year-player-control {
+	position: absolute;
+    font-size: 30px;
+    right: 20px;
+    top: 98px;
+    z-index: 98;
+    text-align: center;
+    color: #336799;
+
+    .active {color: #666;}
+    i {
+        cursor:pointer;
+        margin-right: 8px;
+        padding: 4px 3px;
+
+        &:hover {color: #C2113A;}
+    }
+}
+#year-display {
+    @extend .font-Abel;
+    font-size: 54px;
+    float: right;
+    right: 20px;
+    position: absolute;
+    top: 43px;
+
+    .selection-display {
+        width: 130px;
+        height: 60px;
+        font-size: 50px;
+        color: black;
+        background: transparent;
+        -webkit-appearance: none;
+        border: 0px;
+    }
+}
+
+
+
+.axis-label {
+    font-size: .625em;
+}
+
+#total-funding-chart.kpi-component-container {
+	background: transparent;
+    width: 15%;
+    float: left;
+    margin-top: 10px;
+
+    .kpi-gauge {
+    	display: none;
+    }
+
+    .kpi-number {
+        color: black;
+        font-size: 54px;
+        top: 0;
+        height: 62px;
+        margin-left: 5px;
+    }
+
+    h3 {
+        @extend .font-Abel;
+        font-size: 19px;
+        color: black !important;
+        margin-top: 0;
+        margin-left: 7px;
+        text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
+        text-transform: none;
+        -webkit-text-stroke: 1px rgba(0, 0, 0, 0.3);
+	}
+}
+
+#country-panel {
+    z-index: -1;
+	width: 100%;
+	height: 80%;
+	position: absolute;
+	border-bottom: 1px solid #ddd;
+    overflow: hidden;
+}
+
+.pie-chart-panel {
+	@extend .pie-section-class;
+	position: absolute;
+	left: 25px;
+	height: 18%;
+	bottom: 42%;
+ 	min-height: 100px;
+ 	
+ 	:last-child {
+ 		margin-top: 10px;
+ 	}
+}
+
+
+//add div on top of pie charts section that will override any pointer-events that are conflicting with
+//pointer events of elements behind the pie charts
+#pie-background-clickable {
+	@extend .pie-section-class;
+	position: relative;
+	height: 100%;
+	pointer-events: none; 
+}
+.year-panel {
+    width: 98%;
+    height: 19%;
+    position: absolute;
+    bottom: 0px;
+    left: 1%;
+}
+
+.dc-chart circle.bubble {
+    fill: #336799;
+}
+
+.dc-chart g {
+    circle.bubble:hover {
+        fill-opacity: 1;
+        stroke: #C2113A;
+        stroke-width: 1;
+    }
+
+    text.chart-label {
+        font-size:12px;
+        fill:#222;
+
+        &.chart-label-center {text-anchor:middle;text-align:center;}
+    }
+
+    &.selected {
+        text {
+            fill: #fff;
+            stroke: #fff;
+        }
+        circle {
+            fill-opacity: 1;
+            stroke: #C2113A;
+            stroke-width: 1;
+        }
+    }
+    &.deselected {
+        circle {
+            fill-opacity: 0.2;
+        }
+        text {
+            display: block;
+            opacity: 0.1;
+        }
+    }
+    &.node text {
+        fill: #002A6C;
+        pointer-events: none;
+    }
+    &.node:hover {text-color: #C2113A;}
+
+    &.row {
+        text {fill: black;}
+        rect:hover {
+            fill-opacity: 1.0;
+            fill: #3182bd;
+        }
+    }
+}
+
+.dc-chart .country path {
+    stroke-width: 1;
+    stroke: #fff;
+
+    &:hover {
+        fill: #ccc;
+        cursor: auto;
+    }
+}
+g.country path {
+  cursor: pointer;    
+}
+//bubblemap page styles

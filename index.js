@@ -17,13 +17,14 @@ var dcCustom = {
   filterBuilder: require(jsPath + 'filter-builder'),
   dynatableComponent: require(jsPath + 'dynatable-component'),
   audioDash: require(jsPath + 'audio-dash'),
-  kpiGauge: require(jsPath + 'kpi-gauge')
+  kpiGauge: require(jsPath + 'kpi-gauge'),
+  timelineComponent: require(jsPath + 'timeline-component')
 };
 
 jQuery.extend(dc, dcCustom);
 
 // modify DC to have nice defaults. 
-// Sizeboxify is the entry point which then inherits functions from tooltipsify and quickdefaults
-dc = sizeBoxify(dc);
+// Sizeboxify is the entry point which then inherits/calls functions from tool-tipsify and quick-defaults
+var dcQd = sizeBoxify(dc);
 
-module.exports = dc;
+module.exports = dcQd;

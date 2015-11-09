@@ -10,7 +10,7 @@ require('./stylesheets/size-boxify.demo.scss');
 var data;
 var assistanceCategoryId, assistanceCategoryDimension, assistanceCategoryGroup, assistanceCategoryChart;
 var regionId, regionDimension, regionGroup, regionChart;
-var yearId, yearDimension, yearGroup, yearChart;
+// var yearId, yearDimension, yearGroup, yearChart;
 var countryId, countryDimension, countryGroup, countryChart;
 var fundingId, fundingDimension, fundingGroupSum, fundingChart;
 
@@ -32,7 +32,7 @@ d3.csv(dataFilePath, function(d) {
   regionGroup = regionDimension.group();
 
   yearDimension = data.dimension(function(d) { return d.fiscal_year; });
-  yearGroup = yearDimension.group();//.reduceSum(function(d) { return d.value;});
+  yearGroup = yearDimension.group().reduceSum(function(d) { return d.constant_amount;});
 
   countryDimension = data.dimension(function(d) { return d.country_code;});
   countryGroup = countryDimension.group().reduceSum(function(d) { return d.constant_amount;});
@@ -49,11 +49,12 @@ d3.csv(dataFilePath, function(d) {
     .gap(10)
     .transitionDuration(0);
 
+  var yearList = yearGroup.top(Infinity).map(function(d){return d.key;}).sort();
   yearChart = dc.barChart('#' + yearId)
     .dimension(yearDimension).group(yearGroup)
     .gap(10)
     .elasticY(true)
-    .x(d3.scale.ordinal().domain([2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014]))
+    .x(d3.scale.ordinal().domain(yearList))
     .xUnits(dc.units.ordinal)
     .transitionDuration(0);
 
