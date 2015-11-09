@@ -83,6 +83,80 @@ var filterBuilder = dc.filterBuilder('#filter-builder-id')
                   {chart: bazChart, label: "Baz"}]);
 ```
 
+## dc.pieChart(parent, options) 
+Pie chart component now has custom options passed to it. 
+
+| Param           | Type   | Description                                               |
+|-----------------|--------|-----------------------------------------------------------|
+| options         | object | Takes an object that looks like {innerRadiusRatio: number}. The innerRadiusRatio is the size of the inner radius compared to what the outer radius will be. The outer radius is always going to be 100% of the parent container. |
+
+### .centerTitle(title)
+Add a title to the center of the pie chart. 
+
+| Param           | Type   | Description                                               |
+|-----------------|--------|-----------------------------------------------------------|
+| title           | string | A label that will be placed in the center of the pie chart|
+
+```
+//Example Usage
+var dc = require('qd-components');
+...
+var worldRegions = dc.pieChart('#' + parentId, {innerRadiusRatio: 3/5})
+	.dimension(regionDimension)
+	.group(regionGroup)
+	.title(function(d){return d.region;})
+	.centerTitle('Regions');
+```
+
+## dc.kpiGauge(parent, dimension, group, options)
+KpiGauge is a combination chart. It uses the DC number display in conjunction with our custom DC bar gauge. 
+
+| Param           | Type      | Description                                               |
+|-----------------|-----------|-----------------------------------------------------------|
+| dimension       | object    | Use any dummy dimension for this parameter. All that matters is the data from the dimension object as there is no dimensional data to be displayed, only measure.|
+| group           | object    | The group object will be used for the value displayed in the number display, and for the total capacity value of the bar gauge. |
+| options         | object    | {title: "Display Title", formatter: d3.format(",")} The title text will be displayed under the number display. The formatter will be used to format the number display value. Recommended to import the qd-formatters library for this |
+
+```
+//Example Usage
+var dc = require('qd-components');
+...
+var countryFundingKpi = dc.kpiGauge('#' + parentId, countryDimension, totalFundingSumGroup, {title: "Total Funding", formatter: formatters.bigCurrencyFormat});
+```
+
+## dc.geoBubbleOverlayChart(parent, options)
+QdComponents adds some default styles to DC's geoBubbleOverlayChart, and also a way to add label lookup data for custom tooltip labels.
+
+## .lookupTable(dataKey, dataValueKeys, data)
+Create a lookup table that the chart can use to grab data values based on a data key. This is useful for creating custom tooltips that use the lookup table to create custom labels based on lookup id's. 
+Set the labelLookupKey when using the lookupTable function.
+
+| Param           | Type             | Description                                               |
+|-----------------|------------------|-----------------------------------------------------------|
+| dataKey         | string           | This data key will be used to create keys in the lookup table based on the value found in the chart data for this key.      |
+| dataValueKeys   | array            | These keys will be used to add the corresponding data values from the chart data. |
+| data            | array of objects | Usually the chart data. This data should contain the objects with the dataKey, and dataValueKeys |
+
+### .labelLookupKey(columnName)
+Set the labelLookupKey when using the lookupTable function
+
+| Param           | Type   | Description                                               |
+|-----------------|--------|-----------------------------------------------------------|
+| columnName      | string | A label that will be placed in the center of the pie chart|
+
+```
+//Example Usage
+var dc = require('qd-components');
+...
+var countryChart = dc.geoBubbleOverlayChart('#' + parentId)
+	.dimension(countryDimension)
+	.group(countryGroup)
+	.setGeoJson(geoJson, layerName, dataAccessorFunc);
+countryChart.lookupTable(keyColumn, dataValueKeys, countryDimension.top(Infinity))
+	.labelLookupKey(labelKeyColumn);
+
+```
+
 ## dc.dynatableComponent(parent)
 
 DynatableComponent turns a simple table into a dimensional table that responds to your DC charts. This means any time your DC charts get filtered, the data in the Dynatable also gets filtered. 
@@ -166,25 +240,23 @@ var audioDash = dc.audioDash('#audio-dash-id')
 
 ```
 
-## dc.sizeBoxify(chart)
+# The pipeline
+QdComponents go through a pipeline to modify the dc charts. The dc charts get default to make the charts useable out of the box and other modifications such as sizebox support and tool tip support are also added out of the box by default. The sizeBoxify and toolTipsify parts of the pipeline also have options for more customization. 
 
-Provides easy addition of dynamic resize capability to any DC chart component instance.
+## [dcChart].quickDefaults(quickDefaultsConfig)
+Note: no custom options available yet. 
+The quickdefaults module will give charts sensible defaults out of the box. 
+*rowChart* has elasticX set to true so that the x axis will correctly scale depending on the width of the chart. 
+*pieChart* has the renderLabel set to false so that there is no top label on the chart. It is recommended to use pieChart.centerLabel(String) so the chart gets a label placed in the center.
+*geoChoropleth* 
+*has a blue monochromatic color scale
+*the color calculator dynamically updates on render, meaning the 'heat map' styles are relative to the current values in the chart. 
+*the projection is d3.geo.mercator
+*zoom is enabled by default
 
-```
-// Example Usage
-
-var dc = require('qd-components');
-
-var myFooChart;
-
-// Minimal setup example. Will resize myFooChart based on dimensions of myFooChart.parent()
-dc.sizeBoxify(myFooChart);
-
-// Custom example
-dc.sizeBoxify(myFooChart, function(){
-	// custom resize code here
-});
-```
+## [dcChart].sizeBoxify(sizeBoxifyConfig)
+Note: no custom options available yet. 
+The sizeBoxify module will automatically make your charts resize themselves based on the size of their parent container. This means you use your markup styling to control the size of your charts.
 
 ## [dcChart].toolTipsify(toolTipConfig)
 Makes it easy to add high quality tooltips to any of your DC charts. 
@@ -236,25 +308,25 @@ myFooChart.toolTipsify({
  
 ```
 
-### toolTipsify Support
+### QuickDash DC Components that are Supported
 
-| chart       			| toolTipsify Supported?   | Urgency |
-|-----------------------|--------------------------|---------|
-| rowChart    			| yes					   |         |
-| barChart   			| yes					   |         | 
-| pieChart    			| yes					   |         |
-| lineChart             | no					   | cold    |
-| bubbleChart           | no					   | cold    |
-| bubbleOverlay         | no					   | cold    |
-| geoChoroplethChart	| yes					   |         |
-| geoBubbleOverlayChart | no					   | cold    |
-| heatmap				| no 					   | cold    |
-| scatterPlot			| no 					   | cold    |
-| seriesChart			| no 					   | cold    |
-| treeMap				| no 					   | cold    |
-| sankey				| no 					   | cold    |
-| boxPlot               | no					   | cold    |
-| compositeChart        | no					   | cold    |
+| chart       		| toolTipsify Supported?   | sizeBoxify Supported ?| Urgency (toolTipsify) |
+|-----------------------|--------------------------|-----------------------|---------|
+| rowChart    		| yes			   | yes      		   |         |
+| barChart   		| yes			   | yes            	   |         | 
+| pieChart    		| yes			   | yes    	           |         |
+| lineChart             | no			   | no            	   | cold    |
+| bubbleChart           | no			   | no             	   | cold    |
+| bubbleOverlay         | no			   | no   		   | cold    |
+| geoChoroplethChart	| yes			   | yes     		   |         |
+| geoBubbleOverlayChart | yes			   | yes    		   | cold    |
+| heatmap		| no 			   | no          	   | cold    |
+| scatterPlot		| no 			   | no	         	   | cold    |
+| seriesChart		| no 			   | no	         	   | cold    |
+| treeMap		| no 			   | no	         	   | cold    |
+| sankey		| no 			   | no	        	   | cold    |
+| boxPlot               | no			   | no	         	   | cold    |
+| compositeChart        | no			   | no	         	   | cold    |
 
 ## Todo
 
