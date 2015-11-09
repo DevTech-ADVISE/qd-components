@@ -10,27 +10,27 @@ var addToolTipsifyToDc = function(){
   
   original.rowChart = dc.rowChart;
   dc.rowChart = function(parent, opts) {
-    var _chart = original.rowChart(parent);
+    var _chart = original.rowChart(parent, opts);
     _chart = toolTipsifyMixin(_chart, 'g.row');
-    _chart.toolTipsify();
+    _chart.toolTipsify(opts);
 
     return _chart;
   };
 
   original.pieChart = dc.pieChart;
   dc.pieChart = function(parent, opts) {
-    var _chart = original.pieChart(parent);
+    var _chart = original.pieChart(parent, opts);
     _chart = toolTipsifyMixin(_chart, 'g.pie-slice');
-    _chart.toolTipsify();
+    _chart.toolTipsify(opts);
 
     return _chart;
   };
 
   original.barChart = dc.barChart;
   dc.barChart = function(parent, opts) {
-    var _chart = original.barChart(parent);
+    var _chart = original.barChart(parent, opts);
     _chart = toolTipsifyMixin(_chart, 'rect.bar');
-    _chart.toolTipsify();
+    _chart.toolTipsify(opts);
 
     return _chart;
   };

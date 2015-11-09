@@ -8,7 +8,7 @@ var sizeBoxify = function() {
 
   original.rowChart = dc.rowChart;
   dc.rowChart = function(parent, opts) {
-    var _chart = original.rowChart(parent);
+    var _chart = original.rowChart(parent, opts);
 
     _chart = sizeBoxifyMixin(_chart); 
 
@@ -27,7 +27,7 @@ var sizeBoxify = function() {
 
   original.pieChart = dc.pieChart;
   dc.pieChart = function(parent, opts) {
-    var _chart = original.pieChart(parent);
+    var _chart = original.pieChart(parent, opts);
     var _innerRadiusRatio = (opts && opts.innerRadiusRatio && typeof opts.innerRadiusRatio === "number") ? opts.innerRadiusRatio : 13/20;
     var _centerLegend = (opts && opts.centerLegend && opts.centerLegend === true) ? true : false;
     _chart = sizeBoxifyMixin(_chart);
@@ -71,7 +71,7 @@ var sizeBoxify = function() {
 
   original.barChart = dc.barChart;
   dc.barChart = function(parent, opts) {
-    var _chart = original.barChart(parent);
+    var _chart = original.barChart(parent, opts);
 
     _chart = sizeBoxifyMixin(_chart);
 
