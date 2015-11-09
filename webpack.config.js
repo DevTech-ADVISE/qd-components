@@ -26,6 +26,7 @@ module.exports = {
 
   devtool: 'source-map',
 
+  //Loaders for SCSS and CSS. Also some special loaders for the font awesome
   module: {
     loaders: [
       {
