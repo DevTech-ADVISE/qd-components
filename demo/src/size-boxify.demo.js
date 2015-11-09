@@ -39,7 +39,7 @@ d3.csv(dataFilePath, function(d) {
 
   fundingGroupSum = data.groupAll().reduceSum(function(d) { return d.constant_amount;});
 
-  regionChart = dc.pieChart('#' + regionId).options({centerTitle: 'Regions'});
+  regionChart = dc.pieChart('#' + regionId).centerTitle('Regions');
   regionChart.dimension(regionDimension).group(regionGroup)
     .title(function(d) {return d.region})
     .transitionDuration(0);
