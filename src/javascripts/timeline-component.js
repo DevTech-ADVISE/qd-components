@@ -103,7 +103,7 @@ var timelineComponent = function(playerParentId, timelineId, dimension, group, x
 
 
   //********Selection display *************
-  d3.select(playerParentId).append('select').classed(selectionDisplayClass, true);
+  d3.select(playerParentId).append('label').append('select').classed(selectionDisplayClass, true);
   var timelineSelect = d3.select(playerParentId + ' .' + selectionDisplayClass);
   _domainList.forEach(function(d) {
     var option = timelineSelect.append('option');
