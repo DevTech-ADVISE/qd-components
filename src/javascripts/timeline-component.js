@@ -10,6 +10,7 @@ var timelineComponent = function(playerParentId, timelineId, dimension, group, x
    return g.top(Infinity).map(function(d){return d.key;}).sort();};
   var _domainList = _domainListFunc(group);
   var _initialFilterValue = (options && options.initialFilterValue) ? options.initialFilterValue : _domainList[_domainList.length-2];
+  var _barToolTipFormatter = (options && options.formatter) ? options.formatter : formatters.bigCurrencyFormat;
   var _yearPlayerState;
   var _tickMarks_xFunc = function(domainList) { 
     var width = window.outerWidth;
@@ -86,7 +87,7 @@ var timelineComponent = function(playerParentId, timelineId, dimension, group, x
     return _chart;
   }
 
-  _chart.timeline = dc.barChart(timelineId)
+  _chart.timeline = dc.barChart(timelineId, {formatter: _barToolTipFormatter})
     .dimension(dimension).group(group)
     .elasticY(true)
     .x(d3.scale.ordinal().domain(_domainListFunc(group)))
