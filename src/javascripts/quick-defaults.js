@@ -24,17 +24,21 @@ var quickDefaults = function() {
     };
 
     function addLabelAxisX(displayText) {
-      _chart.svg()
+      if(_chart.select('.x-axis-label').empty()) {
+        _chart.svg()
         .append("text")
         .attr("class", "axis-label x-axis-label")
         .attr("text-anchor", "middle")
         .attr("x", _chart.width() / 2)
         .attr("y", _chart.height())
         .text(displayText);
+      }
+      
     }
 
     function addLabelAxisY(displayText) {
-      _chart.svg()
+      if(_chart.select('.y-axis-label').empty()) {
+        _chart.svg()
         .append("text")
         .attr("class", "axis-label y-axis-label")
         .attr("text-anchor", "end")
@@ -43,9 +47,11 @@ var quickDefaults = function() {
         .attr("x",-4)
         .attr("dy", ".625em")
         .text(displayText);
+      }
+      
     }
 
-    _chart.on('postRender', function() {
+    _chart.on('preRedraw', function() {
       if(_xLabel !== '') {
         addLabelAxisX(_xLabel);
       }
