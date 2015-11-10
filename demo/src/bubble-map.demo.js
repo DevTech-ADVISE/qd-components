@@ -12,7 +12,7 @@ var filterBuilderId, filterBuilder;
 var totalFundingId, totalFundingSum, totalFundingChart;
 var assistanceCategoryId, assistanceCategoryDimension, assistanceCategoryGroup, assistanceCategoryChart;
 var fundingAgencyId, fundingAgencyDimension, fundingAgencyGroup, fundingAgencyChart;
-var timelineId, yearPlayerControlId, yearDimension, yearGroup, yearChart, yearList;
+// var timelineId, yearPlayerControlId, yearDimension, yearGroup, yearChart, yearList;
 // var countryId, countryDimension, countryGroup, countryChart;
 
 //year player 
