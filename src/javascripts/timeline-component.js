@@ -12,7 +12,7 @@ var timelineComponent = function(playerParentId, timelineId, dimension, group, x
   var _initialFilterValue = (options && options.initialFilterValue) ? options.initialFilterValue : _domainList[_domainList.length-2];
   var _barToolTipFormatter = (options && options.formatter) ? options.formatter : formatters.bigCurrencyFormat;
   var _yearPlayerState;
-  var _tickMarks_xFunc = function(domainList) { 
+  var _tickMarks_xFunc = function() { 
     var width = window.outerWidth;
     var domainList = _domainListFunc(group);
     var tickMarks = domainList;
@@ -30,6 +30,7 @@ var timelineComponent = function(playerParentId, timelineId, dimension, group, x
       };
       return tickMarks;
     }
+    return tickMarks;
   };
   var _tickMarks_yFunc = function() { 
     var tickLimit = group.top(1).map(function(d){return d.value});
@@ -94,12 +95,11 @@ var timelineComponent = function(playerParentId, timelineId, dimension, group, x
     .xUnits(dc.units.ordinal)
     .xLabel(xLabel)
     .yLabel(yLabel)
-    .outerPadding(0)
-    .transitionDuration(0);
+    .outerPadding(0);
   _chart.timeline.margins().right = 2;
   _chart.timeline.margins().left = 50;
-  _chart.timeline.xAxis().tickValues(_tickMarks_xFunc()).tickFormat(_tickFormat_xFunc);
-  _chart.timeline.yAxis().tickValues(_tickMarks_yFunc()).tickFormat(_tickFormat_yFunc);
+  _chart.timeline.xAxis().tickValues(_tickMarks_xFunc).tickFormat(_tickFormat_xFunc);
+  _chart.timeline.yAxis().tickValues(_tickMarks_yFunc).tickFormat(_tickFormat_yFunc);
   _chart.timeline.filter(_initialFilterValue);
 
 
