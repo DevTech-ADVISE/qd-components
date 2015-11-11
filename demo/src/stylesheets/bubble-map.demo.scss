@@ -32,7 +32,6 @@ body {
 
 .year-panel .placeholder {
     background: rgba(238, 238, 238, 0.68);
-    overflow: hidden;
 }
 
 .placeholder {
@@ -250,6 +249,7 @@ body {
     width: 98%;
     height: 19%;
     position: absolute;
+    overflow: hidden;
     bottom: 0px;
     left: 1%;
 }
