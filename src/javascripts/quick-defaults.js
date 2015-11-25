@@ -142,10 +142,10 @@ var quickDefaults = function() {
     };
 
     _chart.label(function(d) {
-      if(Object.keys(_chart.lookupTable()).length !== 0) {
-        var lookupRow = _chart.lookupTable()[d.key]
+      if(Object.keys(_lookupTable).length !== 0) {
+        var lookupRow = _lookupTable[d.key]
         if(lookupRow !== undefined) {
-          return lookupRow[_chart.labelLookupKey()];
+          return lookupRow[_labelLookupKey];
         }
         return d.key;
         
@@ -217,10 +217,10 @@ var quickDefaults = function() {
     };
 
     _chart.label(function(d) {
-      if(Object.keys(_chart.lookupTable()).length !== 0) {
-        var lookupRow = _chart.lookupTable()[d.key]
+      if(Object.keys(_lookupTable).length !== 0) {
+        var lookupRow = _lookupTable[d.key]
         if(lookupRow !== undefined) {
-          return lookupRow[_chart.labelLookupKey()];
+          return lookupRow[_labelLookupKey];
         }
         return d.key;
         
