@@ -118,7 +118,41 @@ var quickDefaults = function() {
   original.geoChoroplethChart = dc.geoChoroplethChart;
   dc.geoChoroplethChart = function(parent, opts) {
     var _chart = original.geoChoroplethChart(parent);
+    var _lookupTable = {}, _labelLookupKey = 'id';
 
+    _chart.lookupTable = function(keyColumn, valueColumns, data) {
+      if(!arguments.length) return _lookupTable;
+
+      data.forEach(function(row) {
+        var key = row[keyColumn];
+        var values = {};
+        valueColumns.forEach(function(columnName) {
+          values[columnName] = row[columnName];
+        });
+        _lookupTable[key] = values;
+      });
+
+      return _chart;
+    };
+
+    _chart.labelLookupKey = function(_) {
+      if(!arguments.length) return _labelLookupKey;
+      _labelLookupKey = _;
+      return _chart;
+    };
+
+    _chart.label(function(d) {
+      if(Object.keys(_chart.lookupTable()).length !== 0) {
+        var lookupRow = _chart.lookupTable()[d.key]
+        if(lookupRow !== undefined) {
+          return lookupRow[_chart.labelLookupKey()];
+        }
+        return d.key;
+        
+      }
+      return d.key;
+      
+    });
     //Add zoom markup
     _chart.root().append("div").classed("zoomControlsContainer", true);
     _chart.root().select(".zoomControlsContainer").append("div").classed("zoomButton", true);
@@ -181,6 +215,19 @@ var quickDefaults = function() {
       _labelLookupKey = _;
       return _chart;
     };
+
+    _chart.label(function(d) {
+      if(Object.keys(_chart.lookupTable()).length !== 0) {
+        var lookupRow = _chart.lookupTable()[d.key]
+        if(lookupRow !== undefined) {
+          return lookupRow[_chart.labelLookupKey()];
+        }
+        return d.key;
+        
+      }
+      return d.key;
+      
+    });
 
     _chart.radiusValueModifier = function(_) {
       if(!arguments.length) return _radiusValueModifier;
