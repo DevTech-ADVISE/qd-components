@@ -78,9 +78,7 @@ var addToolTipsifyToDc = function(){
     }
 
     var geoBubbleContent = function(d) {
-      var label = (Object.keys(_chart.lookupTable()).length !== 0) 
-        ? _chart.lookupTable()[d.key][_chart.labelLookupKey()] 
-        : _chart.label()(d);
+      var label = _chart.label()(d);
       return "<label>" + label + "</label><br/>" + formatter(d.value);
     }
 
