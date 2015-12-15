@@ -59,6 +59,7 @@ var quickDefaults = function() {
         addLabelAxisY(_yLabel);
       }
     });
+    _chart.renderTitle(false);
 
     return _chart;
   };
@@ -68,6 +69,7 @@ var quickDefaults = function() {
     var _chart = original.rowChart(parent);
 
     _chart.elasticX(true);
+    _chart.renderTitle(false);
 
     return _chart;
   };
@@ -110,7 +112,8 @@ var quickDefaults = function() {
     };
 
     _chart.renderlet(renderletFunc);
-    _chart.renderLabel(false);
+    _chart.renderTitle(false);
+    _chart.renderLabel(false)
 
     return _chart;
   };
