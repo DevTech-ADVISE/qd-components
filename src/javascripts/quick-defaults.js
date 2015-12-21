@@ -1,6 +1,7 @@
 var inflection = require('inflection'),
   dtip = require('d3-tip')(d3);
 var dc = require('dc');
+var formatters = require('qd-formatters')(d3);
 
 var quickDefaults = function() {
   
@@ -67,9 +68,16 @@ var quickDefaults = function() {
   original.rowChart = dc.rowChart;
   dc.rowChart = function(parent, opts) {
     var _chart = original.rowChart(parent);
+    var _tickFormatFunc = function(d) {return formatters.numberFormat(d)};
+    _chart.tickFormatFunc = function(_) {
+      if(!arguments.length) return _tickFormatFunc;
+      _tickFormatFunc = _;
+      return _chart;
+    };
 
     _chart.elasticX(true);
     _chart.renderTitle(false);
+    _chart.xAxis().tickFormat(_tickFormatFunc);
 
     return _chart;
   };
