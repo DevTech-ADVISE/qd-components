@@ -30,6 +30,10 @@ var sizeBoxify = function() {
     var _chart = original.pieChart(parent, opts);
     var _innerRadiusRatio = (opts && opts.innerRadiusRatio && typeof opts.innerRadiusRatio === "number") ? opts.innerRadiusRatio : 13/20;
     var _centerLegend = (opts && opts.centerLegend && opts.centerLegend === true) ? true : false;
+    //add 2 pixels to cx and cy to move chart enough so chart selection edges don't get cut off
+    //add 2 pixels to height to accomodate moving the chart
+    var edgeOffset = 2;
+
     _chart = sizeBoxifyMixin(_chart);
 
     _chart.getDynamicRadius = function() {
@@ -44,9 +48,6 @@ var sizeBoxify = function() {
     };
 
     _chart.resize = function() {
-      //add 2 pixels to cx and cy to move chart enough so chart selection edges don't get cut off
-      //add 2 pixels to height to accomodate moving the chart
-      var edgeOffset = 2;
       _chart.height(_chart.getDynamicHeight() + edgeOffset).width(_chart.getDynamicWidth())
         .innerRadius(_chart.getInnerRadius()).radius(_chart.getDynamicRadius())
         .cx(_chart.getDynamicRadius() + edgeOffset)
