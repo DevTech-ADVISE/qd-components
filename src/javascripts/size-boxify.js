@@ -30,6 +30,7 @@ var sizeBoxify = function() {
     var _chart = original.pieChart(parent, opts);
     var _innerRadiusRatio = (opts && opts.innerRadiusRatio && typeof opts.innerRadiusRatio === "number") ? opts.innerRadiusRatio : 13/20;
     var _centerLegend = (opts && opts.centerLegend && opts.centerLegend === true) ? true : false;
+    var _legendOffset = 6;
     _chart = sizeBoxifyMixin(_chart);
 
     _chart.getDynamicRadius = function() {
@@ -48,10 +49,10 @@ var sizeBoxify = function() {
         .innerRadius(_chart.getInnerRadius()).radius(_chart.getDynamicRadius())
         .cx(_chart.getDynamicRadius());
       if(_centerLegend === true) {
-        _chart.legend(dc.legend().x((_chart.getDynamicRadius() * 2) + 10).y(_chart.getDynamicRadius() - 6).itemHeight(12).gap(2));
+        _chart.legend(dc.legend().x((_chart.getDynamicRadius() * 2) + 10).y(_chart.getDynamicRadius() - _legendOffset).itemHeight(12).gap(2));
       }
       else {
-        _chart.legend(dc.legend().x((_chart.getDynamicRadius() * 2) + 10).y(12).itemHeight(12).gap(2));
+        _chart.legend(dc.legend().x((_chart.getDynamicRadius() * 2) + 10).y(_legendOffset).itemHeight(12).gap(2));
       }
       _chart.render();
     };
@@ -61,10 +62,10 @@ var sizeBoxify = function() {
       .innerRadius(_chart.getInnerRadius()).radius(_chart.getDynamicRadius())
       .cx(_chart.getDynamicRadius());
     if(_centerLegend === true) {
-      _chart.legend(dc.legend().x((_chart.getDynamicRadius() * 2) + 10).y(_chart.getDynamicRadius() - 6).itemHeight(12).gap(2));
+      _chart.legend(dc.legend().x((_chart.getDynamicRadius() * 2) + 10).y(_chart.getDynamicRadius() - _legendOffset).itemHeight(12).gap(2));
     }
     else {
-      _chart.legend(dc.legend().x((_chart.getDynamicRadius() * 2) + 10).y(12).itemHeight(12).gap(2));
+      _chart.legend(dc.legend().x((_chart.getDynamicRadius() * 2) + 10).y(_legendOffset).itemHeight(12).gap(2));
     }
     return _chart;
   };
