@@ -33,6 +33,7 @@ var sizeBoxify = function() {
     //add 2 pixels to cx and cy to move chart enough so chart selection edges don't get cut off
     //add 2 pixels to height to accomodate moving the chart
     var edgeOffset = 2;
+    var _legendOffset = 6;
 
     _chart = sizeBoxifyMixin(_chart);
 
@@ -53,10 +54,10 @@ var sizeBoxify = function() {
         .cx(_chart.getDynamicRadius() + edgeOffset)
         .cy(_chart.getDynamicRadius() + edgeOffset);
       if(_centerLegend === true) {
-        _chart.legend(dc.legend().x((_chart.getDynamicRadius() * 2) + 10).y(_chart.getDynamicRadius() - 6).itemHeight(12).gap(2));
+        _chart.legend(dc.legend().x((_chart.getDynamicRadius() * 2) + 10).y(_chart.getDynamicRadius() - _legendOffset).itemHeight(12).gap(2));
       }
       else {
-        _chart.legend(dc.legend().x((_chart.getDynamicRadius() * 2) + 10).y(12).itemHeight(12).gap(2));
+        _chart.legend(dc.legend().x((_chart.getDynamicRadius() * 2) + 10).y(_legendOffset).itemHeight(12).gap(2));
       }
       _chart.render();
     };
@@ -67,10 +68,10 @@ var sizeBoxify = function() {
       .cx(_chart.getDynamicRadius() + edgeOffset)
       .cy(_chart.getDynamicRadius() + edgeOffset);
     if(_centerLegend === true) {
-      _chart.legend(dc.legend().x((_chart.getDynamicRadius() * 2) + 10).y(_chart.getDynamicRadius() - 6).itemHeight(12).gap(2));
+      _chart.legend(dc.legend().x((_chart.getDynamicRadius() * 2) + 10).y(_chart.getDynamicRadius() - _legendOffset).itemHeight(12).gap(2));
     }
     else {
-      _chart.legend(dc.legend().x((_chart.getDynamicRadius() * 2) + 10).y(12).itemHeight(12).gap(2));
+      _chart.legend(dc.legend().x((_chart.getDynamicRadius() * 2) + 10).y(_legendOffset).itemHeight(12).gap(2));
     }
     return _chart;
   };
