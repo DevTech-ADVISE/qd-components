@@ -49,7 +49,7 @@ var sizeBoxify = function() {
     };
 
     _chart.resize = function() {
-      _chart.height(_chart.getDynamicHeight() + edgeOffset).width(_chart.getDynamicWidth())
+      _chart.height(_chart.getDynamicHeight() + (2 *edgeOffset)).width(_chart.getDynamicWidth())
         .innerRadius(_chart.getInnerRadius()).radius(_chart.getDynamicRadius())
         .cx(_chart.getDynamicRadius() + edgeOffset)
         .cy(_chart.getDynamicRadius() + edgeOffset);
@@ -63,7 +63,7 @@ var sizeBoxify = function() {
     };
     window.addEventListener('resize', _chart.resize, true);
 
-    _chart.height(_chart.getDynamicHeight() + edgeOffset).width(_chart.getDynamicWidth())
+    _chart.height(_chart.getDynamicHeight() + (2 * edgeOffset)).width(_chart.getDynamicWidth())
       .innerRadius(_chart.getInnerRadius()).radius(_chart.getDynamicRadius())
       .cx(_chart.getDynamicRadius() + edgeOffset)
       .cy(_chart.getDynamicRadius() + edgeOffset);
