@@ -14,14 +14,16 @@ var sizeBoxify = function() {
 
     _chart.resize = function() {
       _chart.height(_chart.getDynamicHeight())
-        .width(_chart.getDynamicWidth())
-        .render();
+        .width(_chart.getDynamicWidth());
 
+      _chart.sbxPreRender()(_chart);
+      _chart.render();
     };
 
     window.addEventListener('resize', _chart.resize, true);
 
     _chart.width(_chart.getDynamicWidth()).height(_chart.getDynamicHeight());
+    _chart.sbxPreRender()(_chart);
     return _chart;
   };
 
@@ -59,6 +61,7 @@ var sizeBoxify = function() {
       else {
         _chart.legend(dc.legend().x((_chart.getDynamicRadius() * 2) + 10).y(_legendOffset).itemHeight(12).gap(2));
       }
+      _chart.sbxPreRender()(_chart);
       _chart.render();
     };
     window.addEventListener('resize', _chart.resize, true);
@@ -73,6 +76,7 @@ var sizeBoxify = function() {
     else {
       _chart.legend(dc.legend().x((_chart.getDynamicRadius() * 2) + 10).y(_legendOffset).itemHeight(12).gap(2));
     }
+    _chart.sbxPreRender()(_chart);
     return _chart;
   };
 
@@ -86,6 +90,7 @@ var sizeBoxify = function() {
       _chart.width(_chart.getDynamicWidth())
         .height(_chart.getDynamicHeight())
         .rescale();
+      _chart.sbxPreRender()(_chart);
       _chart.render();
       _chart.redraw(); //must also redraw so filters are preserved
     };
@@ -93,6 +98,7 @@ var sizeBoxify = function() {
     window.addEventListener('resize', _chart.resize, true);
 
     _chart.width(_chart.getDynamicWidth()).height(_chart.getDynamicHeight());
+    _chart.sbxPreRender()(_chart);
     return _chart;
   };
 
@@ -114,14 +120,17 @@ var sizeBoxify = function() {
     _chart.resize = function() {
       _chart.width(_chart.getDynamicWidth())
         .height(_chart.getDynamicHeight())
-        .projection(_chart.getProjection())
-        .render();
+        .projection(_chart.getProjection());
+
+      _chart.sbxPreRender()(_chart);
+      _chart.render();
     };
 
     window.addEventListener('resize', _chart.resize, true);
 
     _chart.width(_chart.getDynamicWidth()).height(_chart.getDynamicHeight())
       .projection(_chart.getProjection());
+    _chart.sbxPreRender()(_chart);
     return _chart;
   };
 
@@ -208,13 +217,16 @@ var sizeBoxify = function() {
     _chart.resize = function() {
       _chart.width(_chart.getDynamicWidth())
         .height(_chart.adjustedHeight())
-        .projection(_chart.getTranslatedProjection())
-        .render();
+        .projection(_chart.getTranslatedProjection());
+
+      _chart.sbxPreRender()(_chart);
+      _chart.render();
     };
 
     window.addEventListener('resize', _chart.resize, true);
 
     _chart.width(_chart.getDynamicWidth()).height(_chart.adjustedHeight());
+    _chart.sbxPreRender()(_chart);
     return _chart;
   };
 
@@ -225,6 +237,7 @@ var sizeBoxifyMixin = function(chart) {
 
   var container = chart.root()[0][0];
   chart.root().classed('size-boxified', true);
+  var _sbxPreRenderFunc = function(chart) {};
 
   chart.getDynamicHeight = function() {
       return container.offsetHeight;
@@ -232,6 +245,13 @@ var sizeBoxifyMixin = function(chart) {
 
   chart.getDynamicWidth = function() {
     return container.offsetWidth;
+  };
+
+  //do anything required after size calculations are made, but before render
+  chart.sbxPreRender = function(_) {
+    if(!arguments.length) return _sbxPreRenderFunc;
+    _sbxPreRenderFunc = _;
+    return chart;
   };
 
   return chart;
