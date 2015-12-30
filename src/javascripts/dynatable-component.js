@@ -9,7 +9,7 @@ require('../../src/stylesheets/dynatable.scss');
 module.exports = function(parent, chartGroup){
 
   var _chart = dc.baseMixin({});
-  var _columns; 
+  var _columns, _previousColumns = []; 
   var _dataTable;
   var _settings;
   var _initialRecordSize = "Infinity";
@@ -62,9 +62,16 @@ module.exports = function(parent, chartGroup){
     return _chart;
   };
 
+  _chart.forceRender = function(_) {
+    if(!arguments.length) return _forceRender;
+    _forceRender = _;
+    return _chart;
+  };
+
   _chart._doRender = function() {
+    var tableChanged = columnsChanged();
     // Insert Table HTML into parent node
-    if (!_dataTable){
+    if (!_dataTable || tableChanged){
       _chart.root().html("");
       _chart.root().classed('dynatableComponent', true);
       var table = _chart.root().append('table');
@@ -105,6 +112,8 @@ module.exports = function(parent, chartGroup){
 
       // Initialize jQuery DataTable
       _dataTable = $(parent + " table").dynatable(dynatableConfig).data('dynatable');
+
+      _forceRender = false;
     }  
     //_chart._doRedraw(); 
     RefreshTable(_initialRecordSize);   
@@ -122,6 +131,33 @@ module.exports = function(parent, chartGroup){
         _dataTable.process();
     });
   };
+
+  function columnsChanged() {
+    var columnNames = _columns.map(function(d) {return d.csvColumnName;});
+    if(_previousColumns.length === 0) {
+      _previousColumns = columnNames;
+      return true;
+    }
+
+    //check for added columns
+    for(var i = 0; i < columnNames.length; i++) {
+      var columnName = columnNames[i];
+      if(_previousColumns.indexOf(columnName) === -1) {
+        _previousColumns = columnNames;
+        return true;
+      }
+    }
+    //check for removed columns
+    for(var i = 0; i < _previousColumns.length; i ++) {
+      var columnName = _previousColumns[i];
+      if(columnNames.indexOf(columnName) === -1) {
+        _previousColumns = columnNames;
+        return true;
+      }
+    }
+
+    return false;
+  }
 
   function defaultCellWriter(column, record) {
     var cellValue = column.attributeWriter(record),
