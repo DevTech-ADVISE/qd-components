@@ -101,8 +101,8 @@ var toolTipsifyMixin = function(chart, tippableSelector){
 
     // default setup for content & position 
     var content = function(d) {
-      var label = chart.label()(d) || chart.label()(d.data);
-      var value = d.value || d.data.value;
+      var label = (chart.label()(d) !== undefined) ? chart.label()(d) : chart.label()(d.data);
+      var value = (d.value !== undefined) ? d.value : d.data.value;
       return "<label>" + label + "</label><br/>" + formatter(value);
     };
     var position = 'mouse';
