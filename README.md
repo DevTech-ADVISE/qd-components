@@ -125,7 +125,10 @@ var countryFundingKpi = dc.kpiGauge('#' + parentId, countryDimension, totalFundi
 ```
 
 ## dc.geoBubbleOverlayChart(parent, options)
-QdComponents adds some default styles to DC's geoBubbleOverlayChart, and also a way to add label lookup data for custom tooltip labels.
+QdComponents adds some default styles, and the .label() function now uses the .lookupTable to find the correct labels for values on the chart.
+
+## dc.geoBubbleOverlayChart(parent, options)
+QdComponents adds some default styles to DC's geoBubbleOverlayChart, and the .label() function now uses the .lookupTable to find the correct labels for values on the chart. 
 
 ## .lookupTable(dataKey, dataValueKeys, data)
 Create a lookup table that the chart can use to grab data values based on a data key. This is useful for creating custom tooltips that use the lookup table to create custom labels based on lookup id's. 
