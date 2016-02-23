@@ -173,9 +173,15 @@ var quickDefaults = function() {
     var _colorRange = ["#a9c8f4", "#7fa1d2", "#5479b0", "#2a518e", "#002A6C"];
     var _zeroColor = '#ccc';
 
-    var colorDomainFunc = function() { 
+    var _colorDomainFunc = function() { 
       return [d3.min(_chart.group().all(), function(d){return d.value}),
      d3.max(_chart.group().all(), function(d){return d.value})];
+    };
+
+    _chart.colorDomainFunc = function(_) {
+      if(!arguments.length) return _;
+      _colorDomainFunc = _;
+      return _chart;
     };
 
     var colorCalculatorFunc = function (d) {
@@ -192,10 +198,10 @@ var quickDefaults = function() {
         g.selectAll('.country').selectAll('path').style('stroke-width',0.75 / s + 'px');
       })
       .on("preRender", function() {
-        _chart.colorDomain(colorDomainFunc());
+        _chart.colorDomain(_colorDomainFunc());
       })
       .on("preRedraw", function() {
-        _chart.colorDomain(colorDomainFunc());
+        _chart.colorDomain(_colorDomainFunc());
       });
 
     return _chart;
