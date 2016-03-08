@@ -172,6 +172,7 @@ var quickDefaults = function() {
     //Defaults for colors and data
     var _colorRange = ["#a9c8f4", "#7fa1d2", "#5479b0", "#2a518e", "#002A6C"];
     var _zeroColor = '#ccc';
+    var _colorLegend = false;
 
     var _colorDomainFunc = function() { 
       return [d3.min(_chart.group().all(), function(d){return d.value}),
@@ -179,15 +180,71 @@ var quickDefaults = function() {
     };
 
     _chart.colorDomainFunc = function(_) {
-      if(!arguments.length) return _;
+      if(!arguments.length) return _colorDomainFunc;
       _colorDomainFunc = _;
       return _chart;
     };
+
+    _chart.colorRange = function(_) {
+      if(!arguments.length) return _colorRange;
+      _colorRange = _;
+      return _chart;
+    };
+
+    _chart.zeroColor = function(_) {
+      if(!arguments.length) return _zeroColor;
+      _zeroColor = _;
+      return _chart;
+    };
+
+    _chart.colorLegend = function(_) {
+      if(!arguments.length) return _colorLegend;
+      _colorLegend = _;
+      return _chart;
+    }
 
     var colorCalculatorFunc = function (d) {
       if(d === undefined) return _zeroColor;
       if(d < 1 )return _zeroColor;
       return _chart.colors()(d); 
+    };
+
+    var legendablesFunc = function() {
+      //legendables are a list of objects in the format {name: name, data: data, chart: chart, color: color}
+      var colorList = _chart.colorRange().slice();
+      colorList.unshift(_chart.zeroColor());
+
+      //map the min/max values corresponding to each color
+      colorList = colorList.map(function(color) {
+        //Mark the color for countries that have the zeroColor()
+        if(color === _chart.zeroColor()) return {color: color, min: null, max: null};
+
+        //get all of the country values that match the current color
+        var matchingValues = _chart.data().filter(function(country) { return _chart.getColor(country.value) === color;}).map(function(country) { return country.value;});
+        
+        //Mark the color if it doesn't apply to any countries
+        if(!matchingValues.length) return {color: color, min: undefined, max: undefined};
+
+        //Otherwise mark the min/max country values that use this color
+        return {color: color, min: d3.min(matchingValues), max: d3.max(matchingValues)};
+      });
+
+      //transform the min/max values into the labels for each color
+      colorList = colorList.map(function(c, index) {
+        if(c.min === undefined) { //
+          var noCountryLabel = "No Countries between " + formatters.bigCurrencyFormat(colorList[index-1].max) + " and " + formatters.bigCurrencyFormat(colorList[index+1].min);
+          return {color: c.color, label: noCountryLabel};
+        }
+        else if(c.min === null) { //
+          return {color: c.color, label: "No Data"}
+        }
+        else {
+          return {color: c.color, label: formatters.bigCurrencyFormat(c.min) + " to " + formatters.bigCurrencyFormat(c.max)};
+        }
+      });
+      
+      //Return the final array of legendables
+      return colorList.map(function(c) { return {name: c.label, data: undefined, chart: _chart, color: c.color}}).reverse();
     };
 
     _chart.colors(d3.scale.quantize().range(_colorRange))
@@ -199,6 +256,11 @@ var quickDefaults = function() {
       })
       .on("preRender", function() {
         _chart.colorDomain(_colorDomainFunc());
+
+        if(_colorLegend === true) {
+          _chart.legendables = legendablesFunc;
+          _chart.legend(dc.legend().x(20).y(_chart.getDynamicHeight() - 150).itemHeight(12).gap(2));
+        }
       })
       .on("preRedraw", function() {
         _chart.colorDomain(_colorDomainFunc());
