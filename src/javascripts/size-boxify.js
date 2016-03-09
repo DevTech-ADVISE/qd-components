@@ -4,7 +4,9 @@ var dc = require('./tool-tipsify')();
 require('../../src/stylesheets/size-boxify.scss');
 
 var sizeBoxify = function() {
+  var qdResize = new Event('resize:qd');
   var original = {};
+  var _autoResize = true;
 
   original.rowChart = dc.rowChart;
   dc.rowChart = function(parent, opts) {
@@ -19,8 +21,6 @@ var sizeBoxify = function() {
       _chart.sbxPreRender()(_chart);
       _chart.render();
     };
-
-    window.addEventListener('resize', _chart.resize, true);
 
     _chart.width(_chart.getDynamicWidth()).height(_chart.getDynamicHeight());
     _chart.sbxPreRender()(_chart);
@@ -64,7 +64,6 @@ var sizeBoxify = function() {
       _chart.sbxPreRender()(_chart);
       _chart.render();
     };
-    window.addEventListener('resize', _chart.resize, true);
 
     _chart.height(_chart.getDynamicHeight() + (2 * edgeOffset)).width(_chart.getDynamicWidth())
       .innerRadius(_chart.getInnerRadius()).radius(_chart.getDynamicRadius())
@@ -126,7 +125,6 @@ var sizeBoxify = function() {
       _chart.render();
     };
 
-    window.addEventListener('resize', _chart.resize, true);
 
     _chart.width(_chart.getDynamicWidth()).height(_chart.getDynamicHeight())
       .projection(_chart.getProjection());
@@ -223,12 +221,27 @@ var sizeBoxify = function() {
       _chart.render();
     };
 
-    window.addEventListener('resize', _chart.resize, true);
 
     _chart.width(_chart.getDynamicWidth()).height(_chart.adjustedHeight());
     _chart.sbxPreRender()(_chart);
     return _chart;
   };
+
+  //Set this to false if the resize needs to be triggered manually
+  dc.autoResize = function(_) {
+    if(!arguments.length) return _autoResize;
+    _autoResize = _;
+    return dc;
+  }
+
+  //Trigger the 'resize:qd' event
+  //Can be used to trigger resize in the parent application
+  dc.triggerQDResize = function() {
+    window.dispatchEvent(qdResize);
+  };
+
+  //resize qd components on 'resize' if dc.autoResize() is true
+  window.addEventListener('resize', function() {if(dc.autoResize() === true) dc.triggerQDResize();})
 
   return dc;
 };
@@ -253,6 +266,9 @@ var sizeBoxifyMixin = function(chart) {
     _sbxPreRenderFunc = _;
     return chart;
   };
+
+  //add a custom listener to window that all qd components will use
+  window.addEventListener('resize:qd', chart.resize, true);
 
   return chart;
 }

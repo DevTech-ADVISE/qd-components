@@ -71,7 +71,7 @@ var KPIGauge = function(parent, options) {
     _chart.kpiBar.width(barWidth()).render();
   };
 
-  window.addEventListener('resize', resize, true);
+  window.addEventListener('resize:qd', resize, true);
 
   return _chart;
 };
