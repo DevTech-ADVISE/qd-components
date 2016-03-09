@@ -25,6 +25,6 @@ jQuery.extend(dc, dcCustom);
 
 // modify DC to have nice defaults. 
 // Sizeboxify is the entry point which then inherits/calls functions from tool-tipsify and quick-defaults
-var dcQd = sizeBoxify(dc);
+var dcQd = sizeBoxify();
 
 module.exports = dcQd;
