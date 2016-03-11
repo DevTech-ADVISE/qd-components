@@ -50,12 +50,28 @@ module.exports = function (parent, chartGroup) {
             .classed('filter-value-list', true);
 
           var filterValues = filteredFields.selectAll('li.filter-value')
-              .data(function(d){return d.chart.filters().map(function(v){return {chart: d.chart, filterValue: v};});})
+              .data(function(d){return d.chart.filters().filter(function(v){ return v !== "Others";}).map(function(v){return {chart: d.chart, filterValue: v};});})
             .enter().append('li')
             .classed('filter-value', true)
             .text(function(d){return tryLabel(d);})
             .on('click', function(d){
               d.chart.filter(d.filterValue); // dc base .filter() function works for removal as well as addition of filters
+
+              //check if all of the 'Others' filter values have been unfiltered, if so, remove the 'Others' filter on the chart
+              var othersData = d.chart.data().filter(function(d){ return d.key === "Others"})[0];
+              if(othersData && d.chart.filters().indexOf("Others") !== -1) {
+                var othersValuesStillFiltered = false; 
+                for(var i = 0; i < d.chart.filters().length; i ++) {
+                  if(othersData.others.indexOf(d.chart.filters()[i]) !== -1) {
+                    othersValuesStillFiltered = true;
+                    break;
+                  }
+                }
+                if(!othersValuesStillFiltered) {
+                  d.chart.filter(["Others"]);
+                }
+              }
+
               dc.redrawAll();
               d3.event.stopPropagation();
             });
