@@ -171,6 +171,7 @@ var quickDefaults = function() {
 
     //Defaults for colors and data
     var _colorRange = ["#a9c8f4", "#7fa1d2", "#5479b0", "#2a518e", "#002A6C"];
+    var _colorScale = d3.scale.quantize().range(_colorRange);
     var _zeroColor = '#ccc';
     var _colorLegend = false;
     var _showLegendText = true;
@@ -181,9 +182,30 @@ var quickDefaults = function() {
       return "<label>" + label + "</label><br/>" + _legendFormatter(value);
     };
 
+    var _colorScaleType = "quantize";
     var _colorDomainFunc = function() { 
-      return [d3.min(_chart.group().all(), function(d){return d.value}),
-     d3.max(_chart.group().all(), function(d){return d.value})];
+      //quantize scale will create a linear function accross the min/max domain values
+      if(_colorScaleType === "quantize") {
+        return [d3.min(_chart.group().all(), function(d){return d.value}),
+        d3.max(_chart.group().all(), function(d){return d.value})];
+      }
+      //quantile will map the color range to quantiles(similar to quartiles but of n sections)
+      else if(_colorScaleType === "quantile") {
+        return _chart.group().all().map(function(d) { return d.value;}).filter(function(v) { return v > 0;});
+      }
+    };
+
+    //accepts "quantize" or "quantile" as values
+    _chart.colorScaleType = function(_) {
+      if(!arguments.length) return _colorScaleType;
+      _colorScaleType = _;
+      if(_colorScaleType === "quantize") {
+        _colorScale = d3.scale.quantize().range(_colorRange);
+      }
+      else if(_colorScaleType === "quantile") {
+        _colorScale = d3.scale.quantile().range(_colorRange);
+      }
+      return _chart
     };
 
     _chart.colorDomainFunc = function(_) {
@@ -264,15 +286,14 @@ var quickDefaults = function() {
       return colorDomain[0] + " to " + colorDomain[1];
     }
 
-    _chart.colors(d3.scale.quantize().range(_colorRange))
-      .colorCalculator(colorCalculatorFunc)
+    _chart.colorCalculator(colorCalculatorFunc)
       .projection(d3.geo.mercator())
       .enableZoom(true)
       .afterZoom(function(g, s){
         g.selectAll('.country').selectAll('path').style('stroke-width',0.75 / s + 'px');
       })
       .on("preRender", function() {
-        _chart.colorDomain(_colorDomainFunc());
+        _chart.colors(_colorScale).colorDomain(_colorDomainFunc());
 
         if(_colorLegend === true) {
           _chart.legendables = legendablesFunc;
