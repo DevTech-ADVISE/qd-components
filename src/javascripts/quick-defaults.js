@@ -173,6 +173,8 @@ var quickDefaults = function() {
     var _colorRange = ["#a9c8f4", "#7fa1d2", "#5479b0", "#2a518e", "#002A6C"];
     var _colorScale = d3.scale.quantize().range(_colorRange);
     var _zeroColor = '#ccc';
+    var _legendOffsetX = 30, _legendOffsetY = 200, _legendItemHeight = 25, _legendItemGap = 0;
+    var _horizontalLegend = false;
     var _colorLegend = false;
     var _showLegendText = true;
     var _legendFormatter = formatters.bigCurrencyFormat;
@@ -232,6 +234,18 @@ var quickDefaults = function() {
       return _chart;
     };
 
+    _chart.horizontalLegend = function(_) {
+      if(!arguments.length) return _horizontalLegend;
+      _horizontalLegend = _;
+      if(_ === true) {
+        _legendOffsetY = 70;
+      }
+      else {
+        _legendOffsetY = 200; 
+      }
+      return _chart;
+    };
+
     _chart.showLegendText = function(_) {
       if(!arguments.length) return _showLegendText;
       _showLegendText = _;
@@ -275,8 +289,8 @@ var quickDefaults = function() {
           label: getColorLegendLabel(color)};
       });
 
-      //Return the final array of legendables, reversed so it's descending
-      return legendables.reverse();
+      //Return the final array of legendables, reversed only for vertical legend
+      return (_horizontalLegend) ? legendables : legendables.reverse();
     };
 
     var getColorLegendLabel = function(colorCode) {
@@ -297,7 +311,13 @@ var quickDefaults = function() {
 
         if(_colorLegend === true) {
           _chart.legendables = legendablesFunc;
-          _chart.legend(dc.legend().x(30).y(_chart.getDynamicHeight() - 200).itemHeight(25).gap(0));
+          _chart.legend(dc.legend()
+                          .x(_legendOffsetX)
+                          .y(_chart.getDynamicHeight() - _legendOffsetY)
+                          .itemWidth(_legendItemHeight)
+                          .itemHeight(_legendItemHeight)
+                          .gap(_legendItemGap)
+                          .horizontal(_horizontalLegend));
         }
       })
       .on("preRedraw", function() {
