@@ -2,6 +2,7 @@ var inflection = require('inflection'),
   dtip = require('d3-tip')(d3);
 var dc = require('dc');
 var formatters = require('qd-formatters')(d3);
+var ss = require('simple-statistics');
 
 var quickDefaults = function() {
   
@@ -171,7 +172,8 @@ var quickDefaults = function() {
 
     //Defaults for colors and data
     var _colorRange = ["#a9c8f4", "#7fa1d2", "#5479b0", "#2a518e", "#002A6C"];
-    var _colorScale = d3.scale.quantize().range(_colorRange);
+    var _colorScaleType = "quantize";
+    var _colorScale;
     var _zeroColor = '#ccc';
     var _legendOffsetX = 30, _legendOffsetY = 200, _legendItemHeight = 25, _legendItemGap = 0;
     var _horizontalLegend = false;
@@ -184,7 +186,7 @@ var quickDefaults = function() {
       return "<label>" + label + "</label><br/>" + _legendFormatter(value);
     };
 
-    var _colorScaleType = "quantize";
+    
     var _colorDomainFunc = function() { 
       //quantize scale will create a linear function accross the min/max domain values
       if(_colorScaleType === "quantize") {
@@ -195,18 +197,18 @@ var quickDefaults = function() {
       else if(_colorScaleType === "quantile") {
         return _chart.group().all().map(function(d) { return d.value;}).filter(function(v) { return v > 0;});
       }
+      //use simple-statistics' ckmeans for the 'clustered' domain values
+      else if(_colorScaleType === "threshold" || _colorScaleType === "ckmeans") {
+        var chartValues = _chart.group().all().map(function(d) { return d.value;}).filter(function(v) { return v > 0;});
+        return ss.ckmeans(chartValues, _colorRange.length - 1).map(function(cluster) {return cluster[0]});
+      }
     };
 
-    //accepts "quantize" or "quantile" as values
+    //accepts "quantize", "quantile", "threshold", or "ckmeans" as values
     _chart.colorScaleType = function(_) {
       if(!arguments.length) return _colorScaleType;
       _colorScaleType = _;
-      if(_colorScaleType === "quantize") {
-        _colorScale = d3.scale.quantize().range(_colorRange);
-      }
-      else if(_colorScaleType === "quantile") {
-        _colorScale = d3.scale.quantile().range(_colorRange);
-      }
+      setColorScale();
       return _chart
     };
 
@@ -219,8 +221,21 @@ var quickDefaults = function() {
     _chart.colorRange = function(_) {
       if(!arguments.length) return _colorRange;
       _colorRange = _;
+      setColorScale();
       return _chart;
     };
+
+    function setColorScale() {
+      if(_colorScaleType === "quantize") {
+        _colorScale = d3.scale.quantize().range(_colorRange);
+      }
+      else if(_colorScaleType === "quantile" || _colorScaleType === "ckmeans") {
+        _colorScale = d3.scale.quantile().range(_colorRange);
+      }
+      else if(_colorScaleType === "threshold") {
+        _colorScale = d3.scale.threshold().range(_colorRange);
+      }
+    }
 
     _chart.zeroColor = function(_) {
       if(!arguments.length) return _zeroColor;
@@ -243,6 +258,24 @@ var quickDefaults = function() {
       else {
         _legendOffsetY = 200; 
       }
+      return _chart;
+    };
+
+    _chart.legendItemHeight = function(_) {
+      if(!arguments.length) return _legendItemHeight;
+      _legendItemHeight = _;
+      return _chart;
+    };
+
+    _chart.legendOffsetX = function(_) {
+      if(!arguments.length) return _legendOffsetX;
+      _legendOffsetX = _;
+      return _chart;
+    };
+
+    _chart.legendOffsetY = function(_) {
+      if(!arguments.length) return _legendOffsetY;
+      _legendOffsetY = _;
       return _chart;
     };
 
@@ -300,6 +333,8 @@ var quickDefaults = function() {
       return colorDomain[0] + " to " + colorDomain[1];
     }
 
+    //set the color scale and other map defaults
+    setColorScale();
     _chart.colorCalculator(colorCalculatorFunc)
       .projection(d3.geo.mercator())
       .enableZoom(true)
