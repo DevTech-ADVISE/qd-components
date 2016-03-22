@@ -79,6 +79,7 @@ var quickDefaults = function() {
     _chart.elasticX(true);
     _chart.renderTitle(false);
     _chart.xAxis().tickFormat(_tickFormatFunc);
+    _chart.ordering(function(d) { return -d.value;}); //descending by value
 
     return _chart;
   };
@@ -122,7 +123,7 @@ var quickDefaults = function() {
 
     _chart.renderlet(renderletFunc);
     _chart.renderTitle(false);
-    _chart.renderLabel(false)
+    _chart.renderLabel(false);
 
     return _chart;
   };
