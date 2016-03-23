@@ -94,8 +94,6 @@ var sizeBoxify = function() {
       _chart.redraw(); //must also redraw so filters are preserved
     };
 
-    window.addEventListener('resize', _chart.resize, true);
-
     _chart.width(_chart.getDynamicWidth()).height(_chart.getDynamicHeight());
     _chart.sbxPreRender()(_chart);
     return _chart;
