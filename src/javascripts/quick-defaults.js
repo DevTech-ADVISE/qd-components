@@ -186,23 +186,33 @@ var quickDefaults = function() {
       var value = (d.value !== undefined) ? d.value : d.data.value;
       return "<label>" + label + "</label><br/>" + _legendFormatter(value);
     };
-
     
     var _colorDomainFunc = function() { 
       //quantize scale will create a linear function accross the min/max domain values
       if(_colorScaleType === "quantize") {
-        return [d3.min(_chart.group().all(), function(d){return d.value}),
-        d3.max(_chart.group().all(), function(d){return d.value})];
+        return _chart.currentFilteredMinMaxValues();
       }
       //quantile will map the color range to quantiles(similar to quartiles but of n sections)
       else if(_colorScaleType === "quantile") {
-        return _chart.group().all().map(function(d) { return d.value;}).filter(function(v) { return v > 0;});
+        return _chart.currentFilteredValues();
       }
       //use simple-statistics' ckmeans for the 'clustered' domain values
       else if(_colorScaleType === "threshold" || _colorScaleType === "ckmeans") {
-        var chartValues = _chart.group().all().map(function(d) { return d.value;}).filter(function(v) { return v > 0;});
+        var chartValues = _chart.currentFilteredValues();
         return ss.ckmeans(chartValues, _colorRange.length - 1).map(function(cluster) {return cluster[0]});
       }
+    };
+
+    _chart.currentFilteredValues = function () {
+      return _chart.group().all().map(function(d) { return d.value;}).filter(function(v) { return v > 0;});
+    };
+
+    _chart.currentFilteredMinMaxValues = function() {
+      var min = Math.round(d3.min(_chart.group().all(), function(d){return d.value}));
+      if(min < 0) min = 0;
+      var max = Math.round(d3.max(_chart.group().all(), function(d){return d.value}));
+      if(max < 0) max = 0;
+      return [min, max];
     };
 
     //accepts "quantize", "quantile", "threshold", or "ckmeans" as values
@@ -330,7 +340,11 @@ var quickDefaults = function() {
     var getColorLegendLabel = function(colorCode) {
       if(colorCode === _chart.zeroColor()) return "No Data";
 
-      var colorDomain = _chart.colors().invertExtent(colorCode).map(function(value) { return _legendFormatter(value);});
+      var colorDomain = _chart.colors().invertExtent(colorCode);
+      if(colorDomain[0] === 0 && colorDomain[1] === 0) return " --";
+
+      colorDomain = colorDomain.map(function(value) { return _legendFormatter(value);});
+      
       return colorDomain[0] + " to " + colorDomain[1];
     }
 
@@ -343,7 +357,13 @@ var quickDefaults = function() {
         g.selectAll('.country').selectAll('path').style('stroke-width',0.75 / s + 'px');
       })
       .on("preRender", function() {
-        _chart.colors(_colorScale).colorDomain(_colorDomainFunc());
+        if(_colorRange.length > _chart.currentFilteredValues().length) {
+          _chart.colors(d3.scale.quantize().range(_colorRange)).colorDomain(_chart.currentFilteredMinMaxValues());
+        }
+        else {
+          _chart.colors(_colorScale).colorDomain(_colorDomainFunc());
+        }
+        
 
         if(_colorLegend === true) {
           _chart.legendables = legendablesFunc;
@@ -357,7 +377,12 @@ var quickDefaults = function() {
         }
       })
       .on("preRedraw", function() {
-        _chart.colorDomain(_colorDomainFunc());
+        if(_colorRange.length > _chart.currentFilteredValues().length) {
+          _chart.colors(d3.scale.quantize().range(_colorRange)).colorDomain(_chart.currentFilteredMinMaxValues());
+        }
+        else {
+          _chart.colors(_colorScale).colorDomain(_colorDomainFunc());
+        }
       });
 
     return _chart;
