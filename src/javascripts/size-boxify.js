@@ -4,7 +4,11 @@ var dc = require('./tool-tipsify')();
 require('../../src/stylesheets/size-boxify.scss');
 
 var sizeBoxify = function() {
-  var qdResize = new Event('resize:qd');
+  //Use old-fashioned method to create event so it works in old IE
+  //https://developer.mozilla.org/en-US/docs/Web/Guide/Events/Creating_and_triggering_events#The_old-fashioned_way
+  var qdResize = document.createEvent('Event');
+  qdResize.initEvent('resize:qd', true, true);
+
   var original = {};
   var _autoResize = true;
 
