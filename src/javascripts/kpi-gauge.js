@@ -1,4 +1,5 @@
 var dc = require('dc');
+var detectElementResize = require('detect-element-resize');
 
 require('../../src/stylesheets/kpi-gauge.scss');
 
@@ -67,11 +68,21 @@ var KPIGauge = function(parent, options) {
     return _chart;
   }
 
-  resize = function() {
+  var resize = function() {
     _chart.kpiBar.width(barWidth()).render();
   };
 
+  //In the future, refactor kpi gauge sizing into sizeboxify
   window.addEventListener('resize:qd', resize, true);
+
+  //Special case: detect parent element size change that doesn't trigger resize event
+  //This can happen when the scrollbar appears 
+  detectElementResize.addResizeListener(d3.select(parent).node(), checkForResize);
+  function checkForResize() {
+    if(barWidth() > _chart.kpiBar.width() || barWidth() < _chart.kpiBar.width()) {
+      resize();
+    }
+  }
 
   return _chart;
 };

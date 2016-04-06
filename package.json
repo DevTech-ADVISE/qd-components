@@ -23,6 +23,7 @@
     "d3": "~3.5.4",
     "d3-tip": "git://github.com/BI/d3-tip",
     "dc": "git://github.com/BI/dc.js",
+    "detect-element-resize": "0.0.1",
     "dynatable": "git://github.com/BI/jquery-dynatable",
     "font-awesome": "^4.4.0",
     "inflection": "~1.3.8",

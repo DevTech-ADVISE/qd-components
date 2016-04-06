@@ -1,4 +1,5 @@
 var dc = require('./tool-tipsify')();
+var detectElementResize = require('detect-element-resize');
 
 // styles
 require('../../src/stylesheets/size-boxify.scss');
@@ -271,6 +272,15 @@ var sizeBoxifyMixin = function(chart) {
 
   //add a custom listener to window that all qd components will use
   window.addEventListener('resize:qd', chart.resize, true);
+
+  //Special case: detect parent element size change that doesn't trigger resize event
+  //This can happen when the scrollbar appears 
+  detectElementResize.addResizeListener(container, checkForResize);
+  function checkForResize() {
+    if(chart.getDynamicWidth() > chart.width() || chart.getDynamicWidth < chart.width()) {
+      chart.resize();
+    }
+  }
 
   return chart;
 }
