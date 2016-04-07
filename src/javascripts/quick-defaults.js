@@ -357,7 +357,7 @@ var quickDefaults = function() {
         g.selectAll('.country').selectAll('path').style('stroke-width',0.75 / s + 'px');
       })
       .on("preRender", function() {
-        if(_colorRange.length > _chart.currentFilteredValues().length) {
+        if(_colorRange.length >= _chart.currentFilteredValues().length) {
           _chart.colors(d3.scale.quantize().range(_colorRange)).colorDomain(_chart.currentFilteredMinMaxValues());
         }
         else {
@@ -377,7 +377,7 @@ var quickDefaults = function() {
         }
       })
       .on("preRedraw", function() {
-        if(_colorRange.length > _chart.currentFilteredValues().length) {
+        if(_colorRange.length >= _chart.currentFilteredValues().length) {
           _chart.colors(d3.scale.quantize().range(_colorRange)).colorDomain(_chart.currentFilteredMinMaxValues());
         }
         else {
