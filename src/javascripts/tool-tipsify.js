@@ -46,20 +46,16 @@ var addToolTipsifyToDc = function(){
     }
 
     var geoChoroContent = function(d) {
-      var dataItem = _chart.data().filter(function(i){return i.key === d.id})[0];
-      var countryName = '';
-      if(d.properties.name) {
-        countryName = d.properties.name;
+      //get the chart data object whose key matches the geojson feature id
+      var matchingDataItem = _chart.data().filter(function(i){return i.key === d.id})[0];
+      var countryName = _chart.label()({key: d.id, value: undefined}); 
+
+      //if the chart has data for this geojson feature id, return its value in the tooltip content
+      if(matchingDataItem) {
+        return "<label>" + countryName + "</label><br/>" + formatter(_chart.valueAccessor()(matchingDataItem));
       }
-      else if(dataItem) {
-        countryName = _chart.label()(dataItem);
-      }
-      else {
-        countryName = 'N/A';
-      }
-      if (dataItem === undefined) return "<label>" + countryName + "</label><br/>No Data";
-      
-      return "<label>" + countryName + "</label><br/>" + formatter(_chart.valueAccessor()(dataItem));
+
+      return "<label>" + countryName + "</label><br/>No Data";
     }
 
     _chart.toolTipsify({content: geoChoroContent, formatter: formatter});
