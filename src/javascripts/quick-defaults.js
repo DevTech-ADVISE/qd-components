@@ -133,17 +133,32 @@ var quickDefaults = function() {
     var _chart = original.geoChoroplethChart(parent);
     var _lookupTable = {}, _labelLookupKey = 'id';
 
-    _chart.lookupTable = function(keyColumn, valueColumns, data) {
+    //The lookup table provides the label function with a table whos keys are the dimensionKeyColumn(this should be the same column that was used for the chart's dimension)
+    //Each object in the table will include the valueColumns extracted from the original data
+    //NOTE: The data should be provided as an array of objects.
+    //      If your data is already in the correct end format like below, specify dimensionKeyColumn and valueColumns as undefined.
+    //      The data end format will look like {dimensionValue1: {valueColumn1: 'abc', valueColumn2: 'def'}, dimensionValue2: {valueColumn1: 'hij', valueColumn2: 'klo'}}
+    _chart.lookupTable = function(dimensionKeyColumn, valueColumns, data) {
       if(!arguments.length) return _lookupTable;
 
-      data.forEach(function(row) {
-        var key = row[keyColumn];
-        var values = {};
-        valueColumns.forEach(function(columnName) {
-          values[columnName] = row[columnName];
+      if(typeof data === 'object' && !Array.isArray(data)) {
+        //presumed: data as an object with named keys
+        Object.keys(data).forEach(function(key) {
+          _lookupTable[key] = data[key];
         });
-        _lookupTable[key] = values;
-      });
+      }
+      else {
+        //presumed: data as an array of objects than will be transformed into an object with named keys
+        data.forEach(function(row) {
+          var key = row[dimensionKeyColumn];
+          var values = {};
+          valueColumns.forEach(function(columnName) {
+            values[columnName] = row[columnName];
+          });
+          _lookupTable[key] = values;
+        });
+      }
+
 
       return _chart;
     };
