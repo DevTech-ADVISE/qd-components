@@ -6,17 +6,15 @@ var formatters = require('qd-formatters')(d3);
 
 require('./stylesheets/size-boxify.demo.scss');
 
-//add kpi chart
 var data;
 var assistanceCategoryId, assistanceCategoryDimension, assistanceCategoryGroup, assistanceCategoryChart;
 var regionId, regionDimension, regionGroup, regionChart;
-// var yearId, yearDimension, yearGroup, yearChart;
+var yearId, yearDimension, yearGroup, yearChart;
 var countryId, countryDimension, countryGroup, countryChart;
 var fundingId, fundingDimension, fundingGroupSum, fundingChart;
 
 d3.csv(dataFilePath, function(d) {
 
-  //add more charts, and show the tool tip positions, add any more documentation
   data = crossfilter(d);
 
   assistanceCategoryId = 'assistance-category-chart';
@@ -41,13 +39,11 @@ d3.csv(dataFilePath, function(d) {
 
   regionChart = dc.pieChart('#' + regionId).centerTitle('Regions');
   regionChart.dimension(regionDimension).group(regionGroup)
-    .title(function(d) {return d.region})
-    .transitionDuration(0);
+    .title(function(d) {return d.region});
 
   assistanceCategoryChart = dc.rowChart('#' + assistanceCategoryId);
   assistanceCategoryChart.dimension(assistanceCategoryDimension).group(assistanceCategoryGroup)
-    .gap(10)
-    .transitionDuration(0);
+    .gap(10);
 
   var yearList = yearGroup.top(Infinity).map(function(d){return d.key;}).sort();
   yearChart = dc.barChart('#' + yearId)
@@ -55,10 +51,10 @@ d3.csv(dataFilePath, function(d) {
     .gap(10)
     .elasticY(true)
     .x(d3.scale.ordinal().domain(yearList))
-    .xUnits(dc.units.ordinal)
-    .transitionDuration(0);
+    .xUnits(dc.units.ordinal);
 
-  fundingChart = dc.kpiGauge('#' + fundingId, countryDimension, fundingGroupSum, {title: "Total Funding", formatter: formatters.bigCurrencyFormat});
+  fundingChart = dc.kpiGauge('#' + fundingId, {title: "Total Funding", formatter: formatters.bigCurrencyFormat});
+  fundingChart.dimension(countryDimension).group(fundingGroupSum);
 
   d3.json(countriesGeoJsonFilePath, function(geoJson) {
         var geoJsonKeyField = 'id';
