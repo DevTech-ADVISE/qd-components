@@ -75,13 +75,12 @@ var KPIGauge = function(parent, options) {
   //In the future, refactor kpi gauge sizing into sizeboxify
   window.addEventListener('resize:qd', resize, true);
 
-  //Special case: detect parent element size change that doesn't trigger resize event
-  //This can happen when the scrollbar appears 
+  //If the chart parent/container element size changes then resize the chart
   detectElementResize.addResizeListener(d3.select(parent).node(), checkForResize);
   function checkForResize() {
-    if(barWidth() > _chart.kpiBar.width() || barWidth() < _chart.kpiBar.width()) {
+    //Only resize if the chart has its dimension added meaning everything has loaded
+    if(dc.autoResize() === true && _chart.dimension() && _chart.group())
       resize();
-    }
   }
 
   return _chart;
