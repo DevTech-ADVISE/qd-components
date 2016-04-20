@@ -243,9 +243,6 @@ var sizeBoxify = function() {
     window.dispatchEvent(qdResize);
   };
 
-  //resize qd components on 'resize' if dc.autoResize() is true
-  window.addEventListener('resize', function() {if(dc.autoResize() === true) dc.triggerQDResize();})
-
   return dc;
 };
 
@@ -273,19 +270,17 @@ var sizeBoxifyMixin = function(chart) {
   //add a custom listener to window that all qd components will use
   window.addEventListener('resize:qd', chart.resize, true);
 
-  //Special case: detect parent element size change that doesn't trigger resize event
-  //This can happen when the scrollbar appears 
-  detectElementResize.addResizeListener(container, checkForResize);
-  function checkForResize() {
-    if(chart.getDynamicWidth() > chart.width() || chart.getDynamicWidth < chart.width()) {
+
+  //If the chart parent/container element size changes then resize the chart
+  detectElementResize.addResizeListener(container, resizeFunc);
+  function resizeFunc() {
+    //Only resize if the chart has its dimension added meaning everything has loaded
+    if(dc.autoResize() === true && chart.dimension())
       chart.resize();
-    }
   }
+
 
   return chart;
 }
 
 module.exports = sizeBoxify;
-
-
-
