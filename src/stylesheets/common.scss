@@ -1,28 +1,26 @@
 
-//Styles for mobile screen size
-@media only screen and (max-width: 36em) {
-	
-	//filter builder strike through not needed on hover
-	body .filter-builder li.filtered-field ul.filter-value-list > li.filter-value {
-		&:hover {
-			text-decoration: none ;
-			color: #666;
-			border: 1px solid #d3d3d3;
-		}
-		
-		//tap/active give strike through 
-		&:active {
-			text-decoration: line-through;
-			border-color:#eaeaea;
-			color:#aaa;
-		}
+//Styles for touch screen detected by modernizr
+//filter builder strike through not needed on hover
+body .filter-builder li.filtered-field ul.filter-value-list > li.filter-value.touch-remove-fb {
+	&:hover {
+		text-decoration: none ;
+		color: #666;
+		border: 1px solid #d3d3d3;
 	}
-
-	//Do not show tool tips 
-	.d3-tip-mouse {
-		display: none;
+	
+	//tap/active give strike through 
+	&:active {
+		text-decoration: line-through;
+		border-color:#eaeaea;
+		color:#aaa;
 	}
 }
+
+//Do not show tool tips 
+.touch-remove-tt {
+	display: none;
+}
+
 
 .hide-visually {
 	display: none;

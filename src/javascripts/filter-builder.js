@@ -1,11 +1,13 @@
 var dc = require('dc'),
-    inflection = require('inflection');
+    inflection = require('inflection'),
+    modernizr = require('./modernizr/modernizr.js');
 
 // styles
 require('../../src/stylesheets/filter-builder.scss');
 
 module.exports = function (parent, chartGroup) {
   
+    var removeHoverStyles = (modernizr.touchevents) ? true : false; //don't show hover styles on touch screens, it causes some click issues on iOS
     var _chart = dc.baseMixin({});    
     var _filterSources = [];
     _chart._mandatoryAttributes([]);
@@ -53,6 +55,7 @@ module.exports = function (parent, chartGroup) {
               .data(function(d){return d.chart.filters().filter(function(v){ return v !== "Others";}).map(function(v){return {chart: d.chart, filterValue: v};});})
             .enter().append('li')
             .classed('filter-value', true)
+            .classed('touch-remove-fb', removeHoverStyles)
             .text(function(d){return tryLabel(d);})
             .on('click', function(d){
               d.chart.filter(d.filterValue); // dc base .filter() function works for removal as well as addition of filters

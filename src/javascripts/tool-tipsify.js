@@ -2,6 +2,7 @@ var inflection = require('inflection'),
     dtip = require('d3-tip')(d3);
 var formatters = require('qd-formatters')(d3);
 var dc = require('./quick-defaults')();
+var modernizr = require('./modernizr/modernizr.js');
 
 require('../stylesheets/tool-tipsify.scss');
 
@@ -88,6 +89,7 @@ var addToolTipsifyToDc = function(){
 
 var toolTipsifyMixin = function(chart, tippableSelector){
 
+  var touchClass = (modernizr.touchevents) ? "touch-remove-tt" : ""; //don't show tooltips on touch screens, it causes some click issues on iOS
   var _legendToolTips = false;
   var _extraToolTips = [];
   var _position = 'mouse';
@@ -152,7 +154,7 @@ var toolTipsifyMixin = function(chart, tippableSelector){
       var ttId = chart.root().attr('id') + '-tip';
 
       var tt = d3.tip()
-        .attr('class', _d3TipClass)
+        .attr('class', _d3TipClass + " " + touchClass)
         .attr('id', ttId)
         .html(_toolTipContent)
         .offset(_offset);
