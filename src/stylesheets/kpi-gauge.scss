@@ -40,6 +40,7 @@
         position: relative;
         font-size: 38px;
         font-family: 'Abel', Helvetica, Arial, sans-serif;
+        text-rendering: optimizeSpeed; //Slight hack: disable kerning so iOS Safari doesn't mess up abel font(ex: .4)
         color: #fff;
         top: 10px;
         font-weight: 400;
