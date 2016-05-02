@@ -98,10 +98,12 @@
                 font-size: 11px;
                 text-shadow: 0 -1px 0 rgba(255,255,255, 0.6);
                 position: relative;
-                top: 2px;
+
+                @media only screen and (max-width: 33em) {
+                    top: 2px !important;
+                }
             }
         }
-
 
         a.dynatable-page-link {
             padding: 3px 3px;
@@ -148,6 +150,32 @@
                 .fa,
                 &:hover .fa {color:#e0e0e0;}
             }
+
+            //At small screen size make the next and prev buttons smaller so they fit better
+            @media only screen and (max-width: 33em) {
+                background-color: transparent !important;
+                border: 0 !important;
+                text-indent: -100px;
+                width: 24px;
+                overflow: hidden;
+                position: relative;
+                .fa {
+                  position: absolute;
+                  top: 1px;
+                  right: 0;
+                  font-size: 24px;
+                  text-indent: 0;
+                  color:#81A0BA !important;
+                }
+                &:hover .fa {color:#336799 !important;}
+
+                &.dynatable-disabled-page {
+                  color:#bbb !important;
+                  .fa,
+                  &:hover .fa {color:#bbb !important;}
+                }
+            }
+
         }
         a.dynatable-page-prev {margin-right:5px;}
 
