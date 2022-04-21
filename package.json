@@ -11,25 +11,25 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/QuickDash/qd-components"
+    "url": "https://github.com/DevTech-ADVISE/qd-components.git"
   },
-  "author": "Barquin International",
+  "author": "DevTech Systems Inc",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/QuickDash/qd-components/issues"
+    "url": "https://github.com/DevTech-ADVISE/qd-components/issues"
   },
-  "homepage": "https://github.com/QuickDash/qd-components",
+  "homepage": "https://github.com/DevTech-ADVISE/qd-components",
   "dependencies": {
     "d3": "~3.5.4",
-    "d3-tip": "git://github.com/BI/d3-tip",
-    "dc": "git://github.com/BI/dc.js",
+    "d3-tip": "git+ssh://git@github.com:DevTech-ADVISE/d3-tip",
+    "dc": "git+ssh://git@github.com:DevTech-ADVISE/dc.js",
     "detect-element-resize": "0.0.1",
-    "dynatable": "git://github.com/BI/jquery-dynatable",
+    "dynatable": "git+ssh://git@github.com:DevTech-ADVISE/jquery-dynatable",
     "font-awesome": "^4.4.0",
     "inflection": "~1.3.8",
     "jquery": "^2.1.3",
     "normalize.css": "^3.0.3",
-    "qd-formatters": "git://github.com/QuickDash/qd-formatters",
+    "qd-formatters": "git+ssh://git@github.com:DevTech-ADVISE/qd-formatters",
     "simple-statistics": "^1.0.1"
   },
   "devDependencies": {
